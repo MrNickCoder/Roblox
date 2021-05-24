@@ -254,7 +254,7 @@ do
 		
 		local Container = Utility:Create("ScreenGui", {
 			Name = Title;
-			Parent = PlayerGui;
+			Parent = CoreGui;
 		},{
 			Utility:Create("Frame", {
 				Name = "Main";
