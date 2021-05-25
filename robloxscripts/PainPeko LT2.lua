@@ -1,7 +1,7 @@
 ----- [ SERVICES ] -----
 
 ----- [ MODULES ] -----
-local Library = require(loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/robloxui/HoloUI.lua", true))()).new("Pain Peko");
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/robloxui/HoloUI.lua", true))().new("Pain Peko");
 
 ----- [ VARIABLES ] -----
 ---------- [ Player Page ] ----------
