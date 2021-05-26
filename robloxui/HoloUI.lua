@@ -133,7 +133,9 @@ do
 		
 		local Debounce;
 		
-		UserInputService.InputBegan:connect(function(Input)
+		UserInputService.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if self.Keybinds[Input.KeyCode] then
 				for Index, Bind in pairs(self.Keybinds[Input.KeyCode]) do
 					if Debounce then return end
@@ -147,7 +149,9 @@ do
 			end
 		end)
 
-		UserInputService.InputEnded:connect(function(Input)
+		UserInputService.InputEnded:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				for Index, Callback in pairs(self.Ended) do
 					Callback()
@@ -185,14 +189,13 @@ do
 	end
 	
 	function Utility:GenerateCode()
-		local Seed = math.randomseed(math.random());
-		local Letters = "0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz";
-		
 		local Code = "";
 		
 		for Count = 1, 6 do
-			local Character = math.random(1, string.len(Letters));
-			Code = Code + string.sub(Letters, Character, Character);
+			local Type = math.random(1, 30);
+			if Type >= 1 and Type <= 10 then Code = Code..string.char(math.random(48, 57)); end
+			if Type >= 11 and Type <= 20 then Code = Code..string.char(math.random(65, 90)); end
+			if Type >= 21 and Type <= 30 then Code = Code..string.char(math.random(97, 122)); end
 		end
 		
 		return Code
@@ -204,7 +207,9 @@ do
 		local Dragging = false;
 		local DragInput, MousePos, FramePos;
 		
-		Frame.InputBegan:connect(function(Input)
+		Frame.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 and not Utility.Pinned then
 				Dragging = true;
 				MousePos = Input.Position;
@@ -218,13 +223,17 @@ do
 			end
 		end)
 		
-		Frame.InputChanged:connect(function(Input)
+		Frame.InputChanged:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseMovement and not Utility.Pinned then
 				DragInput = Input;
 			end
 		end)
 
-		UserInputService.InputChanged:connect(function(Input)
+		UserInputService.InputChanged:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input == DragInput and Dragging and not Utility.Pinned then
 				local Delta = Input.Position - MousePos
 				Parent.Position  = UDim2.new(FramePos.X.Scale, FramePos.X.Offset + Delta.X, FramePos.Y.Scale, FramePos.Y.Offset + Delta.Y);
@@ -250,11 +259,11 @@ do
 	----- [ NEW CLASS ] -----
 	function Library.new(Title, Settings, Themes)
 		if Settings then Utility.Settings = Utility:ReplaceValues(Utility.Settings, Settings) end
-		if Themes then Utility.Themes = Utility:ReplaceValues(Utility.Themes, Themes); print(Utility.Themes) end
+		if Themes then Utility.Themes = Utility:ReplaceValues(Utility.Themes, Themes); end
 		
 		local Container = Utility:Create("ScreenGui", {
 			Name = Title;
-			Parent = CoreGui;
+			Parent = PlayerGui;
 		},{
 			Utility:Create("Frame", {
 				Name = "Main";
@@ -510,7 +519,9 @@ do
 		Library:UpdateLibrary(Container, Utility.Minimized);
 		local Debounce;
 		
-		Sidebar.Settings.InputBegan:connect(function(Input)
+		Sidebar.Settings.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				if Debounce then return end
 				Debounce = true;
@@ -524,7 +535,9 @@ do
 		end)
 
 		local Topbar = Container.Main.Topbar;
-		Topbar.Holo.InputBegan:connect(function(Input)
+		Topbar.Holo.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				if Debounce then return end
 				Debounce = true;
@@ -535,12 +548,14 @@ do
 				Debounce = false
 			end
 		end)
-		Topbar.Close.InputBegan:connect(function(Input)
+		Topbar.Close.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				if Debounce then return end
 				Debounce = true;
 				
-				
+				Container:Destroy();
 				
 				wait(.2)
 				Debounce = false
@@ -581,12 +596,16 @@ do
 			Debounce = false
 		end
 		
-		Topbar.Minimize.InputBegan:connect(function(Input)
+		Topbar.Minimize.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				Minimize();
 			end
 		end)
-		Topbar.Pin.InputBegan:connect(function(Input)
+		Topbar.Pin.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				Pin();
 			end
@@ -743,7 +762,9 @@ do
 		
 		table.insert(self.Pages, Page)
 		
-		Button.InputBegan:connect(function(Input)
+		Button.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				self:SelectPage(Page)
 			end
@@ -763,7 +784,7 @@ do
 	----- [ FUNCTIONS ] -----
 	
 	----- [ MODULES ] -----
-	function Library:Notification(Title, Message, Type, Callback)
+	function Library:Notification(Title, Message, Type, Time, Callback)
 		if self.ActiveNotification then
 			self.ActiveNotification = self.ActiveNotification();
 		end
@@ -810,7 +831,7 @@ do
 					Size = UDim2.new(0.85, 0, 0.8, 0);
 					ZIndex = 1060;
 					Font = Utility.Themes.Main.TextStyle;
-					Text = Title;
+					Text = Title or "Notification";
 					TextColor3 = Utility.Themes.Main.TextColor;
 					TextScaled = true;
 					TextWrapped = true;
@@ -868,6 +889,10 @@ do
 		Type = Type or "Ok";
 		
 		local Types = {
+			["None"] = {
+				CellSize = UDim2.new(0, 0, 0, 0);
+				Items = {};
+			};
 			["Ok"] = {
 				CellSize = UDim2.new(1, 0, 1, 0);
 				Items = {"Ok"};
@@ -883,8 +908,9 @@ do
 		}
 		
 		local Result = nil;
-		local Active = true;
-		local Close = function()
+		local Active = false;
+		local Close;
+		Close = function()
 			if not Active then return end
 			Active = false;
 			
@@ -926,25 +952,26 @@ do
 			
 			local Debounce;
 			
-			Button.InputBegan:connect(function(Input)
+			Button.InputBegan:connect(function(Input, IsTyping)
+				if IsTyping then return end
+				
 				if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 					if Debounce then return end
 					Debounce = true;
 					
 					if not Active then return end
 					if Callback then
-						Callback(Items)
+						Callback(Items);
 					end
-					Result = Items
+					Result = Items;
 
-					Close()
+					Close();
 					Utility:Tween(Button, {BackgroundTransparency = 1}, 0.5);
 					
 					wait(1)
 					Debounce = false;
 				end
 			end)
-			
 		end
 		
 		wait(.25)
@@ -952,6 +979,166 @@ do
 		
 		self.ActiveNotifcation = Close;
 		
+		coroutine.resume(coroutine.create(function()
+			if Time then
+				wait(Time)
+				
+				if Result == nil then
+					Result = false;
+					
+					Close();
+				end
+			end
+		end))
+		
+		repeat Utility:Wait() until Result ~= nil
+		
+		return Result
+	end
+	
+	function Library:Verification(Callback)
+		if self.ActiveVerification then
+			self.ActiveVerification = self.ActiveVerification();
+		end
+		
+		local Verification = Utility:Create("Frame", {
+			Name = "Verification";
+			Parent = self.Container;
+			AnchorPoint = Vector2.new(0.5, 0.5);
+			BackgroundColor3 = Utility.Themes.Main.PrimaryColor;
+			Position = UDim2.new(0.5, 0, 0.5, 0);
+			Size = UDim2.new(0, 150, 0, 150);
+			ZIndex = 1050;
+			ClipsDescendants = true;
+		}, {
+			Utility:Create("UICorner", {
+				CornerRadius = UDim.new(0, 10);
+			});
+			Utility:Create("Frame", {
+				Name = "Topbar";
+				AnchorPoint = Vector2.new(0.5, 0);
+				BackgroundColor3 = Utility.Themes.Main.SecondaryColor;
+				Position = UDim2.new(0.5, 0, 0, 0);
+				Size = UDim2.new(1, 0, 0, 30);
+				ZIndex = 1055;
+			}, {
+				Utility:Create("UICorner", {
+					CornerRadius = UDim.new(0.35, 0);
+				});
+				Utility:Create("Frame", {
+					Name = "ExtraBackground";
+					AnchorPoint = Vector2.new(0.5, 1);
+					BackgroundColor3 = Utility.Themes.Main.SecondaryColor;
+					BorderSizePixel = 0;
+					Position = UDim2.new(0.5, 0, 1, 0);
+					Size = UDim2.new(1, 0, 0, 15);
+					ZIndex = 1055;
+				});
+				Utility:Create("TextLabel", {
+					Name = "Title";
+					AnchorPoint = Vector2.new(0.5, 0.5);
+					BackgroundTransparency = 1;
+					BorderSizePixel = 0;
+					Position = UDim2.new(0.5, 0, 0.5, 0);
+					Size = UDim2.new(0.85, 0, 0.8, 0);
+					ZIndex = 1060;
+					Font = Utility.Themes.Main.TextStyle;
+					Text = "Verification";
+					TextColor3 = Utility.Themes.Main.TextColor;
+					TextScaled = true;
+					TextWrapped = true;
+				})
+			});
+			Utility:Create("Frame", {
+				Name = "Body";
+				AnchorPoint = Vector2.new(0.5, 0);
+				BackgroundColor3 = Utility.Themes.Main.TertiaryColor;
+				Position = UDim2.new(0.5, 0, 0, 40);
+				Size = UDim2.new(1, -20, 1, -50);
+				ZIndex = 1050;
+			}, {
+				Utility:Create("UICorner", {
+					CornerRadius = UDim.new(0, 10);
+				});
+				Utility:Create("TextLabel", {
+					Name = "Code";
+					AnchorPoint = Vector2.new(0.5, 0);
+					BackgroundTransparency = 1;
+					BorderSizePixel = 0;
+					Position = UDim2.new(0.5, 0, 0, 10);
+					Size = UDim2.new(1, -20, 1, -60);
+					ZIndex = 1050;
+					Font = Enum.Font.Code;
+					Text = "Code";
+					TextColor3 = Utility.Themes.Main.TextColor;
+					TextSize = 25;
+				});
+				Utility:Create("TextBox", {
+					Name = "Input";
+					AnchorPoint = Vector2.new(0.5, 1);
+					BackgroundColor3 = Utility.Themes.Section.Background;
+					Position = UDim2.new(0.5, 0, 1, -10);
+					Size = UDim2.new(1, -20, 0, 30);
+					ZIndex = 1050;
+					Font = Utility.Themes.Main.TextStyle;
+					Text = "";
+					TextColor3 = Utility.Themes.Main.TextColor;
+					TextSize = 20;
+				}, {
+					Utility:Create("UICorner", {
+						CornerRadius = UDim.new(0, 10);
+					})
+				})
+			})
+		})
+		
+		Utility:DraggingEnabled(Verification);
+		
+		local Result = nil;
+		local Active, Code = true, Utility:GenerateCode();
+		local Close = function()
+			if not Active then return end
+			Active = false;
+
+			Utility:Tween(Verification, {Size = UDim2.new(0, 200, 0, 200)}, 0.5);
+			wait(0.25)
+			Utility:Tween(Verification, {Size = UDim2.new(0, 0, 0, 0)}, 0.25);
+
+			wait(0.25)
+			Verification:Destroy();
+		end;
+		
+		Verification.Body.Code.Text = Code;
+		Verification.Body.Input.Text = "";
+		Verification.Size = UDim2.new(0, 0, 0, 0);
+		Verification.Position = UDim2.new(0.5, 0, 0.5, 0);
+
+		Utility:Tween(Verification, {Size = UDim2.new(0, 200, 0, 200)}, 0.5);
+		wait(.25)
+		Utility:Tween(Verification, {Size = UDim2.new(0, 150, 0, 150)}, 0.25);
+		
+		Verification.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+
+			if Input.UserInputType == Enum.UserInputType.Keyboard then
+				if Input.KeyCode == Enum.KeyCode.Return then
+					if Verification.Body.Input.Text == Code then
+						Result = true;
+					else
+						Result = false;
+					end
+
+					if Callback then
+						Callback(Result);
+					end
+
+					Close();
+				end
+			end
+		end)
+		
+		self.ActiveNotifcation = Close;
+
 		repeat Utility:Wait() until Result ~= nil
 		
 		return Result
@@ -1028,7 +1215,9 @@ do
 		
 		local Debounce;
 		
-		Button.Button.InputBegan:connect(function(Input)
+		Button.Button.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				if Debounce then return end
 				Debounce = true;
@@ -1119,6 +1308,7 @@ do
 		self:Resize();
 		
 		local Active = Default;
+		
 		self:UpdateToggle(Toggle, nil, Active);
 		local Debounce, Click;
 		
@@ -1139,18 +1329,25 @@ do
 			Debounce = false;
 		end
 		
-		Toggle.Background.Toggle.Button.InputBegan:connect(function(Input)
+		Toggle.Background.Toggle.Button.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				Click()
 			end
 		end)
-		Toggle.Background.Toggle.InputBegan:connect(function(Input)
+		Toggle.Background.Toggle.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				Click()
 			end
 		end)
 		
-		return Toggle
+		return setmetatable({
+			Toggle = Toggle;
+			GetStatus = function() return Active end;
+		}, {})
 	end
 	
 	function Section:AddTextbox(Title, Default, Callback)
@@ -1226,7 +1423,9 @@ do
 		local InputBox = Textbox.Background.Box.Input;
 		local Debounce;
 		
-		Textbox.InputBegan:connect(function(Input)
+		Textbox.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				if Debounce then return end
 				Debounce = true;
@@ -1272,7 +1471,10 @@ do
 			end
 		end)
 		
-		return Textbox
+		return setmetatable({
+			Textbox = Textbox;
+			GetText = function() return InputBox.Text end;
+		}, {})
 	end
 	
 	function Section:AddKeybind(Title, Default, Callback, ChangedCallback)
@@ -1347,7 +1549,9 @@ do
 		
 		local Debounce;
 		
-		Keybind.Background.Keybind.InputBegan:connect(function(Input)
+		Keybind.Background.Keybind.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				if Debounce then return end
 				Debounce = true;
@@ -1383,7 +1587,10 @@ do
 			end
 		end)
 		
-		return Keybind
+		return setmetatable({
+			Keybind = Keybind;
+			GetKey = function() return Keybind.Background.Keybind.Text end
+		}, {})
 	end
 	
 	function Section:AddSlider(Title, Default, Min, Max, Callback)
@@ -1508,7 +1715,9 @@ do
 			Utility:Tween(Slider.Background.Slider.Button, {BackgroundTransparency = 1}, 0.2);
 		end)
 		
-		Slider.Background.Slider.Button.InputBegan:connect(function(Input)
+		Slider.Background.Slider.Button.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				Dragging = true;
 				
@@ -1542,7 +1751,21 @@ do
 			end
 		end)
 		
-		return Slider
+		return setmetatable({
+			Slider = Slider;
+			Update = function(NewValue, NewMin, NewMax)
+				if NewValue then
+					Value = NewValue;
+				end
+				if NewMin then
+					Min = NewMin;
+				end
+				if NewMax then
+					Max = NewMax;
+				end
+			end;
+			GetValue = function() return Value end;
+		}, {})
 	end
 	
 	function Section:AddDropdown(Title, List, Callback)
@@ -1647,7 +1870,9 @@ do
 		
 		List = List or {};
 		
-		Dropdown.Background.Down.InputBegan:connect(function(Input)
+		Dropdown.Background.Down.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				if Debounce then return end
 				Debounce = true
@@ -1688,7 +1913,15 @@ do
 			self:Resize()
 		end)
 		
-		return Dropdown
+		return setmetatable({
+			Dropdown = Dropdown;
+			Update = function(NewList)
+				if NewList and NewList ~= {}then
+					List = NewList;
+				end
+			end;
+			GetText = function() return Dropdown.Background.Input.Input.Text end;
+		}, {})
 	end
 	
 	function Section:AddTimer(Title, Default, Interval, Callback)
@@ -2006,7 +2239,9 @@ do
 					end
 				end)
 				
-				TextBox.InputChanged:connect(function(Input)
+				TextBox.InputChanged:connect(function(Input, IsTyping)
+					if IsTyping then return end
+					
 					if Input.UserInputType == Enum.UserInputType.MouseWheel and Hovered then
 						HHMMSS[TextBox.Name] = math.clamp(tonumber(TextBox.Text) + Input.Position.Z, 0, Clamps[TextBox.Name]);
 
@@ -2072,7 +2307,6 @@ do
 			Active = Status;
 			
 			if Toggle then
-				print("Minimize Editor")
 				self:UpdateTimer(Timer, nil, LastTime);
 				Animate(false);
 			end
@@ -2138,32 +2372,52 @@ do
 			Activate(Default);
 		end
 		
-		Timer.Background.Button.InputBegan:connect(function(Input)
+		Timer.Background.Button.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				Activate(not Active);
 			end
 		end)
 		
-		Editor.Buttons["1_Submit"].InputBegan:connect(function(Input)
+		Editor.Buttons["1_Submit"].InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 and not Active then
 				Animate(false);
 			end
 		end)
 		
-		Editor.Buttons["2_Cancel"].InputBegan:connect(function(Input)
+		Editor.Buttons["2_Cancel"].InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 and not Active then
 				self:UpdateTimer(Timer, nil, LastTime);
 				Animate(false);
 			end
 		end)
 		
-		Timer.Background.Interval.InputBegan:connect(function(Input)
+		Timer.Background.Interval.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 and not Active then
 				Animate(not Toggle);
 			end
 		end)
 		
-		return Timer
+		return setmetatable({
+			Timer = Timer;
+			Update = function(NewInterval)
+				if Active then return end
+				
+				self:UpdateTimer(Timer, nil, NewInterval);
+
+				for Index, Prop in pairs({"HH", "MM", "SS"}) do
+					HHMMSS[Prop] = NewInterval[Prop];
+				end
+			end;
+			GetStatus = function() return Active end;
+		}, {})
 	end
 	
 	function Section:AddModelViewer(Title, Default, Callback)
@@ -2640,7 +2894,9 @@ do
 					end
 				end)
 				
-				TextBox.InputChanged:connect(function(Input)
+				TextBox.InputChanged:connect(function(Input, IsTyping)
+					if IsTyping then return end
+					
 					if Input.UserInputType == Enum.UserInputType.MouseWheel and Hovered then
 						RGB[Container.Name] = math.clamp(tonumber(TextBox.Text) + Input.Position.Z, 0, 255);
 						
@@ -2654,7 +2910,9 @@ do
 			end
 		end
 		
-		Canvas.InputBegan:connect(function(Input)
+		Canvas.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				DraggingCanvas = true;
 				
@@ -2679,13 +2937,17 @@ do
 			end
 		end)
 		
-		Canvas.InputEnded:connect(function(Input)
+		Canvas.InputEnded:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				DraggingCanvas = false;
 			end
 		end)
 		
-		Color.InputBegan:connect(function(Input)
+		Color.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				DraggingColor = true;
 				
@@ -2709,7 +2971,9 @@ do
 			end
 		end)
 		
-		Color.InputEnded:connect(function(Input)
+		Color.InputEnded:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				DraggingColor = false;
 			end
@@ -2763,26 +3027,47 @@ do
 			Debounce = false;
 		end
 		
-		ColorPicker.Background.Color.InputBegan:connect(function(Input)
+		ColorPicker.Background.Color.InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				Animate(not Toggle)
 			end
 		end)
 		
-		Editor.Buttons["1_Submit"].InputBegan:connect(function(Input)
+		Editor.Buttons["1_Submit"].InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				Animate(false);
 			end
 		end)
 
-		Editor.Buttons["2_Cancel"].InputBegan:connect(function(Input)
+		Editor.Buttons["2_Cancel"].InputBegan:connect(function(Input, IsTyping)
+			if IsTyping then return end
+			
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				self:UpdateColorPicker(ColorPicker, nil, LastColor);
 				Animate(false);
 			end
 		end)
 		
-		return ColorPicker
+		return setmetatable({
+			ColorPicker = ColorPicker;
+			Update = function(NewColor)
+				if NewColor then
+					self:UpdateColorPicker(ColorPicker, nil, NewColor);
+
+					Hue, Sat, Brightness = Color3.toHSV(NewColor);
+					NewColor = Color3.fromHSV(Hue, Sat, Brightness);
+
+					for Index, Prop in pairs({"R", "G", "B"}) do
+						RGB[Prop] = NewColor[Prop] * 255;
+					end
+				end
+			end;
+			GetColor = function() return Color3.fromRGB(RGB["R"], RGB["G"], RGB["B"]) end;
+		}, {})
 	end
 	
 	function Section:AddRadio(Title, Default, List, Callback)
@@ -2925,13 +3210,15 @@ do
 						self:UpdateRadio(Radio, nil, Item);
 					end
 				else
-					if not Selected then
+					if Selected == "" then
 						Selected = Item;
 						self:UpdateRadio(Radio, nil, Item);
 					end					
 				end
 				
-				Object.Radio.InputBegan:connect(function(Input)
+				Object.Radio.InputBegan:connect(function(Input, IsTyping)
+					if IsTyping then return end
+					
 					if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 						if Debounce then return end
 						Debounce = true;
@@ -2950,7 +3237,10 @@ do
 			self:Resize();
 		end
 		
-		return Radio
+		return setmetatable({
+			Radio = Radio;
+			GetSelected = function() return Selected end;
+		}, {})
 	end
 	
 	function Section:AddCheckbox(Title, Default, List, Callback)
@@ -3091,7 +3381,9 @@ do
 					self:UpdateCheckbox(Checkbox, nil, Selected);
 				end
 				
-				Object.Checkbox.InputBegan:connect(function(Input)
+				Object.Checkbox.InputBegan:connect(function(Input, IsTyping)
+					if IsTyping then return end
+					
 					if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 						if Debounce then return end
 						Debounce = true;
@@ -3124,7 +3416,10 @@ do
 			self:Resize();
 		end
 		
-		return Checkbox
+		return setmetatable({
+			Checkbox = Checkbox;
+			GetSelected = function() return Selected end;
+		}, {})
 	end
 	
 	----- [ CLASS FUNCTIONS ] -----
@@ -3337,7 +3632,9 @@ do
 			
 			local Debounce;
 			
-			Button.InputBegan:connect(function(Input)
+			Button.InputBegan:connect(function(Input, IsTyping)
+				if IsTyping then return end
+				
 				if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 					if Debounce then return end
 					Debounce = true;
