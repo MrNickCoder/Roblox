@@ -1,7 +1,7 @@
 --[[
 	Created by: NickCoder
 	Inspired by: Hololive
-	Version: 1.0.0
+	Version: 1.0.1
 --]]
 
 ----- [ SERVICES ] -----
@@ -1965,7 +1965,7 @@ do
 					AnchorPoint = Vector2.new(0, 1);
 					BackgroundColor3 = Utility.Themes.Section.Background;
 					Position = UDim2.new(0, 25, 1, -5);
-					Size = UDim2.new(0.3, 0, 0, 34);
+					Size = UDim2.new(0.4, 0, 0, 34);
 					ZIndex = 1008;
 				}, {
 					Utility:Create("UICorner", {
@@ -1979,7 +1979,7 @@ do
 						Size = UDim2.new(1, -10, 1, -10);
 						ZIndex = 1008;
 						Font = Utility.Themes.Section.TextStyle;
-						Text = "00:00:00";
+						Text = "00:00:00.000";
 						TextColor3 = Utility.Themes.Section.TextColor;
 						TextSize = 25;
 					}, {
@@ -2013,7 +2013,7 @@ do
 			AnchorPoint = Vector2.new(0.5, 0.5);
 			BackgroundColor3 = Utility.Themes.Main.PrimaryColor;
 			Position = UDim2.new(0.5, 0, 0.5, 0);
-			Size = UDim2.new(0, 250, 0, 150);
+			Size = UDim2.new(0, 325, 0, 150);
 			Visible = false;
 			ZIndex = 1050;
 			ClipsDescendants = true;
@@ -2066,8 +2066,8 @@ do
 				ZIndex = 1050;
 			}, {
 				Utility:Create("UIGridLayout", {
-					CellPadding = UDim2.new(0, 5, 0, 5);
-					CellSize = UDim2.new(0, 110, 1, 0);
+					CellPadding = UDim2.new(0, 25, 0, 5);
+					CellSize = UDim2.new(0, 125, 1, 0);
 					HorizontalAlignment = Enum.HorizontalAlignment.Center;
 					SortOrder = Enum.SortOrder.Name;
 					VerticalAlignment = Enum.VerticalAlignment.Center;
@@ -2114,12 +2114,13 @@ do
 					CellPadding = UDim2.new(0, 15, 0, 0);
 					CellSize = UDim2.new(0, 60, 0, 45);
 					HorizontalAlignment = Enum.HorizontalAlignment.Center;
-					SortOrder = Enum.SortOrder.Name;
+					SortOrder = Enum.SortOrder.LayoutOrder;
 					VerticalAlignment = Enum.VerticalAlignment.Center;
 				});
 				Utility:Create("TextBox", {
 					Name = "HH";
 					BackgroundColor3 = Utility.Themes.Main.TertiaryColor;
+					LayoutOrder = 1;
 					ZIndex = 1050;
 					Font = Utility.Themes.Main.TextStyle;
 					Text = "00";
@@ -2133,6 +2134,7 @@ do
 				Utility:Create("TextBox", {
 					Name = "MM";
 					BackgroundColor3 = Utility.Themes.Main.TertiaryColor;
+					LayoutOrder = 2;
 					ZIndex = 1050;
 					Font = Utility.Themes.Main.TextStyle;
 					Text = "00";
@@ -2146,9 +2148,24 @@ do
 				Utility:Create("TextBox", {
 					Name = "SS";
 					BackgroundColor3 = Utility.Themes.Main.TertiaryColor;
+					LayoutOrder = 3;
 					ZIndex = 1050;
 					Font = Utility.Themes.Main.TextStyle;
 					Text = "00";
+					TextColor3 = Utility.Themes.Main.TextColor;
+					TextSize = 25;
+				}, {
+					Utility:Create("UICorner", {
+						CornerRadius = UDim.new(0, 10);
+					})
+				});
+				Utility:Create("TextBox", {
+					Name = "MS";
+					BackgroundColor3 = Utility.Themes.Main.TertiaryColor;
+					LayoutOrder = 4;
+					ZIndex = 1050;
+					Font = Utility.Themes.Main.TextStyle;
+					Text = "000";
 					TextColor3 = Utility.Themes.Main.TextColor;
 					TextSize = 25;
 				}, {
@@ -2167,18 +2184,19 @@ do
 			[""] = true;
 		}
 		local Active = Default or false;
-		local Time = Interval or {HH = 0; MM = 0; SS = 0;};
+		local Time = Interval or {HH = 0; MM = 0; SS = 0; MS = 0;};
 		local Animate_Debounce, Activate_Debounce, Toggle, Animate, Activate;
-		local HHMMSS = {
+		local HHMMSSMS = {
 			HH = 0;
 			MM = 0;
 			SS = 0;
+			MS = 0;
 		}
 		
 		self.Timers[Timer] = {
 			Editor = Editor;
 			Callback = function(Prop, Value)
-				HHMMSS[Prop] = Value;
+				HHMMSSMS[Prop] = Value;
 			end
 		}
 		
@@ -2193,8 +2211,8 @@ do
 		if Interval then
 			self:UpdateTimer(Timer, nil, Interval);
 			
-			for Index, Prop in pairs({"HH", "MM", "SS"}) do
-				HHMMSS[Prop] = Interval[Prop];
+			for Index, Prop in pairs({"HH", "MM", "SS", "MS"}) do
+				HHMMSSMS[Prop] = Interval[Prop];
 			end
 		end
 		
@@ -2205,6 +2223,7 @@ do
 					HH = 23;
 					MM = 59;
 					SS = 59;
+					MS = 999;
 				}
 				
 				TextBox.MouseEnter:connect(function()
@@ -2223,7 +2242,7 @@ do
 					Focused = false;
 
 					if not tonumber(TextBox.Text) then
-						TextBox.Text = HHMMSS[TextBox.Name];
+						TextBox.Text = HHMMSSMS[TextBox.Name];
 					end
 				end)
 				
@@ -2233,9 +2252,9 @@ do
 					if not Allowed[Text] and not tonumber(Text) then
 						TextBox.Text = Text:sub(1, #Text - 1);
 					elseif Focused and not Allowed[Text] then
-						HHMMSS[TextBox.Name] = math.clamp(tonumber(TextBox.Text), 0, Clamps[TextBox.Name]);
+						HHMMSSMS[TextBox.Name] = math.clamp(tonumber(TextBox.Text), 0, Clamps[TextBox.Name]);
 
-						self:UpdateTimer(Timer, nil, HHMMSS);
+						self:UpdateTimer(Timer, nil, HHMMSSMS);
 					end
 				end)
 				
@@ -2243,9 +2262,9 @@ do
 					if IsTyping then return end
 					
 					if Input.UserInputType == Enum.UserInputType.MouseWheel and Hovered then
-						HHMMSS[TextBox.Name] = math.clamp(tonumber(TextBox.Text) + Input.Position.Z, 0, Clamps[TextBox.Name]);
+						HHMMSSMS[TextBox.Name] = math.clamp(tonumber(TextBox.Text) + Input.Position.Z, 0, Clamps[TextBox.Name]);
 
-						self:UpdateTimer(Timer, nil, HHMMSS);
+						self:UpdateTimer(Timer, nil, HHMMSSMS);
 					end
 				end)
 			end
@@ -2275,19 +2294,20 @@ do
 				
 				self.Page.Library.ActiveTimer = Animate
 				LastTime = {
-					HH = HHMMSS["HH"];
-					MM = HHMMSS["MM"];
-					SS = HHMMSS["SS"];
+					HH = HHMMSSMS["HH"];
+					MM = HHMMSSMS["MM"];
+					SS = HHMMSSMS["SS"];
+					MS = HHMMSSMS["MS"];
 				};
 				
 				Editor.Visible = true;
 				Editor.Size = UDim2.new(0, 0, 0, 0);
 				
-				Utility:Tween(Editor, {Size = UDim2.new(0, 300, 0, 200)}, 0.4);
+				Utility:Tween(Editor, {Size = UDim2.new(0, 375, 0, 200)}, 0.4);
 				wait(0.2)
-				Utility:Tween(Editor, {Size = UDim2.new(0, 250, 0, 150)}, 0.2);
+				Utility:Tween(Editor, {Size = UDim2.new(0, 325, 0, 150)}, 0.2);
 			else
-				Utility:Tween(Editor, {Size = UDim2.new(0, 300, 0, 200)}, 0.4);
+				Utility:Tween(Editor, {Size = UDim2.new(0, 375, 0, 200)}, 0.4);
 				wait(0.2)
 				Utility:Tween(Editor, {Size = UDim2.new(0, 0, 0, 0)}, 0.2);
 				wait(0.2)
@@ -2300,7 +2320,7 @@ do
 		
 		Activate = function(Status)
 			if Activate_Debounce then return end
-			if HHMMSS["HH"] == 0 and HHMMSS["MM"] == 0 and HHMMSS["SS"] == 0 then return end
+			if HHMMSSMS["HH"] == 0 and HHMMSSMS["MM"] == 0 and HHMMSSMS["SS"] == 0 and HHMMSSMS["MS"] == 0 then return end
 			
 			Activate_Debounce = true;
 			
@@ -2311,57 +2331,51 @@ do
 				Animate(false);
 			end
 			
-			self:UpdateTimer(Timer, nil, HHMMSS);
+			self:UpdateTimer(Timer, nil, HHMMSSMS);
 			
 			if Active then
 				Timer.Background.Button.Text = "Stop";
 				
-				local Left = {
-					HH = HHMMSS["HH"];
-					MM = HHMMSS["MM"];
-					SS = HHMMSS["SS"];
-				};
+				local StartTime = tick();
 				
 				coroutine.resume(coroutine.create(function()
 					while Active do
-						if Left["SS"] <= 0 then
-							if Left["MM"] <= 0 then
-								if Left["HH"] <= 0 then
-									Left = {
-										HH = HHMMSS["HH"];
-										MM = HHMMSS["MM"];
-										SS = HHMMSS["SS"];
-									};
-									Callback(HHMMSS);
-								else
-									Left["HH"] = Left["HH"] - 1;
-									Left["MM"] = 59;
-								end
-							else
-								Left["MM"] = Left["MM"] - 1;
-								Left["SS"] = 59;
-							end
-						else
-							Left["SS"] = Left["SS"] - 1;
+						local CurrentTime = tick();
+						local ConvertedTime = (HHMMSSMS["HH"] * 3600) + (HHMMSSMS["MM"] * 60) + HHMMSSMS["SS"] + (HHMMSSMS["MS"] / 1000);
+						
+						if CurrentTime >= (StartTime + ConvertedTime) then
+							StartTime = tick()
+							Callback(HHMMSSMS);
 						end
 						
+						local TimeLeft = (StartTime + ConvertedTime) - CurrentTime
 						
+						local Hours = math.floor(((TimeLeft / 60) / 60) % 60);
+						local Minutes = math.floor((TimeLeft / 60) % 60);
+						local Seconds = math.floor(TimeLeft % 60);
+						local Milliseconds = math.floor(((TimeLeft % 60) - Seconds) * 1000);
 						
-						local Hours, Minutes, Seconds = Left["HH"], Left["MM"], Left["SS"];
-
+						if Hours < 0 then Hours = 0 end
+						if Minutes < 0 then Minutes = 0 end
+						if Seconds < 0 then Seconds = 0 end
+						if Milliseconds < 0 then Milliseconds = 0 end
+						
 						if string.len(Hours) == 1 then Hours = "0"..Hours end
 						if string.len(Minutes) == 1 then Minutes = "0"..Minutes end
 						if string.len(Seconds) == 1 then Seconds = "0"..Seconds end
-
-						Timer.Background.Interval.Interval.Text = Hours..":"..Minutes..":"..Seconds;
+						if string.len(Milliseconds) == 1 then Milliseconds = "00"..Milliseconds
+						elseif string.len(Milliseconds) == 2 then Milliseconds = "0"..Milliseconds
+						end
 						
-						wait(1);
+						Timer.Background.Interval.Interval.Text = Hours..":"..Minutes..":"..Seconds.."."..Milliseconds;
+						
+						wait()
 					end
 				end))
 			else
 				Timer.Background.Button.Text = "Start";
 				
-				self:UpdateTimer(Timer, nil, HHMMSS);
+				self:UpdateTimer(Timer, nil, HHMMSSMS);
 			end
 			
 			wait(.1)
@@ -2412,8 +2426,8 @@ do
 				
 				self:UpdateTimer(Timer, nil, NewInterval);
 
-				for Index, Prop in pairs({"HH", "MM", "SS"}) do
-					HHMMSS[Prop] = NewInterval[Prop];
+				for Index, Prop in pairs({"HH", "MM", "SS", "MS"}) do
+					HHMMSSMS[Prop] = NewInterval[Prop];
 				end
 			end;
 			GetStatus = function() return Active end;
@@ -3678,6 +3692,7 @@ do
 			HH = 23;
 			MM = 59;
 			SS = 59;
+			MS = 999;
 		}
 		
 		if Title then
@@ -3686,19 +3701,30 @@ do
 		end
 		
 		local Time = Interval;
-		local Hours, Minutes, Seconds = math.clamp(Time["HH"], 0, Clamps["HH"]), math.clamp(Time["MM"], 0, Clamps["MM"]), math.clamp(Time["SS"], 0, Clamps["SS"]);
+		local Hours, Minutes, Seconds, Milliseconds = math.clamp(Time["HH"], 0, Clamps["HH"]), math.clamp(Time["MM"], 0, Clamps["MM"]), math.clamp(Time["SS"], 0, Clamps["SS"]), math.clamp(Time["MS"], 0, Clamps["MS"]);
 		
 		if string.len(Hours) == 1 then Hours = "0"..Hours end
 		if string.len(Minutes) == 1 then Minutes = "0"..Minutes end
 		if string.len(Seconds) == 1 then Seconds = "0"..Seconds end
+		if string.len(Milliseconds) == 1 then Milliseconds = "00"..Milliseconds
+		elseif string.len(Milliseconds) == 2 then Milliseconds = "0"..Milliseconds
+		end
 		
-		Timer.Background.Interval.Interval.Text = Hours..":"..Minutes..":"..Seconds;
+		Timer.Background.Interval.Interval.Text = Hours..":"..Minutes..":"..Seconds.."."..Milliseconds;
 		
 		for Index, TextBox in pairs(Editor.Inputs:GetChildren()) do
 			if TextBox:IsA("TextBox") then
 				local Value = math.clamp(Time[TextBox.Name], 0, Clamps[TextBox.Name]);
 				
-				if string.len(Value) == 1 then Value = "0"..Value end
+				if not TextBox:IsFocused() then
+					if TextBox.Name == "MS" then
+						if string.len(Value) == 1 then Value = "00"..Value
+						elseif string.len(Value) == 2 then Value = "0"..Value
+						end
+					else
+						if string.len(Value) == 1 then Value = "0"..Value end
+					end
+				end
 				
 				TextBox.Text = Value;
 			end
