@@ -38,7 +38,7 @@ local GamePage = Library:AddPage("Game");
 
 -- [ Delivery ] --
 local DeliverySect = GamePage:AddSection("Delivery");
-local FastDeliver = DeliverySect:AddTimer("Fast Deliver(Need a package on hand)", false, {HH = 0, MM = 0, SS = 0, MS = 100}, function()
+local FastDelivery = DeliverySect:AddTimer("Fast Delivery(Need a package on hand)", false, {HH = 0, MM = 0, SS = 0, MS = 100}, function()
 	local Boxes = Character:FindFirstChild("Boxes");
 	if Boxes then
 		if #Boxes:GetChildren() >= 1 then
