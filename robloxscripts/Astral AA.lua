@@ -58,7 +58,6 @@ if game.PlaceId ~= 8304191830 then GetLevelData() end --]]
 ----- [ SERVICES ] -----
 local HttpService		= game:GetService("HttpService")
 local Workspace			= game:GetService("Workspace")
-local ReplicatedStorage	= game:GetService("ReplicatedStorage")
 local Players			= game:GetService("Players")
 local RunService		= game:GetService("RunService")
 local UserInputService	= game:GetService("UserInputService")
@@ -68,7 +67,7 @@ local Player			= Players.LocalPlayer
 local Mouse				= Player:GetMouse()
 
 ----- [ ITEM DROP RESULTS ] -----
-local ItemLoader = require(ReplicatedStorage.src.Loader)
+local ItemLoader = require(game.ReplicatedStorage.src.Loader)
 local ItemInventoryService = DropLoader.load_client_service(script, "ItemInventoryServiceClient")
 function Get_Inventory_Items_Unique_Items() return ItemInventoryService["session"]['inventory']['inventory_profile_data']['unique_items'] end
 function Get_Inventory_Items() return ItemInventoryService["session"]["inventory"]['inventory_profile_data']['normal_items'] end
@@ -121,9 +120,9 @@ local function GetCurrentLevelName() if game.Workspace._MAP_CONFIG then return g
 function Comma_Value(Text)
 	local Value = Text;
 	while true do
-		local str, num = string.gsub(Value, "^(-?%d+)(%d%d%d)", "%1,%2");
-		Value = str
-		if num ~= 0 then else break end
+		local Str, Num = string.gsub(Value, "^(-?%d+)(%d%d%d)", "%1,%2");
+		Value = Str
+		if Num ~= 0 then else break end
 	end
 	return Value
 end
