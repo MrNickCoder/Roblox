@@ -318,3 +318,101 @@ local PortalPage = Window:AddPage("Portal Config", "🌀")
 local MiscPage = Window:AddPage("Misc [BETA]", "🛠️")
 
 local DiscordPage = Window:AddPage("Discord", "🌐")
+
+----- [ Auto Leave ] -----
+local PlaceID = 8304191830
+local AllIDs = {}
+local FoundAnything = ""
+local ActualHour = os.date("!*t").hour
+local Deleted = false
+local Last
+local ServerFile = pcall(function() AllIDs = game:GetService('HttpService'):JSONDecode(readfile("NotSameServers.json")) end)
+if not ServerFile then
+	table.insert(AllIDs, ActualHour)
+	writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
+end
+
+function TPReturner()
+	local Site;
+	if FoundAnything == "" then Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
+	else Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. FoundAnything)) end
+	
+	local ID = ""
+	if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then FoundAnything = Site.nextPageCursor end
+	
+	local Num = 0;
+	local ExtraNum = 0
+	for Index, Server in pairs(Site.data) do
+		ExtraNum += 1
+		local Possible = true
+		ID = tostring(Server.id)
+		if tonumber(Server.maxPlayers) > tonumber(Server.playing) then
+			if ExtraNum ~= 1 and tonumber(Server.playing) < Last or ExtraNum == 1 then Last = tonumber(Server.playing)
+			elseif ExtraNum ~= 1 then continue end
+			
+			for _,Existing in pairs(AllIDs) do
+				if Num ~= 0 then
+					if ID == tostring(Existing) then Possible = false end
+				else
+					if tonumber(ActualHour) ~= tonumber(Existing) then
+						local delFile = pcall(function()
+							delfile("NotSameServers.json")
+							AllIDs = {}
+							table.insert(AllIDs, ActualHour)
+						end)
+					end
+				end
+				Num = Num + 1
+			end
+			if Possible == true then
+				table.insert(AllIDs, ID)
+				wait()
+				pcall(function()
+					writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
+					wait()
+					game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
+				end)
+				wait(4)
+			end
+		end
+	end
+end
+
+function Teleport()
+	while wait() do
+		pcall(function()
+			TPReturner()
+			if FoundAnything ~= "" then
+				TPReturner()
+			end
+		end)
+	end
+end
+
+----- [ Start of Check Connection ] -----
+function CheckInternet()
+	warn("Auto Reconnect Loaded")
+	while task.wait(5) do
+		game.CoreGui.RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(a)
+			if a.Name == 'ErrorPrompt' then
+				task.wait(10)
+				warn("Trying to Reconnect")
+				TPReturner()
+			end
+		end)
+	end
+end
+-----------------------------------------
+
+warn("Astral Anti-AFK Loaded!!!")
+warn("Astral Hider Name Loaded!!!")
+warn("Astral AA v1 Loaded!!!")
+warn("All Loaded !!!")
+
+if game.PlaceId == 8304191830 then
+	repeat task.wait(0.5) until Workspace:WaitForChild(game.Players.LocalPlayer.Name)
+	CheckInternet()
+elseif game.PlaceId ~= 8304191830 then
+	repeat task.wait(0.5) until Workspace:WaitForChild("_terrain")
+	CheckInternet()
+end
