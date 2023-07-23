@@ -608,23 +608,27 @@ do
 		local Label = Utility:Create("TextLabel", {
 			Name = "Label",
 			Parent = self.Container,
-			AutomaticSize = Enum.AutomaticSize.Y,
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 0, 0),
+			Size = UDim2.new(1, 0, 0, 14),
 			ZIndex = 2,
 			Font = Enum.Font.Gotham,
 			Text = Data.Text,
 			TextColor3 = Utility.Themes.TextColor,
 			TextSize = 12,
 			TextTransparency = 0.10000000149012,
-			TextWrapped = true,
+			TextTruncate = Enum.TextTruncate.AtEnd,
 			TextXAlignment = Enum.TextXAlignment.Left
 		})
 		
+		local MetaTable = setmetatable({
+			Label = Label,
+			Data = Data,
+		}, {})
+		
 		table.insert(self.Modules, Label)
 		
-		return Label
+		return MetaTable
 	end
 	
 	function Section:AddButton(Title, Callback)
@@ -660,7 +664,6 @@ do
 		}, {})
 
 		table.insert(self.Modules, Button)
-		--self:Resize()
 
 		local Text = Button.Title
 		local Debounce = false;
@@ -751,7 +754,6 @@ do
 		}, {})
 
 		table.insert(self.Modules, Toggle)
-		--self:Resize()
 
 		self:UpdateToggle(MetaTable, nil, {Value = MetaTable.Data.Active})
 
@@ -831,7 +833,6 @@ do
 		}, {})
 
 		table.insert(self.Modules, Textbox)
-		--self:Resize()
 
 		local Button = Textbox.Button
 		local Input = Button.Textbox
@@ -936,7 +937,6 @@ do
 		}, {})
 
 		table.insert(self.Modules, Keybind)
-		--self:Resize()
 
 		local Text = Keybind.Button.Text
 		local Button = Keybind.Button
@@ -1077,7 +1077,6 @@ do
 		}, {})
 
 		table.insert(self.Modules, Slider)
-		--self:Resize()
 
 		local Allowed = {
 			[""] = true,
@@ -1247,7 +1246,6 @@ do
 		}, {})
 
 		table.insert(self.Modules, Dropdown)
-		--self:Resize()
 
 		local Search = Dropdown.Search
 		local Focused
@@ -1355,7 +1353,6 @@ do
 		}, {})
 		
 		table.insert(self.Modules, Radio)
-		--self:Resize()
 		
 		local Selected = MetaTable.Data.Selected or ""
 		local Debounce;
@@ -1451,8 +1448,6 @@ do
 				end)
 				
 			end
-			
-			self:Resize()
 		end
 		
 		return MetaTable
@@ -1524,7 +1519,6 @@ do
 		}, {})
 
 		table.insert(self.Modules, Checkbox)
-		--self:Resize()
 		
 		local Selected = MetaTable.Data.Selected or {}
 		local Debounce;
@@ -1627,8 +1621,6 @@ do
 				end)
 
 			end
-
-			self:Resize()
 		end
 		
 		return MetaTable
@@ -1724,7 +1716,7 @@ do
 			Page:Resize()
 		end
 	end
-	
+
 	function Page:Resize(Scroll)
 		local Padding = 10
 		local Size = 0
@@ -1743,11 +1735,14 @@ do
 
 	function Section:Resize(Smooth)
 		if self.Page.Library.FocusedPage ~= self.Page then return end
-
+		
 		local Padding = 4
-		local Size = (4 * Padding) + self.Container.Title.AbsoluteSize.Y -- offset
-
+		local Size = (4 * Padding) + self.Container.Title.AbsoluteSize.Y -- Offset
+		
 		for Index, Module in pairs(self.Modules) do
+			if Module:IsA("TextLabel") then
+				print(Module.Name .. " - " .. Module.TextBounds.Y)
+			end
 			Size = Size + Module.AbsoluteSize.Y + Padding
 		end
 
