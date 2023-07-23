@@ -272,7 +272,7 @@ do
 	-------------------------
 	----- [ NEW CLASS ] -----
 	-------------------------
-	function Library.new(Title)
+	function Library.new(Title, Data)
 		local Container = Utility:Create("ScreenGui", {
 			Name = "HoloLibUI";
 			ZIndexBehavior = Enum.ZIndexBehavior.Global,
@@ -384,11 +384,30 @@ do
 		
 		Utility:InitializeKeybind()
 		
-		return setmetatable({
+		local MetaTable = setmetatable({
 			Container = Container,
 			PagesContainer = Container.Main.Pages.Pages_Container,
 			Pages = {},
+			ToggleKey = nil,
 		}, Library)
+		
+		if Data and Data.ToggleKey then MetaTable.ToggleKey = Data.ToggleKey end
+		
+		Container.Main.TopBar.Button.MouseButton1Click:Connect(function()
+			MetaTable:Toggle()
+		end)
+		
+		UserInputService.InputEnded:connect(function(Input)
+			if MetaTable.ToggleKey and MetaTable.ToggleKey ~= nil then
+				if typeof(MetaTable.ToggleKey) == "string" then MetaTable.ToggleKey = Enum.KeyCode[MetaTable.ToggleKey] end
+				
+				if Input.KeyCode == MetaTable.ToggleKey then
+					MetaTable:Toggle()
+				end
+			end
+		end)
+		
+		return MetaTable
 	end
 	
 	function Page.new(Library, Title, Icon)
@@ -526,10 +545,6 @@ do
 
 		table.insert(self.Pages, Page)
 		
-		self.Container.Main.TopBar.Button.MouseButton1Click:Connect(function()
-			self:Toggle()
-		end)
-		
 		Button.MouseButton1Click:Connect(function()
 			self:SelectPage(Page, true)
 		end)
@@ -622,6 +637,7 @@ do
 		})
 		
 		local MetaTable = setmetatable({
+			Section = self,
 			Label = Label,
 			Data = Data,
 		}, {})
@@ -658,6 +674,7 @@ do
 		})
 		
 		local MetaTable = setmetatable({
+			Section = self,
 			Button = Button,
 			Title = Title,
 			Callback = Callback,
@@ -747,6 +764,7 @@ do
 		})
 		
 		local MetaTable = setmetatable({
+			Section = self,
 			Toggle = Toggle,
 			Title = Title,
 			Data = Data,
@@ -826,6 +844,7 @@ do
 		})
 		
 		local MetaTable = setmetatable({
+			Section = self,
 			Textbox = Textbox,
 			Title = Title,
 			Data = Data,
@@ -929,6 +948,7 @@ do
 		})
 		
 		local MetaTable = setmetatable({
+			Section = self,
 			Keybind = Keybind,
 			Title = Title,
 			Data = Data,
@@ -1070,6 +1090,7 @@ do
 		})
 		
 		local MetaTable = setmetatable({
+			Section = self,
 			Slider = Slider,
 			Title = Title,
 			Data = Data,
@@ -1239,6 +1260,7 @@ do
 		})
 		
 		local MetaTable = setmetatable({
+			Section = self,
 			Dropdown = Dropdown,
 			Title = Title,
 			Data = Data,
@@ -1346,6 +1368,7 @@ do
 		})
 		
 		local MetaTable = setmetatable({
+			Section = self,
 			Radio = Radio,
 			Title = Title,
 			Data = Data,
@@ -1512,6 +1535,7 @@ do
 		})
 		
 		local MetaTable = setmetatable({
+			Section = self,
 			Checkbox = Checkbox,
 			Title = Title,
 			Data = Data,
@@ -1740,10 +1764,9 @@ do
 		local Size = (4 * Padding) + self.Container.Title.AbsoluteSize.Y -- Offset
 		
 		for Index, Module in pairs(self.Modules) do
-			if Module:IsA("TextLabel") then
-				print(Module.Name .. " - " .. Module.TextBounds.Y)
+			if Module.Visible then
+				Size = Size + Module.AbsoluteSize.Y + Padding
 			end
-			Size = Size + Module.AbsoluteSize.Y + Padding
 		end
 
 		if Smooth then
