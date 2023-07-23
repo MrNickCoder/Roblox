@@ -125,14 +125,16 @@ do
 
 		Clone.Parent = Object
 		Clone:ClearAllChildren()
-
-		Object.ImageTransparency = 1
+		
+		if Utility:HasProperty(Object, "ImageTransparency") then Object.ImageTransparency = 1
+		else Object.BackgroundTransparency = 1 end
 		Utility:Tween(Clone, {Size = Object.Size}, 0.2)
 
 		spawn(function()
 			wait(0.2)
 
-			Object.ImageTransparency = 0
+			if Utility:HasProperty(Object, "ImageTransparency") then Object.ImageTransparency = 0
+			else Object.BackgroundTransparency = 0 end
 			Clone:Destroy()
 		end)
 
@@ -202,6 +204,13 @@ do
 		wait()
 
 		return Key
+	end
+	
+	function Utility:HasProperty(Object, Property)
+		local Success = pcall(function()
+			return Object[Property]
+		end)
+		return Success and not Object:FindFirstChild(Property)
 	end
 	
 	function Utility:GenerateCode()
@@ -711,6 +720,8 @@ do
 	end
 	
 	function Section:AddToggle(Title, Callback, Data)
+		Data = Data or {Active = false}
+		
 		local Toggle = Utility:Create("ImageButton", {
 			Name = "Toggle",
 			Parent = self.Container,
@@ -790,6 +801,8 @@ do
 	end
 	
 	function Section:AddTextbox(Title, Callback, Data)
+		Data = Data or {Text = ""}
+		
 		local Textbox = Utility:Create("ImageButton", {
 			Name = "Textbox",
 			Parent = self.Container,
@@ -835,7 +848,7 @@ do
 					Size = UDim2.new(1, -10, 1, 0),
 					ZIndex = 3,
 					Font = Enum.Font.GothamBold,
-					Text = Data.Value or "",
+					Text = Data.Text,
 					TextColor3 = Utility.Themes.TextColor,
 					TextSize = 11,
 					ClearTextOnFocus = false
@@ -867,7 +880,7 @@ do
 		end)
 
 		Input:GetPropertyChangedSignal("Text"):Connect(function()
-			MetaTable.Data.Value = Input.Text
+			MetaTable.Data.Text = Input.Text
 			if Button.ImageTransparency == 0 and (Button.Size == UDim2.new(0, 200, 0, 16) or Button.Size == UDim2.new(0, 100, 0, 16)) then Utility:Pop(Button, 10) end -- i know, i dont like this either
 
 			if MetaTable.Callback then
@@ -878,7 +891,7 @@ do
 		end)
 
 		Input.FocusLost:Connect(function()
-			MetaTable.Data.Value = Input.Text
+			MetaTable.Data.Text = Input.Text
 			Input.TextXAlignment = Enum.TextXAlignment.Center
 
 			Utility:Tween(Textbox.Button, {Size = UDim2.new(0, 100, 0, 16), Position = UDim2.new(1, -110, 0.5, -8)}, 0.2)
@@ -894,6 +907,7 @@ do
 	end
 	
 	function Section:AddKeybind(Title, Callback, ChangedCallback, Data)
+		Data = Data or {Key = nil}
 		if typeof(Data.Key) == "string" then Data.Key = Enum.KeyCode[Data.Key] end
 		
 		local Keybind = Utility:Create("ImageButton", {
@@ -1005,6 +1019,8 @@ do
 	end
 	
 	function Section:AddSlider(Title, Callback, Data)
+		Data = Data or {Value = 1, Min = 0, Max = 1}
+		
 		local Slider = Utility:Create("ImageButton", {
 			Name = "Slider",
 			Parent = self.Container,
@@ -1159,8 +1175,7 @@ do
 	end
 
 	function Section:AddDropdown(Title, Callback, Data)
-		Data.Options = Data.Options or {}
-		Data.Search = Data.Search == nil or Data.Search
+		Data = Data or {Options = {}, Search = nil}
 		
 		local Dropdown = Utility:Create("Frame", {
 			Name = "Dropdown",
@@ -1310,6 +1325,8 @@ do
 	end
 	
 	function Section:AddRadio(Title, Callback, Data)
+		Data = Data or {Options = {}, Selected = nil}
+		
 		local Radio = Utility:Create("ImageLabel", {
 			Name = "Radio",
 			Parent = self.Container,
@@ -1424,7 +1441,7 @@ do
 							BorderSizePixel = 0,
 							Position = UDim2.new(0.5, 0, 0.5, 0),
 							Size = UDim2.new(0, 13, 0, 13),
-							ZIndex = 2,
+							ZIndex = 3,
 							Visible = false
 						}, {
 							Utility:Create("UICorner", {
@@ -1477,6 +1494,8 @@ do
 	end
 	
 	function Section:AddCheckbox(Title, Callback, Data)
+		Data = Data or {Options = {}, Selected = {}}
+		
 		local Checkbox = Utility:Create("ImageLabel", {
 			Name = "Checkbox",
 			Parent = self.Container,
@@ -1591,7 +1610,7 @@ do
 							BorderSizePixel = 0,
 							Position = UDim2.new(0.5, 0, 0.5, 0),
 							Size = UDim2.new(0, 13, 0, 13),
-							ZIndex = 2,
+							ZIndex = 3,
 							Visible = false
 						}, {
 							Utility:Create("UICorner", {
@@ -1821,7 +1840,7 @@ do
 		local Textbox = self:GetModule(MetaTable.Textbox)
 
 		if Title then Textbox.Title.Text = Title end
-		if Data.Value then Textbox.Button.Textbox.Text = Data.Value end
+		if Data.Text then Textbox.Button.Textbox.Text = Data.Text end
 	end
 	
 	function Section:UpdateKeybind(MetaTable, Title, Data)
@@ -1947,8 +1966,15 @@ do
 			if Items:IsA("ImageButton") then
 				if Items.Item.Text == Data.Item then
 					Items.Radio.Fill.Visible = true;
+					Items.Radio.Fill.Size = UDim2.new(0, 0, 0, 0)
+					Utility:Tween(Items.Radio.Fill, {Size = UDim2.new(0, 13, 0, 13)}, 0.2)
 				else
-					Items.Radio.Fill.Visible = false;
+					if Items.Radio.Fill.Visible == true then
+						Items.Radio.Fill.Size = UDim2.new(0, 13, 0, 13)
+						Utility:Tween(Items.Radio.Fill, {Size = UDim2.new(0, 0, 0, 0)}, 0.2)
+						wait(0.2)
+						Items.Radio.Fill.Visible = false;
+					end
 				end
 			end
 		end
@@ -1962,7 +1988,16 @@ do
 		for Index, Items in pairs(Checkbox.Options.Container:GetChildren()) do
 			if Items:IsA("ImageButton") then
 				if Items.Item.Text == Data.Item then
-					Items.Checkbox.Fill.Visible = Data.Active;
+					if Data.Active then
+						Items.Checkbox.Fill.Visible = true;
+						Items.Checkbox.Fill.Size = UDim2.new(0, 0, 0, 0)
+						Utility:Tween(Items.Checkbox.Fill, {Size = UDim2.new(0, 13, 0, 13)}, 0.2)
+					else
+						Items.Checkbox.Fill.Size = UDim2.new(0, 13, 0, 13)
+						Utility:Tween(Items.Checkbox.Fill, {Size = UDim2.new(0, 0, 0, 0)}, 0.2)
+						wait(0.2)
+						Items.Checkbox.Fill.Visible = false;
+					end
 				end
 			end
 		end
