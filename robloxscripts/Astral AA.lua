@@ -19,7 +19,7 @@ end
 local Folder = "Astral_V1_Anime_Adventures" --
 local File = game:GetService("Players").LocalPlayer.Name .. "_AnimeAdventures.json"
 
-Settings = {} --[[
+Settings = {} --
 function SaveSettings()
 	local HttpService = game:GetService("HttpService")
 	if not isfolder(Folder) then makefolder(Folder) end
