@@ -68,7 +68,7 @@ local Mouse				= Player:GetMouse()
 
 ----- [ ITEM DROP RESULTS ] -----
 local ItemLoader = require(game.ReplicatedStorage.src.Loader)
-local ItemInventoryService = DropLoader.load_client_service(script, "ItemInventoryServiceClient")
+local ItemInventoryService = ItemLoader.load_client_service(script, "ItemInventoryServiceClient")
 function Get_Inventory_Items_Unique_Items() return ItemInventoryService["session"]['inventory']['inventory_profile_data']['unique_items'] end
 function Get_Inventory_Items() return ItemInventoryService["session"]["inventory"]['inventory_profile_data']['normal_items'] end
 function Get_Units_Owner() return ItemInventoryService["session"]["collection"]["collection_profile_data"]['owned_units'] end
