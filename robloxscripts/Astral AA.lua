@@ -24,7 +24,7 @@ function SaveSettings()
 	local HttpService = game:GetService("HttpService")
 	if not isfolder(Folder) then makefolder(Folder) end
 
-	writefile(Folder .. "/" .. File, HttpService.JSONEncode(Settings))
+	writefile(Folder .. "/" .. File, HttpService:JSONEncode(Settings))
 	Settings = LoadSettings()
 	warn("Settings Saved!")
 end
