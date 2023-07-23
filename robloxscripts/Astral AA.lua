@@ -56,15 +56,15 @@ if game.PlaceId ~= 8304191830 then GetLevelData() end --]]
 -----------------------------------------------------------------
 
 ----- [ SERVICES ] -----
-local HttpService		= game:GetService("HttpService")
-local Workspace			= game:GetService("Workspace")
-local Players			= game:GetService("Players")
-local RunService		= game:GetService("RunService")
-local UserInputService	= game:GetService("UserInputService")
+local HttpService			= game:GetService("HttpService")
+local Workspace				= game:GetService("Workspace")
+local Players				= game:GetService("Players")
+local RunService			= game:GetService("RunService")
+local UserInputService		= game:GetService("UserInputService")
 
 ----- [ INITIALIZE ] -----
-local Player			= Players.LocalPlayer
-local Mouse				= Player:GetMouse()
+local Player				= Players.LocalPlayer
+local Mouse					= Player:GetMouse()
 
 ----- [ ITEM DROP RESULTS ] -----
 local ItemLoader = require(game.ReplicatedStorage.src.Loader)
