@@ -303,7 +303,7 @@ if game.CoreGui:FindFirstChild("HoloLibUI") then game.CoreGui["HoloLibUI"]:Destr
 local Directory = "Anime_Adventures/"..game.Players.LocalPlayer.Name
 local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/robloxui/HoloLib.lua"))()
 local Executor = tostring(identifyexecutor())
-local Window = UILibrary("[Astral V1] Anime Adventures"..Version.." - "..Executor)
+local Window = UILibrary.new("[Astral V1] Anime Adventures"..Version.." - "..Executor)
 
 local HomePage = Window:AddPage("Home", "🏠")
 local Developers = HomePage:AddSection("Anime Adventures")
