@@ -306,6 +306,16 @@ local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrN
 local Executor = tostring(identifyexecutor())
 local Window = UILibrary("[Astral V1] Anime Adventures"..Version.." - "..Executor)
 
-local Home = Window:AddPage("Home", "🏠")
+local HomePage = Window:AddPage("Home", "🏠")
+local Developers = HomePage:AddSection("Anime Adventures")
+local ChallengeHelp = HomePage:AddSection("⚙️ Challenge Config ⚙️")
 
-local Farm = Window:AddPage("Auto Farm", "🤖")
+local FarmPage = Window:AddPage("Auto Farm", "🤖")
+
+local UnitPage = Window:AddPage("Unit Config", "🧙")
+
+local PortalPage = Window:AddPage("Portal Config", "🌀")
+
+local MiscPage = Window:AddPage("Misc [BETA]", "🛠️")
+
+local DiscordPage = Window:AddPage("Discord", "🌐")
