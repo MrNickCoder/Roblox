@@ -13,14 +13,18 @@
    	Version: 1.0.0                                                  
 --]]
 
+------------------------
 ----- [ SERVICES ] -----
+------------------------
 local Players			= game:GetService("Players");
 local RunService		= game:GetService("RunService");
 local TweenService		= game:GetService("TweenService");
 local UserInputService	= game:GetService("UserInputService");
 local CoreGui			= game:GetService("CoreGui");
 
+--------------------------
 ----- [ INITIALIZE ] -----
+--------------------------
 local Player			= Players.LocalPlayer;
 local PlayerGui			= Player:FindFirstChild("PlayerGui");
 local Mouse				= Player:GetMouse();
@@ -253,7 +257,9 @@ do
 	end
 end
 
+-----------------------
 ----- [ CLASSES ] -----
+-----------------------
 local Library = {}
 local Page = {}
 local Section = {}
@@ -263,7 +269,9 @@ do
 	Page.__index = Page;
 	Section.__index = Section;
 	
+	-------------------------
 	----- [ NEW CLASS ] -----
+	-------------------------
 	function Library.new(Title)
 		local Container = Utility:Create("ScreenGui", {
 			Name = "HoloLibUI";
@@ -537,7 +545,9 @@ do
 		return Section
 	end
 	
-	----- [ Functions ] -----
+	-------------------------
+	----- [ FUNCTIONS ] -----
+	-------------------------
 	function Library:SetTheme(Theme, Color)
 		Utility.Themes[Theme] = Color
 
@@ -591,20 +601,25 @@ do
 		self.Toggling = false
 	end
 	
-	----- [ New Modules ] -----
+	---------------------------
+	----- [ New MODULES ] -----
+	---------------------------
 	function Section:AddLabel(Data)
 		local Label = Utility:Create("TextLabel", {
 			Name = "Label",
 			Parent = self.Container,
+			AutomaticSize = Enum.AutomaticSize.Y,
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 0, 30),
+			Size = UDim2.new(1, 0, 0, 0),
 			ZIndex = 2,
 			Font = Enum.Font.Gotham,
 			Text = Data.Text,
 			TextColor3 = Utility.Themes.TextColor,
 			TextSize = 12,
-			TextTransparency = 0.10000000149012
+			TextTransparency = 0.10000000149012,
+			TextWrapped = true,
+			TextXAlignment = Enum.TextXAlignment.Left
 		})
 		
 		table.insert(self.Modules, Label)
@@ -1619,8 +1634,9 @@ do
 		return MetaTable
 	end
 	
-	----- [ Class Functions ] -----
-	
+	-------------------------------
+	----- [ CLASS FUNCTIONS ] -----
+	-------------------------------
 	function Library:SelectPage(Page, Toggle)
 		if Toggle and self.FocusedPage == Page then return end -- already selected
 
@@ -1755,7 +1771,9 @@ do
 		error("No module found under "..tostring(Info))
 	end
 	
-	----- [ Updates ] -----
+	------------------------------
+	----- [ MODULE UPDATES ] -----
+	------------------------------
 	function Section:UpdateButton(MetaTable, Title)
 		local Button = self:GetModule(MetaTable.Button)
 
