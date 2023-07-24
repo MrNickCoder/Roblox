@@ -354,6 +354,7 @@ local function AutoFarmConfigUI()
 	SFarmConfig:AddToggle("🏃 Auto Defeat", function(value) Settings.FarmConfig.AutoDefeat = value; SaveSettings() end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoDefeat or false})
 	
 	FarmCategory.Callback = function(value)
+		if not Settings.FarmConfig then Settings.FarmConfig = {} end
 		Settings.FarmConfig.FarmCategory = value
 		SaveSettings()
 		
