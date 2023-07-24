@@ -295,7 +295,7 @@ do
 				BackgroundTransparency = 1,
 				AnchorPoint = Vector2.new(0.5, 0),
 				Position = UDim2.new(0.5, 0, 0.5, -190),
-				Size = UDim2.new(0, 700, 0, 380),
+				Size = Data and Data.Size or UDim2.new(0, 700, 0, 380),
 				Image = "rbxassetid://4641149554",
 				ImageColor3 = Utility.Themes.Background,
 				ScaleType = Enum.ScaleType.Slice,
@@ -391,16 +391,17 @@ do
 			})
 		})
 		
+		if Data and Data.Size then Container.Main.Position = UDim2.new(0.5, 0, 0.5, -(Data.Size.Y.Offset / 2)) end
+		
 		Utility:InitializeKeybind()
 		
 		local MetaTable = setmetatable({
 			Container = Container,
 			PagesContainer = Container.Main.Pages.Pages_Container,
 			Pages = {},
-			ToggleKey = nil,
+			Size = Data and Data.Size or UDim2.new(0, 700, 0, 380),
+			ToggleKey = Data and Data.ToggleKey or nil,
 		}, Library)
-		
-		if Data and Data.ToggleKey then MetaTable.ToggleKey = Data.ToggleKey end
 		
 		Container.Main.TopBar.Button.MouseButton1Click:Connect(function()
 			MetaTable:Toggle()
@@ -605,7 +606,7 @@ do
 			wait(0.1)
 			Utility:Tween(Frame, {Size = UDim2.new(1, -22, 1, -4), Position = Position["In"]}, 0.1)
 			
-			Utility:Tween(Container, {Size = UDim2.new(0, 700, 0, 380)}, 0.2)
+			Utility:Tween(Container, {Size = self.Size}, 0.2)
 			wait(0.2)
 
 			Container.ClipsDescendants = false
@@ -618,7 +619,7 @@ do
 			wait(0.1)
 			Utility:Tween(Frame, {Size = UDim2.new(1, -22, 1, -4), Position = Position["Out"]}, 0.1)
 
-			Utility:Tween(Container, {Size = UDim2.new(0, 700, 0, Topbar.Size.Y.Offset)}, 0.2)
+			Utility:Tween(Container, {Size = UDim2.new(0, self.Size.X.Offset, 0, Topbar.Size.Y.Offset)}, 0.2)
 			wait(0.2)
 		end
 
