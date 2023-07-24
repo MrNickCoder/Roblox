@@ -1,7 +1,11 @@
+--------------------------
 ----- [ UPDATE FIX ] -----
+--------------------------
 local Version = "v1.0.0b01"
 
+-------------------------------
 ----- [ LOADING SECTION ] -----
+-------------------------------
 repeat task.wait() until game:IsLoaded()
 if game.PlaceId == 8304191830 then
 	repeat task.wait() until game.Workspace:FindFirstChild(game.Players.LocalPlayer.Name)
@@ -14,12 +18,13 @@ else
 	repeat task.wait() until game:GetService("Workspace")["_waves_started"].Value == true
 end
 
--------------------------------
+------------------------
 ----- [ SETTINGS ] -----
+------------------------
 local Folder = "Astral_V1_Anime_Adventures" --
 local File = game:GetService("Players").LocalPlayer.Name .. "_AnimeAdventures.json"
 
-Settings = {} --
+Settings = {}
 function SaveSettings()
 	local HttpService = game:GetService("HttpService")
 	if not isfolder(Folder) then makefolder(Folder) end
@@ -52,21 +57,27 @@ function GetLevelData()
 	return List
 end
 
-if game.PlaceId ~= 8304191830 then GetLevelData() end --]]
+if game.PlaceId ~= 8304191830 then GetLevelData() end
 -----------------------------------------------------------------
 
+------------------------
 ----- [ SERVICES ] -----
+------------------------
 local HttpService			= game:GetService("HttpService")
 local Workspace				= game:GetService("Workspace")
 local Players				= game:GetService("Players")
 local RunService			= game:GetService("RunService")
 local UserInputService		= game:GetService("UserInputService")
 
+--------------------------
 ----- [ INITIALIZE ] -----
+--------------------------
 local Player				= Players.LocalPlayer
 local Mouse					= Player:GetMouse()
 
+---------------------------------
 ----- [ ITEM DROP RESULTS ] -----
+---------------------------------
 local ItemLoader = require(game.ReplicatedStorage.src.Loader)
 local ItemInventoryService = ItemLoader.load_client_service(script, "ItemInventoryServiceClient")
 function Get_Inventory_Items_Unique_Items() return ItemInventoryService["session"]['inventory']['inventory_profile_data']['unique_items'] end
@@ -135,13 +146,13 @@ function Webhook()
 	if Settings.WebhookEnabled then
 		local URL = Settings.WebhookURL; print("Webhook?")
 		if URL == "" then warn("Webhook URL is empty!"); return end
-		
+
 		local Time = os.date('!*t', OSTime);
 		local Thumbnails_Avatar = HttpService:JSONDecode(game:HttpGet("https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. game:GetService("Players").LocalPlayer.UserId .. "&size=150x150&format=Png&isCircular=true", true))
 		local Executor = tostring(identifyexecutor())
 		UserLevel = Player.PlayerGui:FindFirstChild("spawn_units"):FindFirstChild("Lives"):FindFirstChild("Main"):FindFirstChild("Desc"):FindFirstChild("Level").Text
 		TotalGems = Player.PlayerGui:FindFirstChild("spawn_units"):FindFirstChild("Lives"):FindFirstChild("Frame"):FindFirstChild("Resource"):FindFirstChild("Gem"):FindFirstChild("Level").Text
-		
+
 		ResultHolder = Player.PlayerGui:FindFirstChild("ResultsUI"):FindFirstChild("Holder")
 		if game.PlaceId ~= 8304191830 then
 			LevelName = game:GetService("Workspace"):FindFirstChild("_MAP_CONFIG"):FindFirstChild("GetLevelData"):InvokeServer()["name"]
@@ -149,7 +160,7 @@ function Webhook()
 		else LevelName, Result = "nil","nil" end
 		if Result == "VICTORY" then Result = "VICTORY" end
 		if Result == "DEFEAT" then Result = "DEFEAT" end
-		
+
 		_Map = game:GetService("Workspace")["_BASES"].player.base["fake_unit"]:WaitForChild("HumanoidRootPart")
 		GetLevelData = game.workspace._MAP_CONFIG:WaitForChild("GetLevelData"):InvokeServer()
 		World = GetLevelData.id or GetLevelData.world or GetLevelData.name
@@ -159,7 +170,7 @@ function Webhook()
 		BattlePassValue = Player.PlayerGui:FindFirstChild("BattlePass"):FindFirstChild("Main"):FindFirstChild("Level"):FindFirstChild("V").Text
 		BattlePass = game:GetService("Players").LocalPlayer.PlayerGui.BattlePass.Main.Level.Title.Text
 		Waves = CWaves:split(": ")
-		
+
 		if Waves ~= nil and Waves[2] == "999" then Waves[2] = "Use [Auto Leave at Wave] or [Test Webhook]" end
 		TTime = CTime:split(": ")
 		if Waves ~= nil and TTime[2] == "22:55" then TTime[2] = "Use [Auto Leave at Wave] or [Test Webhook]" end
@@ -172,10 +183,10 @@ function Webhook()
 		if Exp[1] == "+99999" then Exp[1] = "+0" end
 		Trophy = ResultHolder:FindFirstChild("LevelRewards"):FindFirstChild("ScrollingFrame"):FindFirstChild("TrophyReward"):FindFirstChild("Main"):FindFirstChild("Amount").Text
 		if Trophy == "+99999" then Trophy = "+0" end
-		
+
 		TotalTime =  ResultHolder:FindFirstChild("Middle"):FindFirstChild("Timer").Text
 		TotalWaves = ResultHolder:FindFirstChild("Middle"):FindFirstChild("WavesCompleted").Text
-		
+
 		local TextDropLabel = ""
 		local CountAmount = 1
 		for Index, Item in pairs(Get_Inventory_Items()) do Table_All_Items_New_data[Index]['Count'] = Item end
@@ -227,7 +238,7 @@ function Webhook()
 			end
 		end
 		if TextDropLabel == "" then TextDropLabel = "No Items Drops" end
-		
+
 		local Data = {
 			["content"] = "",
 			["username"] = "Astral V1 Anime Adventures",
@@ -271,7 +282,7 @@ function Webhook()
 				}
 			}
 		}
-		
+
 		local WBody = game:GetService("HttpService"):JSONEncode(Data)
 		local WHeaders = {["content-type"] = "application/json"}
 		local WRequest = http_request or request or HttpPost or syn.request or http.request
@@ -281,43 +292,117 @@ function Webhook()
 	end
 end
 function BabyWebhook()
-	
+
 end
 function SnipeWebhook()
-	
+
 end
 function SpecialSummonSniperWebhook()
-	
+
 end
 function StandardSummonSniperWebhook()
-	
+
 end
 function ShopSniperWebhook()
-	
+
 end
 -----------------------
 
+------------------------------
 ----- [ USER INTERFACE ] -----
+------------------------------
 if game.CoreGui:FindFirstChild("HoloLibUI") then game.CoreGui["HoloLibUI"]:Destroy() end
 
 local Directory = "Anime_Adventures/"..game.Players.LocalPlayer.Name
 local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/robloxui/HoloLib.lua"))()
 local Executor = tostring(identifyexecutor())
 local Window = UILibrary.new("[Astral V1] Anime Adventures"..Version.." - "..Executor)
+Window.ToggleKey = Enum.KeyCode.P
 
-local HomePage = Window:AddPage("Home", "🏠")
-local Developers = HomePage:AddSection("Anime Adventures")
-local ChallengeHelp = HomePage:AddSection("⚙️ Challenge Config ⚙️")
+local PHome = Window:AddPage("Home", "🏠")
+local SDevelopers = PHome:AddSection("Anime Adventures")
+local SChallengeHelp = PHome:AddSection("⚙️ Challenge Config ⚙️")
 
-local FarmPage = Window:AddPage("Auto Farm", "🤖")
+local PFarm = Window:AddPage("Auto Farm", "🤖")
+local SFarmConfig = PFarm:AddSection("⚙️ Auto Farm Config ⚙️")
+local SWorldConfig = PFarm:AddSection("🌏 Config Config 🌏")
 
-local UnitPage = Window:AddPage("Unit Config", "🧙")
+local PUnit = Window:AddPage("Unit Config", "🧙")
 
-local PortalPage = Window:AddPage("Portal Config", "🌀")
+local PMisc = Window:AddPage("Misc [BETA]", "🛠️")
 
-local MiscPage = Window:AddPage("Misc [BETA]", "🛠️")
+local PDiscord = Window:AddPage("Discord", "🌐")
 
-local DiscordPage = Window:AddPage("Discord", "🌐")
+----- [ Auto Farm Config ] -----
+local function AutoFarmConfigUI()
+	local FarmCategory = SFarmConfig:AddRadio("🔱 Farm Category", nil, {Options = {"Story Worlds", "Legend Stages", "Raid Worlds", "Infinity Castle", "Portals", "Dungeon", "Secret Portals"}, Selected = Settings.FarmConfig.FarmCategory or "Story Worlds"})
+	
+	SFarmConfig:AddToggle("🌾 Auto Start", function(value) end, {Active = Settings.FarmConfig.AutoStart})
+	SFarmConfig:AddToggle("👨‍🌾 Auto Place Unit", function(value) end, {Active = Settings.FarmConfig.AutoPlace})
+	SFarmConfig:AddToggle("⭐️ Auto Upgrade Units", function(value) end, {Active = Settings.FarmConfig.AutoUpgrade})
+	SFarmConfig:AddToggle("🔥 Auto Abilities", function(value) end, {Active = Settings.FarmConfig.AutoAbilities})
+	SFarmConfig:AddCheckbox("🧙 Auto Buff 100%", function(value) end, {Options = {"Orwin/Erwin", "Wenda/Wendy", "Leafy/Leafa"}, Selected = Settings.FarmConfig.AutoBuff})
+	
+	local AutoReplay = SFarmConfig:AddToggle("🏃 Auto Replay", function(value) end, {Active = Settings.FarmConfig.AutoReplay})
+	local AutoPortalReplay = SFarmConfig:AddToggle("🏃 Auto Pick Portal [Replay]", function(value) end, {Active = Settings.FarmConfig.AutoReplayPortal})
+	local AutoNextStory = SFarmConfig:AddToggle("🏃 Auto Next Story", function(value) end, {Active = Settings.FarmConfig.AutoNextStory})
+	local AutoNextLevel = SFarmConfig:AddToggle("🏃 Auto Next Level", function(value) end, {Active = Settings.FarmConfig.AutoNextLevel})
+	
+	SFarmConfig:AddToggle("🏃 Auto Leave", function(value) end, {Active = Settings.FarmConfig.AutoLeave})
+	SFarmConfig:AddToggle("⭐️ Sell Units At Wave", function(value) end, {Active = Settings.FarmConfig.WaveSell})
+	SFarmConfig:AddToggle("⭐️ Leave At Wave", function(value) end, {Active = Settings.FarmConfig.WaveLeave})
+	SFarmConfig:AddToggle("🏃 Auto Defeat", function(value) end, {Active = Settings.FarmConfig.AutoDefeat})
+	
+	FarmCategory.Callback = function(value)
+		FarmCategory.Section:Resize(true)
+	end
+end
+-------------------------
+
+----- [ World Config ] -----
+local function WorldConfigUI()
+
+end
+----------------------------
+
+----- [ Home Page ] -----
+local function HomeUI()
+	SDevelopers:AddLabel({Text = "📝 Scripted by: Arpon AG#6612 & Forever4D#0001 & HOLYSHz#3819"})
+	SDevelopers:AddLabel({Text = "📝 Also thanks to Trapstar#7845, bytenode#9646 for the help!"})
+	SDevelopers:AddLabel({Text = "📝 Improved by: NickCoder"})
+	SDevelopers:AddLabel({Text = "📝 UI By: NickCoder"})
+	SDevelopers:AddLabel({Text = "🔧 To toggle the UI press \" P \""})
+	
+	SChallengeHelp:AddLabel({Text = "double_cost = 'High Cost'"})
+	SChallengeHelp:AddLabel({Text = "short_range = 'Short Range'"})
+	SChallengeHelp:AddLabel({Text = "fast_enemies = 'Fast Enemies'"})
+	SChallengeHelp:AddLabel({Text = "regen_enemies = 'Regen Enemies'"})
+	SChallengeHelp:AddLabel({Text = "tank_enemies = 'Tank Enemies'"})
+	SChallengeHelp:AddLabel({Text = "shield_enemies = 'Shield Enemies'"})
+	SChallengeHelp:AddLabel({Text = "triple_cost = 'Triple Cost'"})
+	SChallengeHelp:AddLabel({Text = "hyper_regen_enemies = 'Hyper-Regen Enemies'"})
+	SChallengeHelp:AddLabel({Text = "hyper_shield_enemies = 'Steel-Plated Enemies'"})
+	SChallengeHelp:AddLabel({Text = "godspeed_enemies = 'Godspeed Enemies'"})
+	SChallengeHelp:AddLabel({Text = "flying_enemies = 'Flying Enemies'"})
+	SChallengeHelp:AddLabel({Text = "mini_range = 'Mini-Range'"})
+end
+-----------------------
+
+----- [ Setup ] -----
+if game.PlaceId == 8304191830 then
+	HomeUI()
+	AutoFarmConfigUI()
+else
+	HomeUI()
+	AutoFarmConfigUI()
+end
+---------------------
+
+
+-------------------------
+----- [ FUNCTIONS ] -----
+-------------------------
+
 
 ----- [ Auto Leave ] -----
 local PlaceID = 8304191830
@@ -331,15 +416,14 @@ if not ServerFile then
 	table.insert(AllIDs, ActualHour)
 	writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
 end
-
 function TPReturner()
 	local Site;
 	if FoundAnything == "" then Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
 	else Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. FoundAnything)) end
-	
+
 	local ID = ""
 	if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then FoundAnything = Site.nextPageCursor end
-	
+
 	local Num = 0;
 	local ExtraNum = 0
 	for Index, Server in pairs(Site.data) do
@@ -349,7 +433,7 @@ function TPReturner()
 		if tonumber(Server.maxPlayers) > tonumber(Server.playing) then
 			if ExtraNum ~= 1 and tonumber(Server.playing) < Last or ExtraNum == 1 then Last = tonumber(Server.playing)
 			elseif ExtraNum ~= 1 then continue end
-			
+
 			for _,Existing in pairs(AllIDs) do
 				if Num ~= 0 then
 					if ID == tostring(Existing) then Possible = false end
@@ -377,7 +461,6 @@ function TPReturner()
 		end
 	end
 end
-
 function Teleport()
 	while wait() do
 		pcall(function()
@@ -388,6 +471,7 @@ function Teleport()
 		end)
 	end
 end
+--------------------------
 
 ----- [ Start of Check Connection ] -----
 function CheckInternet()
