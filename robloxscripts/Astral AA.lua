@@ -337,25 +337,41 @@ local PDiscord = Window:AddPage("Discord", "🌐")
 local function AutoFarmConfigUI()
 	local FarmCategory = SFarmConfig:AddRadio("🔱 Farm Category", nil, {Options = {"Story Worlds", "Legend Stages", "Raid Worlds", "Infinity Castle", "Portals", "Dungeon", "Secret Portals"}, Selected = Settings.FarmConfig and Settings.FarmConfig.FarmCategory or "Story Worlds"})
 	
-	SFarmConfig:AddToggle("🌾 Auto Start", function(value) end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoStart or false})
-	SFarmConfig:AddToggle("👨‍🌾 Auto Place Unit", function(value) end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoPlace or false})
-	SFarmConfig:AddToggle("⭐️ Auto Upgrade Units", function(value) end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoUpgrade or false})
-	SFarmConfig:AddToggle("🔥 Auto Abilities", function(value) end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoAbilities or false})
-	SFarmConfig:AddCheckbox("🧙 Auto Buff 100%", function(value) end, {Options = {"Orwin/Erwin", "Wenda/Wendy", "Leafy/Leafa"}, Selected = Settings.FarmConfig and Settings.FarmConfig.AutoBuff or {}})
+	SFarmConfig:AddToggle("🌾 Auto Start", function(value) Settings.FarmConfig.AutoStart = value; SaveSettings() end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoStart or false})
+	SFarmConfig:AddToggle("👨‍🌾 Auto Place Unit", function(value) Settings.FarmConfig.AutoPlace = value; SaveSettings() end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoPlace or false})
+	SFarmConfig:AddToggle("⭐️ Auto Upgrade Units", function(value) Settings.FarmConfig.AutoUpgrade = value; SaveSettings() end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoUpgrade or false})
+	SFarmConfig:AddToggle("🔥 Auto Abilities", function(value) Settings.FarmConfig.AutoAbilities = value; SaveSettings() end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoAbilities or false})
+	SFarmConfig:AddCheckbox("🧙 Auto Buff 100%", function(value) Settings.FarmConfig.AutoBuff = value; SaveSettings() end, {Options = {"Orwin/Erwin", "Wenda/Wendy", "Leafy/Leafa"}, Selected = Settings.FarmConfig and Settings.FarmConfig.AutoBuff or {}})
 	
-	local AutoReplay = SFarmConfig:AddToggle("🏃 Auto Replay", function(value) end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoReplay or false})
-	local AutoPortalReplay = SFarmConfig:AddToggle("🏃 Auto Pick Portal [Replay]", function(value) end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoReplayPortal or false})
-	local AutoNextStory = SFarmConfig:AddToggle("🏃 Auto Next Story", function(value) end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoNextStory or false})
-	local AutoNextLevel = SFarmConfig:AddToggle("🏃 Auto Next Level", function(value) end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoNextLevel or false})
+	local AutoReplay = SFarmConfig:AddToggle("🏃 Auto Replay", function(value) Settings.FarmConfig.AutoReplay = value; SaveSettings() end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoReplay or false})
+	local AutoPortalReplay = SFarmConfig:AddToggle("🏃 Auto Pick Portal [Replay]", function(value) Settings.FarmConfig.AutoReplayPortal = value; SaveSettings() end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoReplayPortal or false})
+	local AutoNextStory = SFarmConfig:AddToggle("🏃 Auto Next Story", function(value) Settings.FarmConfig.AutoNextStory = value; SaveSettings() end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoNextStory or false})
+	local AutoNextLevel = SFarmConfig:AddToggle("🏃 Auto Next Level", function(value) Settings.FarmConfig.AutoNextLevel = value; SaveSettings() end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoNextLevel or false})
 	
-	SFarmConfig:AddToggle("🏃 Auto Leave", function(value) end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoLeave or false})
-	SFarmConfig:AddToggle("⭐️ Sell Units At Wave", function(value) end, {Active = Settings.FarmConfig and Settings.FarmConfig.WaveSell or false})
-	SFarmConfig:AddToggle("⭐️ Leave At Wave", function(value) end, {Active = Settings.FarmConfig and Settings.FarmConfig.WaveLeave or false})
-	SFarmConfig:AddToggle("🏃 Auto Defeat", function(value) end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoDefeat or false})
+	SFarmConfig:AddToggle("🏃 Auto Leave", function(value) Settings.FarmConfig.AutoLeave = value; SaveSettings() end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoLeave or false})
+	SFarmConfig:AddToggle("⭐️ Sell Units At Wave", function(value) Settings.FarmConfig.WaveSell = value; SaveSettings() end, {Active = Settings.FarmConfig and Settings.FarmConfig.WaveSell or false})
+	SFarmConfig:AddToggle("⭐️ Leave At Wave", function(value) Settings.FarmConfig.WaveLeave = value; SaveSettings() end, {Active = Settings.FarmConfig and Settings.FarmConfig.WaveLeave or false})
+	SFarmConfig:AddToggle("🏃 Auto Defeat", function(value) Settings.FarmConfig.AutoDefeat = value; SaveSettings() end, {Active = Settings.FarmConfig and Settings.FarmConfig.AutoDefeat or false})
 	
 	FarmCategory.Callback = function(value)
+		Settings.FarmConfig.FarmCategory = value
+		SaveSettings()
+		
+		if value == "Story Worlds" then
+			AutoReplay.Toggle.Visible = true
+			AutoPortalReplay.Toggle.Visible = false
+			AutoNextStory.Toggle.Visible = true
+			AutoNextLevel.Toggle.Visible = false
+		elseif value == "Infinity Castle" then
+			AutoReplay.Toggle.Visible = false
+			AutoPortalReplay.Toggle.Visible = false
+			AutoNextStory.Toggle.Visible = false
+			AutoNextLevel.Toggle.Visible = true
+		end
 		FarmCategory.Section:Resize(true)
 	end
+	
+	FarmCategory.Callback(FarmCategory.Data.Selected)
 end
 -------------------------
 
