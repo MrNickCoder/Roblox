@@ -335,7 +335,7 @@ local PDiscord = Window:AddPage("Discord", "🌐")
 
 ----- [ Auto Farm Config ] -----
 local function AutoFarmConfigUI()
-	local FarmCategory = SFarmConfig:AddRadio("🔱 Farm Category", nil, {Options = {"Story Worlds", "Legend Stages", "Raid Worlds", "Infinity Castle", "Portals", "Dungeon", "Secret Portals"}, Selected = Settings.FarmConfig.FarmCategory or "Story Worlds"})
+	local FarmCategory = SFarmConfig:AddRadio("🔱 Farm Category", nil, {Options = {"Story Worlds", "Legend Stages", "Raid Worlds", "Infinity Castle", "Portals", "Dungeon", "Secret Portals"}, Selected = Settings.FarmConfig and Settings.FarmConfig.FarmCategory or "Story Worlds"})
 	
 	SFarmConfig:AddToggle("🌾 Auto Start", function(value) end, {Active = Settings.FarmConfig.AutoStart})
 	SFarmConfig:AddToggle("👨‍🌾 Auto Place Unit", function(value) end, {Active = Settings.FarmConfig.AutoPlace})
@@ -385,6 +385,8 @@ local function HomeUI()
 	SChallengeHelp:AddLabel({Text = "godspeed_enemies = 'Godspeed Enemies'"})
 	SChallengeHelp:AddLabel({Text = "flying_enemies = 'Flying Enemies'"})
 	SChallengeHelp:AddLabel({Text = "mini_range = 'Mini-Range'"})
+	
+	Window:SelectPage(PHome, true)
 end
 -----------------------
 
