@@ -336,12 +336,13 @@ local PMisc = Window:AddPage("Misc [BETA]", "🛠️")
 local PDiscord = Window:AddPage("Discord", "🌐")
 
 ----- [ Auto Farm Config ] -----
+local FarmCategory;
 local function AutoFarmConfigUI()
 	if Settings and not Settings.FarmConfig then Settings.FarmConfig = {} end
 	if Settings and not Settings.WorldConfig then Settings.WorldConfig = {} end
 	
 	SFarmConfig:AddLabel({Text = "🔱 Farm Category"})
-	local FarmCategory = SFarmConfig:AddDropdown("Pick Category", function(value)
+	FarmCategory = SFarmConfig:AddDropdown("Pick Category", function(value)
 		Settings.FarmConfig.FarmCategory = value
 		SaveSettings()
 		
@@ -368,11 +369,26 @@ local function AutoFarmConfigUI()
 	SFarmConfig:AddToggle("⭐️ Leave At Wave", function(value) Settings.FarmConfig.WaveLeave = value; SaveSettings() end, {Active = Settings.FarmConfig.WaveLeave or false})
 	SFarmConfig:AddToggle("🏃 Auto Defeat", function(value) Settings.FarmConfig.AutoDefeat = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoDefeat or false})
 	
+	getgenv().UpdateOptions = function(value)
+		AutoReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Replay"]
+		AutoPortalReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Portal Replay"]
+		AutoNextStory.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Next Story"]
+		AutoNextLevel.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Next Level"]
+		
+		FarmCategory.Section:Resize(true)
+	end
+	
+	getgenv().UpdateOptions(FarmCategory.Data.Value)
+end
+-------------------------
+
+----- [ World Config ] -----
+local function WorldConfigUI()
 	SWorldConfig:AddLabel({Text = "🌏 Select World"})
 	local WorldType = SWorldConfig:AddDropdown("Pick World", function(value)
 		Settings.WorldConfig.WorldType = value
 		SaveSettings()
-		
+
 		getgenv().UpdateWorldLevel(value)
 	end)
 	SWorldConfig:AddLabel()
@@ -383,14 +399,6 @@ local function AutoFarmConfigUI()
 	end)
 	SWorldConfig:AddLabel()
 	
-	getgenv().UpdateOptions = function(value)
-		AutoReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Replay"]
-		AutoPortalReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Portal Replay"]
-		AutoNextStory.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Next Story"]
-		AutoNextLevel.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Next Level"]
-		
-		FarmCategory.Section:Resize(true)
-	end
 	getgenv().UpdateWorldType = function(value)
 		WorldType.Reset()
 		if not AAData["World Type"]["Type"][value]["Worlds"] then
@@ -402,7 +410,7 @@ local function AutoFarmConfigUI()
 
 			WorldType.Data.Options = AAData["World Type"]["Type"][value]["Worlds"]
 		end
-		
+
 		WorldType.Section:Resize(true)
 	end
 	getgenv().UpdateWorldLevel = function(value)
@@ -411,22 +419,15 @@ local function AutoFarmConfigUI()
 			WorldLevel.Dropdown.Visible = false
 		else
 			WorldLevel.Dropdown.Visible = true
-			
+
 			WorldLevel.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"]
 		end
-		
+
 		WorldLevel.Section:Resize(true)
 	end
 	
-	getgenv().UpdateOptions(FarmCategory.Data.Value)
 	getgenv().UpdateWorldType(FarmCategory.Data.Value)
 	getgenv().UpdateWorldLevel(WorldType.Data.Value)
-end
--------------------------
-
------ [ World Config ] -----
-local function WorldConfigUI()
-
 end
 ----------------------------
 
@@ -459,9 +460,11 @@ end
 if game.PlaceId == 8304191830 then
 	HomeUI()
 	AutoFarmConfigUI()
+	WorldConfigUI()
 else
 	HomeUI()
 	AutoFarmConfigUI()
+	WorldConfigUI()
 end
 ---------------------
 
