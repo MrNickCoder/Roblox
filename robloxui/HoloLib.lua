@@ -1283,6 +1283,8 @@ do
 		local Search = Dropdown.Search
 		local Focused
 		
+		MetaTable.Close = function() self:UpdateDropdown(MetaTable, nil, {}) end
+		
 		Search.Button.MouseButton1Click:Connect(function()
 			if Search.Button.Rotation == 0 then
 				self:UpdateDropdown(MetaTable, nil, {Options = MetaTable.Data.Options})

@@ -316,18 +316,19 @@ if game.CoreGui:FindFirstChild("HoloLibUI") then game.CoreGui["HoloLibUI"]:Destr
 local Directory = "Anime_Adventures/"..game.Players.LocalPlayer.Name
 local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/robloxui/HoloLib.lua"))()
 local Executor = tostring(identifyexecutor())
-local Window = UILibrary.new("[Astral V1] Anime Adventures"..Version.." - "..Executor)
+local Window = UILibrary.new("[Astral V1] Anime Adventures "..Version.." - "..Executor)
 Window.ToggleKey = Enum.KeyCode.P
 
 local PHome = Window:AddPage("Home", "🏠")
 local SDevelopers = PHome:AddSection("Anime Adventures")
-local SChallengeHelp = PHome:AddSection("⚙️ Challenge Config ⚙️")
+local SHelp = PHome:AddSection("❓ Help ❓")
 
 local PFarm = Window:AddPage("Auto Farm", "🤖")
-local SFarmConfig = PFarm:AddSection("⚙️ Auto Farm Config ⚙️")
+local SFarmConfig = PFarm:AddSection("⚙️ Auto Farm Configuration ⚙️")
 local SWorldConfig = PFarm:AddSection("🌏 World Config 🌏")
 
 local PUnit = Window:AddPage("Unit Config", "🧙")
+local SUnitConfig = PUnit:AddSection("⚙️ Unit Configuration ⚙️")
 
 local PMisc = Window:AddPage("Misc [BETA]", "🛠️")
 
@@ -339,7 +340,7 @@ local function AutoFarmConfigUI()
 	if not Settings.WorldConfig then Settings.WorldConfig = {} end
 	
 	SFarmConfig:AddLabel({Text = "🔱 Farm Category"})
-	local FarmCategory = SFarmConfig:AddDropdown("Pick Category", nil, {Options = {"Story Worlds", "Legend Stages", "Raid Worlds", "Infinity Castle", "Portals", "Dungeon", "Secret Portals"}, Value = Settings.FarmConfig.FarmCategory or "Story Worlds"})
+	local FarmCategory = SFarmConfig:AddDropdown("Pick Category", function(value) Settings.FarmConfig.FarmCategory = value; SaveSettings(); getgenv().UpdateWorld() end, {Options = {"Story Worlds", "Legend Stages", "Raid Worlds", "Infinity Castle", "Portals", "Dungeon", "Secret Portals"}, Value = Settings.FarmConfig.FarmCategory or "Story Worlds"})
 	
 	SFarmConfig:AddLabel()
 	SFarmConfig:AddToggle("🌾 Auto Start", function(value) Settings.FarmConfig.AutoStart = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoStart or false})
@@ -358,20 +359,50 @@ local function AutoFarmConfigUI()
 	SFarmConfig:AddToggle("⭐️ Leave At Wave", function(value) Settings.FarmConfig.WaveLeave = value; SaveSettings() end, {Active = Settings.FarmConfig.WaveLeave or false})
 	SFarmConfig:AddToggle("🏃 Auto Defeat", function(value) Settings.FarmConfig.AutoDefeat = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoDefeat or false})
 	
-	FarmCategory.Callback = function(value)
-		Settings.FarmConfig.FarmCategory = value
-		SaveSettings()
+	local WorldType = SWorldConfig:AddDropdown("Pick World", function(value) Settings.WorldConfig.WorldType = value end, {})
+	
+	getgenv().UpdateWorld = function()
+		local value = Settings.FarmConfig.FarmCategory
 		
+		WorldType.Close()
 		if value == "Story Worlds" then
 			AutoReplay.Toggle.Visible = true
 			AutoPortalReplay.Toggle.Visible = false
 			AutoNextStory.Toggle.Visible = true
 			AutoNextLevel.Toggle.Visible = false
-		elseif value == "Legend Stages" or value == "Raid Worlds" then
+			
+			WorldType.Data.Options = {"Planet Namak", "Shiganshinu District", "Snowy Town","Hidden Sand Village", "Marine's Ford",
+				"Ghoul City", "Hollow World", "Ant Kingdom", "Magic Town", "Cursed Academy","Clover Kingdom","Cape Canaveral", "Alien Spaceship","Fabled Kingdom",
+				"Hero City","Puppet Island","Virtual Dungeon","Windhym"}
+		elseif value == "Legend Stages" then
 			AutoReplay.Toggle.Visible = true
 			AutoPortalReplay.Toggle.Visible = false
 			AutoNextStory.Toggle.Visible = false
 			AutoNextLevel.Toggle.Visible = false
+			
+			WorldType.Data.Options = {"Clover Kingdom (Elf Invasion)", "Hollow Invasion","Cape Canaveral (Legend)", "Fabled Kingdom (Legend)", "Hero City (Midnight)", "Virtual Dungeon (Bosses)"}
+		elseif value == "Raid Worlds" then
+			AutoReplay.Toggle.Visible = true
+			AutoPortalReplay.Toggle.Visible = false
+			AutoNextStory.Toggle.Visible = false
+			AutoNextLevel.Toggle.Visible = false
+			
+			WorldType.Data.Options = {"Storm Hideout","West City", "Infinity Train", "Shiganshinu District - Raid","Hiddel Sand Village - Raid", "Freezo's Invasion", "Entertainment District", 
+				"Hero City (Hero Slayer)", "Marine's Ford (Buddha)"}
+		elseif value == "Portals" then
+			AutoReplay.Toggle.Visible = false
+			AutoPortalReplay.Toggle.Visible = true
+			AutoNextStory.Toggle.Visible = false
+			AutoNextLevel.Toggle.Visible = false
+			
+			WorldType.Data.Options = {"Alien Portals","Zeldris Portals","Demon Portals","Dressrosa Portals","Madoka Portals","The Eclipse"}
+		elseif value == "Dungeon" then
+			AutoReplay.Toggle.Visible = false
+			AutoPortalReplay.Toggle.Visible = false
+			AutoNextStory.Toggle.Visible = false
+			AutoNextLevel.Toggle.Visible = false
+			
+			WorldType.Data.Options = {"Cursed Womb","Crused Parade","Anniversary Island"}
 		elseif value == "Infinity Castle" then
 			AutoReplay.Toggle.Visible = false
 			AutoPortalReplay.Toggle.Visible = false
@@ -382,7 +413,7 @@ local function AutoFarmConfigUI()
 		FarmCategory.Section:Resize(true)
 	end
 	
-	FarmCategory.Callback(FarmCategory.Data.Selected)
+	getgenv().UpdateWorld()
 end
 -------------------------
 
