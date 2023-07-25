@@ -359,7 +359,12 @@ local function AutoFarmConfigUI()
 	SFarmConfig:AddToggle("⭐️ Leave At Wave", function(value) Settings.FarmConfig.WaveLeave = value; SaveSettings() end, {Active = Settings.FarmConfig.WaveLeave or false})
 	SFarmConfig:AddToggle("🏃 Auto Defeat", function(value) Settings.FarmConfig.AutoDefeat = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoDefeat or false})
 	
-	local WorldType = SWorldConfig:AddDropdown("Pick World", function(value) Settings.WorldConfig.WorldType = value end, {})
+	SWorldConfig:AddLabel("🌏 Select World")
+	local WorldType = SWorldConfig:AddDropdown("Pick World", function(value) Settings.WorldConfig.WorldType = value; SaveSettings() end)
+	SWorldConfig:AddLabel()
+	SWorldConfig:AddLabel("🎚️ Select Level")
+	local WorldType = SWorldConfig:AddDropdown("Pick World", function(value) Settings.WorldConfig.LevelType = value; SaveSettings() end)
+	SWorldConfig:AddLabel()
 	
 	getgenv().UpdateWorld = function()
 		local value = Settings.FarmConfig.FarmCategory
