@@ -282,11 +282,12 @@ do
 	----- [ NEW CLASS ] -----
 	-------------------------
 	function Library.new(Title, Data)
+		if not RunService:IsStudio() and CoreGui:FindFirstChild("HoloLibUI") then warn("Hololib:", "instance already exists in coregui!"); return end
+		
 		local Container = Utility:Create("ScreenGui", {
 			Name = "HoloLibUI";
 			ZIndexBehavior = Enum.ZIndexBehavior.Global,
 			ResetOnSpawn = false,
-			Parent = PlayerGui;
 		},{
 			Utility:Create("ImageLabel", {
 				Name = "Main",
@@ -390,6 +391,9 @@ do
 				})
 			})
 		})
+		
+		if not RunService:IsStudio() then Container.Parent = CoreGui
+		else Container.Parent = PlayerGui end
 		
 		if Data and Data.Size then Container.Main.Position = UDim2.new(0.5, 0, 0.5, -(Data.Size.Y.Offset / 2)) end
 		
