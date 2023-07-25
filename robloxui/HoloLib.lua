@@ -638,6 +638,8 @@ do
 	----- [ New MODULES ] -----
 	---------------------------
 	function Section:AddLabel(Data)
+		Data = Data or {Text = ""}
+		
 		local Label = Utility:Create("TextLabel", {
 			Name = "Label",
 			Parent = self.Container,
