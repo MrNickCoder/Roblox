@@ -155,7 +155,8 @@ do
 
 		local Debounce = false;
 
-		UserInputService.InputBegan:connect(function(Input)
+		UserInputService.InputBegan:connect(function(Input, Chatting)
+			if Chatting then return end
 			if self.Keybinds[Input.KeyCode] then
 				for Index, Bind in pairs(self.Keybinds[Input.KeyCode]) do
 					if Debounce then return end
@@ -169,7 +170,8 @@ do
 			end
 		end)
 
-		UserInputService.InputEnded:connect(function(Input)
+		UserInputService.InputEnded:connect(function(Input, Chatting)
+			if Chatting then return end
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 				for Index, Callback in pairs(self.Ended) do
 					Callback()
@@ -411,9 +413,11 @@ do
 			MetaTable:Toggle()
 		end)
 		
-		UserInputService.InputEnded:connect(function(Input)
+		UserInputService.InputEnded:connect(function(Input, Chatting)
+			if Chatting then return end
 			if MetaTable.ToggleKey and MetaTable.ToggleKey ~= nil then
 				if typeof(MetaTable.ToggleKey) == "string" then MetaTable.ToggleKey = Enum.KeyCode[MetaTable.ToggleKey] end
+				
 				
 				if Input.KeyCode == MetaTable.ToggleKey then
 					MetaTable:Toggle()
@@ -1283,7 +1287,9 @@ do
 		local Search = Dropdown.Search
 		local Focused
 		
-		MetaTable.Close = function() self:UpdateDropdown(MetaTable, nil, {}) end
+		function MetaTable:Reset()
+			self:UpdateDropdown(MetaTable, MetaTable.Title, {})
+		end
 		
 		Search.Button.MouseButton1Click:Connect(function()
 			if Search.Button.Rotation == 0 then
