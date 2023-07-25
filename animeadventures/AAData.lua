@@ -66,6 +66,12 @@ return {
 						["Levels"] = {"berserk_infinite","berserk_level_1","berserk_level_2","berserk_level_3","berserk_level_4","berserk_level_5","berserk_level_6"};
 					};
 				};
+				["UI"] = {
+					["Auto Replay"] = true;
+					["Auto Portal Replay"] = false;
+					["Auto Next Story"] = true;
+					["Auto Next Level"] = false;
+				};
 			};
 			["Legend Stages"] = {
 				["Worlds"] = {
@@ -91,6 +97,12 @@ return {
 					["Virtual Dungeon (Bosses)"] = {
 						["Levels"] = {"sao_legend_1","sao_legend_2","sao_legend_3"};
 					};
+				};
+				["UI"] = {
+					["Auto Replay"] = true;
+					["Auto Portal Replay"] = false;
+					["Auto Next Story"] = false;
+					["Auto Next Level"] = false;
 				};
 			},
 			["Raid Worlds"] = {
@@ -126,7 +138,13 @@ return {
 					["Marine's Ford (Buddha)"] = {
 						["Levels"] = {"marineford_sengoku"};
 					};
-				}
+				};
+				["UI"] = {
+					["Auto Replay"] = true;
+					["Auto Portal Replay"] = false;
+					["Auto Next Story"] = false;
+					["Auto Next Level"] = false;
+				};
 			};
 			["Portals"] = {
 				["Worlds"] = {
@@ -184,6 +202,12 @@ return {
 						};
 					};
 				};
+				["UI"] = {
+					["Auto Replay"] = false;
+					["Auto Portal Replay"] = true;
+					["Auto Next Story"] = false;
+					["Auto Next Level"] = false;
+				};
 			};
 			["Dungeon"] = {
 				["Worlds"] = {
@@ -199,7 +223,13 @@ return {
 					["Anniversary Island"] = {
 						["Levels"] = {"namek_anniversary"};
 					};
-				}
+				};
+				["UI"] = {
+					["Auto Replay"] = false;
+					["Auto Portal Replay"] = false;
+					["Auto Next Story"] = false;
+					["Auto Next Level"] = false;
+				};
 			};
 			["Secret Portals"] = {
 				["Worlds"] = {
@@ -216,7 +246,21 @@ return {
 						["Levels"] = {"portal_item__femto"};
 					};
 				};
+				["UI"] = {
+					["Auto Replay"] = false;
+					["Auto Portal Replay"] = true;
+					["Auto Next Story"] = false;
+					["Auto Next Level"] = false;
+				};
 			};
-		}
+			["Infinity Castle"] = {
+				["UI"] = {
+					["Auto Replay"] = false;
+					["Auto Portal Replay"] = false;
+					["Auto Next Story"] = false;
+					["Auto Next Level"] = true;
+				};
+			};
+		};
 	};
 }
