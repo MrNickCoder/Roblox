@@ -336,8 +336,8 @@ local PDiscord = Window:AddPage("Discord", "🌐")
 
 ----- [ Auto Farm Config ] -----
 local function AutoFarmConfigUI()
-	if not Settings.FarmConfig then Settings.FarmConfig = {} end
-	if not Settings.WorldConfig then Settings.WorldConfig = {} end
+	if Settings and not Settings.FarmConfig then Settings.FarmConfig = {} end
+	if Settings and not Settings.WorldConfig then Settings.WorldConfig = {} end
 	
 	SFarmConfig:AddLabel({Text = "🔱 Farm Category"})
 	local FarmCategory = SFarmConfig:AddDropdown("Pick Category", function(value)
@@ -427,8 +427,8 @@ local function AutoFarmConfigUI()
 		end
 	end
 	
-	getgenv().UpdateOptions(Settings.FarmConfig.FarmCategory)
-	getgenv().UpdateWorldType(Settings.FarmConfig.FarmCategory)
+	getgenv().UpdateOptions(SFarmConfig.Data.Value)
+	getgenv().UpdateWorldType(SFarmConfig.Data.Value)
 end
 -------------------------
 
