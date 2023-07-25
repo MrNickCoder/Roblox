@@ -315,6 +315,7 @@ if game.CoreGui:FindFirstChild("HoloLibUI") then game.CoreGui["HoloLibUI"]:Destr
 
 local Directory = "Anime_Adventures/"..game.Players.LocalPlayer.Name
 local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/robloxui/HoloLib.lua"))()
+local AAData = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/animeadventures/AAData.lua"))()
 local Executor = tostring(identifyexecutor())
 local Window = UILibrary.new("[Astral V1] Anime Adventures "..Version.." - "..Executor)
 Window.ToggleKey = Enum.KeyCode.P
@@ -346,7 +347,7 @@ local function AutoFarmConfigUI()
 		
 		getgenv().UpdateOptions(value)
 		getgenv().UpdateWorldType(value)
-	end, {Options = {"Story Worlds", "Legend Stages", "Raid Worlds", "Infinity Castle", "Portals", "Dungeon", "Secret Portals"}, Value = Settings.FarmConfig.FarmCategory or "Story Worlds"})
+	end, {Options = AAData["World Type"]["Types"], Value = Settings.FarmConfig.FarmCategory or AAData["World Type"]["Types"][1]})
 	
 	SFarmConfig:AddLabel()
 	SFarmConfig:AddToggle("🌾 Auto Start", function(value) Settings.FarmConfig.AutoStart = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoStart or false})
@@ -368,29 +369,39 @@ local function AutoFarmConfigUI()
 	SFarmConfig:AddToggle("🏃 Auto Defeat", function(value) Settings.FarmConfig.AutoDefeat = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoDefeat or false})
 	
 	SWorldConfig:AddLabel({Text = "🌏 Select World"})
-	local WorldType = SWorldConfig:AddDropdown("Pick World", function(value) Settings.WorldConfig.WorldType = value; SaveSettings() end)
+	local WorldType = SWorldConfig:AddDropdown("Pick World", function(value)
+		Settings.WorldConfig.WorldType = value
+		SaveSettings()
+		
+		getgenv().UpdateWorldLevel(value)
+	end)
 	SWorldConfig:AddLabel()
 	SWorldConfig:AddLabel({Text = "🎚️ Select Level"})
-	local WorldLevel = SWorldConfig:AddDropdown("Pick Level", function(value) Settings.WorldConfig.WorldLevel = value; SaveSettings() end)
+	local WorldLevel = SWorldConfig:AddDropdown("Pick Level", function(value)
+		Settings.WorldConfig.WorldLevel = value
+		SaveSettings()
+	end)
 	SWorldConfig:AddLabel()
 	
 	getgenv().UpdateOptions = function(value)
+		AutoReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Replay"]
+		AutoPortalReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Portal Replay"]
+		AutoNextStory.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Next Story"]
+		AutoNextLevel.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Next Level"]
+		
+		FarmCategory.Section:Resize(true)
+		--[[
 		if value == "Story Worlds" then
 			AutoReplay.Toggle.Visible = true
 			AutoPortalReplay.Toggle.Visible = false
 			AutoNextStory.Toggle.Visible = true
 			AutoNextLevel.Toggle.Visible = false
-		elseif value == "Legend Stages" then
+		elseif value == "Legend Stages" or value == "Raid Worlds" then
 			AutoReplay.Toggle.Visible = true
 			AutoPortalReplay.Toggle.Visible = false
 			AutoNextStory.Toggle.Visible = false
 			AutoNextLevel.Toggle.Visible = false
-		elseif value == "Raid Worlds" then
-			AutoReplay.Toggle.Visible = true
-			AutoPortalReplay.Toggle.Visible = false
-			AutoNextStory.Toggle.Visible = false
-			AutoNextLevel.Toggle.Visible = false
-		elseif value == "Portals" then
+		elseif value == "Portals" or value == "Secret Portals" then
 			AutoReplay.Toggle.Visible = false
 			AutoPortalReplay.Toggle.Visible = true
 			AutoNextStory.Toggle.Visible = false
@@ -406,11 +417,22 @@ local function AutoFarmConfigUI()
 			AutoNextStory.Toggle.Visible = false
 			AutoNextLevel.Toggle.Visible = true
 		end
-
-		FarmCategory.Section:Resize(true)
+		--]]
 	end
 	getgenv().UpdateWorldType = function(value)
-		WorldType.Close()
+		WorldType:Reset()
+		if not AAData["World Type"]["Type"][value]["Worlds"] then
+			WorldType.Dropdown.Visible = false
+			WorldLevel.Dropdown.Visible = false
+		else
+			WorldType.Dropdown.Visible = true
+			WorldLevel.Dropdown.Visible = true
+
+			WorldType.Data.Options = AAData["World Type"]["Type"][value]["Worlds"]
+		end
+		
+		WorldType.Section:Resize(true)
+		--[[
 		if value == "Story Worlds" then
 			WorldType.Data.Options = {"Planet Namak", "Shiganshinu District", "Snowy Town","Hidden Sand Village", "Marine's Ford",
 				"Ghoul City", "Hollow World", "Ant Kingdom", "Magic Town", "Cursed Academy","Clover Kingdom","Cape Canaveral", "Alien Spaceship","Fabled Kingdom",
@@ -424,11 +446,68 @@ local function AutoFarmConfigUI()
 			WorldType.Data.Options = {"Alien Portals","Zeldris Portals","Demon Portals","Dressrosa Portals","Madoka Portals","The Eclipse"}
 		elseif value == "Dungeon" then
 			WorldType.Data.Options = {"Cursed Womb","Crused Parade","Anniversary Island"}
+		elseif value == "Secret Portals" then
+			WorldType.Data.Options = {"Dressrosa Secret Portals","Madoka Secret Portals","The Eclipse Secret"} 
 		end
+		--]]
+	end
+	getgenv().UpdateWorldLevel = function(value)
+		WorldLevel:Reset()
+		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"] then
+			WorldLevel.Dropdown.Visible = false
+		else
+			WorldLevel.Dropdown.Visible = true
+			
+			WorldLevel.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"]
+		end
+		
+		WorldLevel.Section:Resize(true)
+		--[[
+		if FarmCategory.Data.Value == "Story Worlds" then
+			if value == "Planet Namak" then
+				WorldLevel.Data.Options = {"namek_infinite", "namek_level_1", "namek_level_2", "namek_level_3", "namek_level_4", "namek_level_5", "namek_level_6"}
+			elseif value == "Shiganshinu District" then
+				WorldLevel.Data.Options = {"aot_infinite", "aot_level_1", "aot_level_2", "aot_level_3", "aot_level_4","aot_level_5", "aot_level_6"}
+			elseif value == "Snowy Town" then
+				WorldLevel.Data.Options = {"demonslayer_infinite", "demonslayer_level_1", "demonslayer_level_2", "demonslayer_level_3", "demonslayer_level_4", "demonslayer_level_5","demonslayer_level_6"}
+			elseif value == "Hidden Sand Village" then
+				WorldLevel.Data.Options =  {"naruto_infinite", "naruto_level_1", "naruto_level_2", "naruto_level_3","naruto_level_4", "naruto_level_5", "naruto_level_6"}
+			elseif value == "Marine's Ford" then
+				WorldLevel.Data.Options = {"marineford_infinite","marineford_level_1","marineford_level_2","marineford_level_3","marineford_level_4","marineford_level_5","marineford_level_6"}
+			elseif value == "Ghoul City" then
+				WorldLevel.Data.Options = {"tokyoghoul_infinite","tokyoghoul_level_1","tokyoghoul_level_2","tokyoghoul_level_3","tokyoghoul_level_4","tokyoghoul_level_5","tokyoghoul_level_6"}
+			elseif value == "Hollow World" then
+				WorldLevel.Data.Options = {"hueco_infinite","hueco_level_1","hueco_level_2","hueco_level_3","hueco_level_4","hueco_level_5","hueco_level_6"}
+			elseif value == "Ant Kingdom" then
+				WorldLevel.Data.Options = {"hxhant_infinite","hxhant_level_1","hxhant_level_2","hxhant_level_3","hxhant_level_4","hxhant_level_5","hxhant_level_6"}
+			elseif value == "Magic Town" then
+				WorldLevel.Data.Options =  {"magnolia_infinite","magnolia_level_1","magnolia_level_2","magnolia_level_3","magnolia_level_4","magnolia_level_5","magnolia_level_6"}
+			elseif value == "Cursed Academy" then
+				WorldLevel.Data.Options = {"jjk_infinite","jjk_level_1","jjk_level_2","jjk_level_3", "jjk_level_4","jjk_level_5","jjk_level_6"}
+			elseif value == "Clover Kingdom" then
+				WorldLevel.Data.Options = {"clover_infinite","clover_level_1","clover_level_2","clover_level_3","clover_level_4","clover_level_5","clover_level_6"}
+			elseif value == "Cape Canaveral" then
+				WorldLevel.Data.Options = {"jojo_infinite","jojo_level_1","jojo_level_2","jojo_level_3","jojo_level_4","jojo_level_5","jojo_level_6",}
+			elseif value == "Alien Spaceship" then
+				WorldLevel.Data.Options = {"opm_infinite","opm_level_1","opm_level_2","opm_level_3","opm_level_4","opm_level_5","opm_level_6",}
+			elseif value == "Fabled Kingdom" then
+				WorldLevel.Data.Options = {"7ds_infinite","7ds_level_1","7ds_level_2","7ds_level_3","7ds_level_4","7ds_level_5","7ds_level_6",}
+			elseif value == "Hero City" then
+				WorldLevel.Data.Options = {"mha_infinite","mha_level_1","mha_level_2","mha_level_3","mha_level_4","mha_level_5","mha_level_6",}
+			elseif value == "Puppet Island" then
+				WorldLevel.Data.Options = {"dressrosa_infinite","dressrosa_level_1","dressrosa_level_2","dressrosa_level_3","dressrosa_level_4","dressrosa_level_5","dressrosa_level_6",}
+			elseif value == "Virtual Dungeon" then
+				WorldLevel.Data.Options = {"sao_infinite","sao_level_1","sao_level_2","sao_level_3","sao_level_4","sao_level_5","sao_level_6",}
+			elseif value == "Windhym" then
+				WorldLevel.Data.Options = {"berserk_infinite","berserk_level_1","berserk_level_2","berserk_level_3","berserk_level_4","berserk_level_5","berserk_level_6",}	
+			end
+		end
+		--]]
 	end
 	
 	getgenv().UpdateOptions(FarmCategory.Data.Value)
 	getgenv().UpdateWorldType(FarmCategory.Data.Value)
+	getgenv().UpdateWorldLevel(WorldType.Data.Value)
 end
 -------------------------
 
