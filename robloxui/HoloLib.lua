@@ -1287,8 +1287,8 @@ do
 		local Search = Dropdown.Search
 		local Focused
 		
-		function MetaTable:Reset()
-			self:UpdateDropdown(MetaTable, MetaTable.Title, {})
+		MetaTable.Reset = function()
+			self:UpdateDropdown(MetaTable, nil, {Options = {}})
 		end
 		
 		Search.Button.MouseButton1Click:Connect(function()
@@ -1932,7 +1932,7 @@ do
 					end)
 				end
 
-				self:UpdateDropdown(MetaTable, Value, nil, MetaTable.Callback)
+				self:UpdateDropdown(MetaTable, Value, {})
 			end)
 
 			Entries = Entries + 1
