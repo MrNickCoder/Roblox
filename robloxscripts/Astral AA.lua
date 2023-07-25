@@ -337,6 +337,7 @@ local PDiscord = Window:AddPage("Discord", "🌐")
 
 ----- [ Auto Farm Config ] -----
 local FarmCategory;
+local AutoReplay, AutoPortalReplay, AutoNextStory, AutoNextLevel;
 local function AutoFarmConfigUI()
 	if Settings and not Settings.FarmConfig then Settings.FarmConfig = {} end
 	if Settings and not Settings.WorldConfig then Settings.WorldConfig = {} end
@@ -358,10 +359,10 @@ local function AutoFarmConfigUI()
 	SFarmConfig:AddCheckbox("🧙 Auto Buff 100%", function(value) Settings.FarmConfig.AutoBuff = value; SaveSettings() end, {Options = {"Orwin/Erwin", "Wenda/Wendy", "Leafy/Leafa"}, Selected = Settings.FarmConfig.AutoBuff or {}})
 	
 	SFarmConfig:AddLabel()
-	local AutoReplay = SFarmConfig:AddToggle("🏃 Auto Replay", function(value) Settings.FarmConfig.AutoReplay = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoReplay or false})
-	local AutoPortalReplay = SFarmConfig:AddToggle("🏃 Auto Pick Portal [Replay]", function(value) Settings.FarmConfig.AutoReplayPortal = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoReplayPortal or false})
-	local AutoNextStory = SFarmConfig:AddToggle("🏃 Auto Next Story", function(value) Settings.FarmConfig.AutoNextStory = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoNextStory or false})
-	local AutoNextLevel = SFarmConfig:AddToggle("🏃 Auto Next Level", function(value) Settings.FarmConfig.AutoNextLevel = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoNextLevel or false})
+	AutoReplay = SFarmConfig:AddToggle("🏃 Auto Replay", function(value) Settings.FarmConfig.AutoReplay = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoReplay or false})
+	AutoPortalReplay = SFarmConfig:AddToggle("🏃 Auto Pick Portal [Replay]", function(value) Settings.FarmConfig.AutoReplayPortal = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoReplayPortal or false})
+	AutoNextStory = SFarmConfig:AddToggle("🏃 Auto Next Story", function(value) Settings.FarmConfig.AutoNextStory = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoNextStory or false})
+	AutoNextLevel = SFarmConfig:AddToggle("🏃 Auto Next Level", function(value) Settings.FarmConfig.AutoNextLevel = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoNextLevel or false})
 	
 	SFarmConfig:AddLabel()
 	SFarmConfig:AddToggle("🏃 Auto Leave", function(value) Settings.FarmConfig.AutoLeave = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoLeave or false})
@@ -383,9 +384,10 @@ end
 -------------------------
 
 ----- [ World Config ] -----
+local WorldType, WorldLevel;
 local function WorldConfigUI()
 	SWorldConfig:AddLabel({Text = "🌏 Select World"})
-	local WorldType = SWorldConfig:AddDropdown("Pick World", function(value)
+	WorldType = SWorldConfig:AddDropdown("Pick World", function(value)
 		Settings.WorldConfig.WorldType = value
 		SaveSettings()
 
@@ -393,7 +395,7 @@ local function WorldConfigUI()
 	end)
 	SWorldConfig:AddLabel()
 	SWorldConfig:AddLabel({Text = "🎚️ Select Level"})
-	local WorldLevel = SWorldConfig:AddDropdown("Pick Level", function(value)
+	WorldLevel = SWorldConfig:AddDropdown("Pick Level", function(value)
 		Settings.WorldConfig.WorldLevel = value
 		SaveSettings()
 	end)
