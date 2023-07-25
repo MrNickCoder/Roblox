@@ -1180,7 +1180,7 @@ do
 	end
 
 	function Section:AddDropdown(Title, Callback, Data)
-		Data = Data or {Options = {}, Search = nil}
+		Data = Data or {Options = {}}
 		
 		local Dropdown = Utility:Create("Frame", {
 			Name = "Dropdown",
@@ -1204,21 +1204,6 @@ do
 				ScaleType = Enum.ScaleType.Slice,
 				SliceCenter = Rect.new(2, 2, 298, 298)
 			}, {
-				Utility:Create("TextLabel", {
-					Name = "TextLabel",
-					AnchorPoint = Vector2.new(0, 0.5),
-					BackgroundTransparency = 1,
-					TextTruncate = Enum.TextTruncate.AtEnd,
-					Position = UDim2.new(0, 10, 0.5, 1),
-					Size = UDim2.new(1, -42, 1, 0),
-					ZIndex = 3,
-					Font = Enum.Font.Gotham,
-					Text = Data.Value or Title,
-					TextColor3 = Utility.Themes.TextColor,
-					TextSize = 12,
-					TextTransparency = 0.10000000149012,
-					TextXAlignment = Enum.TextXAlignment.Left
-				}),
 				Utility:Create("TextBox", {
 					Name = "TextBox",
 					AnchorPoint = Vector2.new(0, 0.5),
@@ -1286,16 +1271,11 @@ do
 			Data = Data,
 			Callback = Callback,
 		}, {})
-
+		
 		table.insert(self.Modules, Dropdown)
 
 		local Search = Dropdown.Search
 		local Focused
-		
-		Dropdown.MouseEnter:Connect(function()
-			if MetaTable.Data.Search then Search.TextBox.Visible = true
-			else Search.TextBox.Visible = false end
-		end)
 		
 		Search.Button.MouseButton1Click:Connect(function()
 			if Search.Button.Rotation == 0 then
@@ -1318,7 +1298,8 @@ do
 		Search.TextBox:GetPropertyChangedSignal("Text"):Connect(function()
 			if Focused then
 				local Options = Utility:Sort(Search.TextBox.Text, MetaTable.Data.Options)
-				Options = #Options ~= 0 and Options 
+				Options = #Options ~= 0 and Options
+				print(Options)
 
 				self:UpdateDropdown(MetaTable, nil, {Options = Options})
 			end
@@ -1891,7 +1872,6 @@ do
 		local Dropdown = self:GetModule(MetaTable.Dropdown)
 
 		if Title then
-			Dropdown.Search.TextLabel.Text = Title
 			Dropdown.Search.TextBox.Text = Title
 		end
 
@@ -1903,7 +1883,7 @@ do
 			if Button:IsA("ImageButton") then Button:Destroy() end
 		end
 
-		for Index, Value in pairs(Data.Options or {}) do
+		for Index, Value in pairs(Data and Data.Options or {}) do
 			local Button = Utility:Create("ImageButton", {
 				Parent = Dropdown.List.Frame,
 				BackgroundTransparency = 1,
@@ -1947,7 +1927,7 @@ do
 		local Frame = Dropdown.List.Frame
 
 		Utility:Tween(Dropdown, {Size = UDim2.new(1, 0, 0, (Entries == 0 and 30) or math.clamp(Entries, 0, 3) * 34 + 38)}, 0.3)
-		Utility:Tween(Dropdown.Search.Button, {Rotation = Data.Options and 180 or 0}, 0.3)
+		Utility:Tween(Dropdown.Search.Button, {Rotation = (Data and Data.Options) and 180 or 0}, 0.3)
 
 		if Entries > 3 then
 			for Index, Button in pairs(Dropdown.List.Frame:GetChildren()) do
