@@ -338,8 +338,10 @@ local function AutoFarmConfigUI()
 	if not Settings.FarmConfig then Settings.FarmConfig = {} end
 	if not Settings.WorldConfig then Settings.WorldConfig = {} end
 	
-	local FarmCategory = SFarmConfig:AddDropdown("🔱 Farm Category", nil, {Options = {"Story Worlds", "Legend Stages", "Raid Worlds", "Infinity Castle", "Portals", "Dungeon", "Secret Portals"}, Selected = Settings.FarmConfig.FarmCategory or "Story Worlds"})
+	SFarmConfig:AddLabel("🔱 Farm Category")
+	local FarmCategory = SFarmConfig:AddDropdown("Pick Category", nil, {Options = {"Story Worlds", "Legend Stages", "Raid Worlds", "Infinity Castle", "Portals", "Dungeon", "Secret Portals"}, Selected = Settings.FarmConfig.FarmCategory or "Story Worlds"})
 	
+	SFarmConfig:AddLabel("")
 	SFarmConfig:AddToggle("🌾 Auto Start", function(value) Settings.FarmConfig.AutoStart = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoStart or false})
 	SFarmConfig:AddToggle("👨‍🌾 Auto Place Unit", function(value) Settings.FarmConfig.AutoPlace = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoPlace or false})
 	SFarmConfig:AddToggle("⭐️ Auto Upgrade Units", function(value) Settings.FarmConfig.AutoUpgrade = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoUpgrade or false})
