@@ -427,8 +427,8 @@ local function AutoFarmConfigUI()
 		end
 	end
 	
-	getgenv().UpdateOptions(SFarmConfig.Data.Value)
-	getgenv().UpdateWorldType(SFarmConfig.Data.Value)
+	getgenv().UpdateOptions(FarmCategory.Data.Value)
+	getgenv().UpdateWorldType(FarmCategory.Data.Value)
 end
 -------------------------
 
