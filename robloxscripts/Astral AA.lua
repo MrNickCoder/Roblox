@@ -340,7 +340,13 @@ local function AutoFarmConfigUI()
 	if not Settings.WorldConfig then Settings.WorldConfig = {} end
 	
 	SFarmConfig:AddLabel({Text = "🔱 Farm Category"})
-	local FarmCategory = SFarmConfig:AddDropdown("Pick Category", function(value) Settings.FarmConfig.FarmCategory = value; SaveSettings(); getgenv().UpdateWorld() end, {Options = {"Story Worlds", "Legend Stages", "Raid Worlds", "Infinity Castle", "Portals", "Dungeon", "Secret Portals"}, Value = Settings.FarmConfig.FarmCategory or "Story Worlds"})
+	local FarmCategory = SFarmConfig:AddDropdown("Pick Category", function(value)
+		Settings.FarmConfig.FarmCategory = value
+		SaveSettings()
+		
+		getgenv().UpdateOptions(value)
+		getgenv().UpdateWorldType(value)
+	end, {Options = {"Story Worlds", "Legend Stages", "Raid Worlds", "Infinity Castle", "Portals", "Dungeon", "Secret Portals"}, Value = Settings.FarmConfig.FarmCategory or "Story Worlds"})
 	
 	SFarmConfig:AddLabel()
 	SFarmConfig:AddToggle("🌾 Auto Start", function(value) Settings.FarmConfig.AutoStart = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoStart or false})
@@ -366,59 +372,61 @@ local function AutoFarmConfigUI()
 	local WorldLevel = SWorldConfig:AddDropdown("Pick Level", function(value) Settings.WorldConfig.WorldLevel = value; SaveSettings() end)
 	SWorldConfig:AddLabel()
 	
-	getgenv().UpdateWorld = function()
-		local value = Settings.FarmConfig.FarmCategory
-		
-		WorldType.Close()
+	getgenv().UpdateOptions = function(value)
 		if value == "Story Worlds" then
 			AutoReplay.Toggle.Visible = true
 			AutoPortalReplay.Toggle.Visible = false
 			AutoNextStory.Toggle.Visible = true
 			AutoNextLevel.Toggle.Visible = false
-			
-			WorldType.Data.Options = {"Planet Namak", "Shiganshinu District", "Snowy Town","Hidden Sand Village", "Marine's Ford",
-				"Ghoul City", "Hollow World", "Ant Kingdom", "Magic Town", "Cursed Academy","Clover Kingdom","Cape Canaveral", "Alien Spaceship","Fabled Kingdom",
-				"Hero City","Puppet Island","Virtual Dungeon","Windhym"}
 		elseif value == "Legend Stages" then
 			AutoReplay.Toggle.Visible = true
 			AutoPortalReplay.Toggle.Visible = false
 			AutoNextStory.Toggle.Visible = false
 			AutoNextLevel.Toggle.Visible = false
-			
-			WorldType.Data.Options = {"Clover Kingdom (Elf Invasion)", "Hollow Invasion","Cape Canaveral (Legend)", "Fabled Kingdom (Legend)", "Hero City (Midnight)", "Virtual Dungeon (Bosses)"}
 		elseif value == "Raid Worlds" then
 			AutoReplay.Toggle.Visible = true
 			AutoPortalReplay.Toggle.Visible = false
 			AutoNextStory.Toggle.Visible = false
 			AutoNextLevel.Toggle.Visible = false
-			
-			WorldType.Data.Options = {"Storm Hideout","West City", "Infinity Train", "Shiganshinu District - Raid","Hiddel Sand Village - Raid", "Freezo's Invasion", "Entertainment District", 
-				"Hero City (Hero Slayer)", "Marine's Ford (Buddha)"}
 		elseif value == "Portals" then
 			AutoReplay.Toggle.Visible = false
 			AutoPortalReplay.Toggle.Visible = true
 			AutoNextStory.Toggle.Visible = false
 			AutoNextLevel.Toggle.Visible = false
-			
-			WorldType.Data.Options = {"Alien Portals","Zeldris Portals","Demon Portals","Dressrosa Portals","Madoka Portals","The Eclipse"}
 		elseif value == "Dungeon" then
 			AutoReplay.Toggle.Visible = false
 			AutoPortalReplay.Toggle.Visible = false
 			AutoNextStory.Toggle.Visible = false
 			AutoNextLevel.Toggle.Visible = false
-			
-			WorldType.Data.Options = {"Cursed Womb","Crused Parade","Anniversary Island"}
 		elseif value == "Infinity Castle" then
 			AutoReplay.Toggle.Visible = false
 			AutoPortalReplay.Toggle.Visible = false
 			AutoNextStory.Toggle.Visible = false
 			AutoNextLevel.Toggle.Visible = true
 		end
-		
+
 		FarmCategory.Section:Resize(true)
 	end
+	getgenv().UpdateWorldType = function(value)
+		WorldType.Close()
+		if value == "Story Worlds" then
+			WorldType.Data.Options = {"Planet Namak", "Shiganshinu District", "Snowy Town","Hidden Sand Village", "Marine's Ford",
+				"Ghoul City", "Hollow World", "Ant Kingdom", "Magic Town", "Cursed Academy","Clover Kingdom","Cape Canaveral", "Alien Spaceship","Fabled Kingdom",
+				"Hero City","Puppet Island","Virtual Dungeon","Windhym"}
+		elseif value == "Legend Stages" then
+			WorldType.Data.Options = {"Clover Kingdom (Elf Invasion)", "Hollow Invasion","Cape Canaveral (Legend)", "Fabled Kingdom (Legend)", "Hero City (Midnight)", "Virtual Dungeon (Bosses)"}
+		elseif value == "Raid Worlds" then
+			WorldType.Data.Options = {"Storm Hideout","West City", "Infinity Train", "Shiganshinu District - Raid","Hiddel Sand Village - Raid", "Freezo's Invasion", "Entertainment District", 
+				"Hero City (Hero Slayer)", "Marine's Ford (Buddha)"}
+		elseif value == "Portals" then
+			WorldType.Data.Options = {"Alien Portals","Zeldris Portals","Demon Portals","Dressrosa Portals","Madoka Portals","The Eclipse"}
+		elseif value == "Dungeon" then
+			WorldType.Data.Options = {"Cursed Womb","Crused Parade","Anniversary Island"}
+		end
+	end
 	
-	getgenv().UpdateWorld()
+	getgenv().UpdateOptions(Settings.FarmConfig.FarmCategory)
+	getgenv().UpdateWorldType(Settings.FarmConfig.FarmCategory)
 end
 -------------------------
 
