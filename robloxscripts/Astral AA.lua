@@ -345,6 +345,7 @@ local function AutoFarmConfigUI()
 	SFarmConfig:AddLabel({Text = "🔱 Farm Category"})
 	FarmCategory = SFarmConfig:AddDropdown("Pick Category", function(value)
 		Settings.FarmConfig.FarmCategory = value
+		Settings.WorldConfig.WorldType = AAData["World Type"]["Type"][value]["Worlds"][1]
 		SaveSettings()
 		
 		getgenv().UpdateOptions(value)
@@ -392,13 +393,11 @@ local function WorldConfigUI()
 	local WorldTypeLabel = SWorldConfig:AddLabel({Text = "🌏 Select World"})
 	WorldType = SWorldConfig:AddDropdown("Pick World", function(value)
 		Settings.WorldConfig.WorldType = value
+		Settings.WorldConfig.WorldLevel = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"][1]
 		SaveSettings()
 
 		getgenv().UpdateWorldLevel(value)
-	end, {
-		Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"],
-		Value = Settings.WorldConfig.WorldType or AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"][1]
-	})
+	end, {})
 	
 	local SWorldConfigSpace = SWorldConfig:AddLabel()
 	
@@ -406,10 +405,7 @@ local function WorldConfigUI()
 	WorldLevel = SWorldConfig:AddDropdown("Pick Level", function(value)
 		Settings.WorldConfig.WorldLevel = value
 		SaveSettings()
-	end, {
-		Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"],
-		Value = Settings.WorldConfig.WorldLevel or AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"][1]
-	})
+	end, {})
 	
 	getgenv().UpdateWorldType = function(value)
 		WorldType.Reset()
