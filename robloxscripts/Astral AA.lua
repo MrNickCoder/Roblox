@@ -389,7 +389,7 @@ end
 ----- [ World Config ] -----
 local WorldType, WorldLevel;
 local function WorldConfigUI()
-	SWorldConfig:AddLabel({Text = "🌏 Select World"})
+	local WorldTypeLabel = SWorldConfig:AddLabel({Text = "🌏 Select World"})
 	WorldType = SWorldConfig:AddDropdown("Pick World", function(value)
 		Settings.WorldConfig.WorldType = value
 		SaveSettings()
@@ -400,9 +400,9 @@ local function WorldConfigUI()
 		Value = Settings.WorldConfig.WorldType or AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"][1]
 	})
 	
-	SWorldConfig:AddLabel()
+	local SWorldConfigSpace = SWorldConfig:AddLabel()
 	
-	SWorldConfig:AddLabel({Text = "🎚️ Select Level"})
+	local WorldLevelLabel = SWorldConfig:AddLabel({Text = "🎚️ Select Level"})
 	WorldLevel = SWorldConfig:AddDropdown("Pick Level", function(value)
 		Settings.WorldConfig.WorldLevel = value
 		SaveSettings()
@@ -414,13 +414,21 @@ local function WorldConfigUI()
 	getgenv().UpdateWorldType = function(value)
 		WorldType.Reset()
 		if not AAData["World Type"]["Type"][value]["Worlds"] then
+			WorldTypeLabel.Label.Visible = false
 			WorldType.Dropdown.Visible = false
+			SWorldConfigSpace.Label.Visible = false
+			WorldLevelLabel.Label.Visible = false
 			WorldLevel.Dropdown.Visible = false
 		else
+			WorldTypeLabel.Label.Visible = true
 			WorldType.Dropdown.Visible = true
+			SWorldConfigSpace.Label.Visible = true
+			WorldLevelLabel.Label.Visible = true
 			WorldLevel.Dropdown.Visible = true
-
+			
 			WorldType.Data.Options = AAData["World Type"]["Type"][value]["Worlds"]
+			WorldType.Data.Value = AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"][1]
+			WorldType.Section:UpdateDropdown(WorldType, WorldType.Data.Value, {})
 		end
 
 		WorldType.Section:Resize(true)
@@ -428,11 +436,17 @@ local function WorldConfigUI()
 	getgenv().UpdateWorldLevel = function(value)
 		WorldLevel.Reset()
 		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"] then
+			SWorldConfigSpace.Label.Visible = false
+			WorldLevelLabel.Label.Visible = false
 			WorldLevel.Dropdown.Visible = false
 		else
+			SWorldConfigSpace.Label.Visible = true
+			WorldLevelLabel.Label.Visible = true
 			WorldLevel.Dropdown.Visible = true
 
 			WorldLevel.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"]
+			WorldLevel.Data.Value = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"][1]
+			WorldLevel.Section:UpdateDropdown(WorldLevel, WorldLevel.Data.Value, {})
 		end
 
 		WorldLevel.Section:Resize(true)
