@@ -437,7 +437,8 @@ local function WorldConfigUI()
 	end
 	getgenv().UpdateWorldLevel = function(value)
 		WorldLevel.Reset()
-		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"] then
+		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
+			AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"] then
 			SWorldConfigSpace.Label.Visible = false
 			WorldLevelLabel.Label.Visible = false
 			WorldLevel.Dropdown.Visible = false
@@ -448,8 +449,8 @@ local function WorldConfigUI()
 
 			WorldLevel.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"]
 			if Settings.WorldConfig.WorldLevel and
-				not table.find(AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"], Settings.WorldConfig.WorldLevel) then
-				Settings.WorldConfig.WorldLevel = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"][1]
+				not table.find(AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"], Settings.WorldConfig.WorldLevel) then
+				Settings.WorldConfig.WorldLevel = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"][1]
 			end
 			WorldLevel.Data.Value = Settings.WorldConfig.WorldLevel
 			WorldLevel.Section:UpdateDropdown(WorldLevel, WorldLevel.Data.Value, {})
