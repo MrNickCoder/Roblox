@@ -429,6 +429,8 @@ local function WorldConfigUI()
 			WorldType.Data.Options = AAData["World Type"]["Type"][value]["Worlds"]
 			WorldType.Data.Value = AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"][1]
 			WorldType.Section:UpdateDropdown(WorldType, WorldType.Data.Value, {})
+			
+			getgenv().UpdateWorldLevel(WorldType.Data.Value)
 		end
 
 		WorldType.Section:Resize(true)
