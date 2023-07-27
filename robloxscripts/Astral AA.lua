@@ -75,6 +75,15 @@ local UserInputService		= game:GetService("UserInputService")
 local Player				= Players.LocalPlayer
 local Mouse					= Player:GetMouse()
 
+-----------------------
+----- [ UTILITY ] -----
+-----------------------
+function Visible(List, Visible)
+	for i, v in pairs(List) do
+		v.Visible = Visible
+	end
+end
+
 ---------------------------------
 ----- [ ITEM DROP RESULTS ] -----
 ---------------------------------
@@ -344,9 +353,11 @@ local function AutoFarmConfigUI()
 	
 	SFarmConfig:AddLabel({Text = "🔱 Farm Category"})
 	FarmCategory = SFarmConfig:AddDropdown("Pick Category", function(value)
+		if Settings.FarmConfig.FarmCategory == value then return end
 		Settings.FarmConfig.FarmCategory = value
 		Settings.WorldConfig.WorldType = AAData["World Type"]["Type"][value]["Worlds"][1]
 		SaveSettings()
+		warn("Changed Farming Type to "..value)
 		
 		getgenv().UpdateOptions(value)
 		getgenv().UpdateWorldType(value)
@@ -388,39 +399,68 @@ end
 -------------------------
 
 ----- [ World Config ] -----
-local WorldType, WorldLevel;
+local WorldType, WorldLevel, WorldDifficulty;
 local function WorldConfigUI()
 	local WorldTypeLabel = SWorldConfig:AddLabel({Text = "🌏 Select World"})
-	WorldType = SWorldConfig:AddDropdown("Pick World", function(value)
+	WorldType = SWorldConfig:AddDropdown("", function(value)
+		if Settings.WorldConfig.WorldType == value then return end
 		Settings.WorldConfig.WorldType = value
 		Settings.WorldConfig.WorldLevel = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"][1]
 		SaveSettings()
+		warn("Changed World Type to "..value)
 
 		getgenv().UpdateWorldLevel(value)
 	end, {})
 	
-	local SWorldConfigSpace = SWorldConfig:AddLabel()
+	local WCSpace_1 = SWorldConfig:AddLabel()
 	
 	local WorldLevelLabel = SWorldConfig:AddLabel({Text = "🎚️ Select Level"})
-	WorldLevel = SWorldConfig:AddDropdown("Pick Level", function(value)
+	WorldLevel = SWorldConfig:AddDropdown("", function(value)
+		if Settings.WorldConfig.WorldLevel == value then return end
 		Settings.WorldConfig.WorldLevel = value
+		if string.find(Settings.WorldConfig.WorldLevel, "_infinite") or table.find({"Legend Stages", "Raid Worlds"}, Settings.FarmConfig.FarmCategory) then
+			Settings.WorldConfig.WorldDifficulty = "Hard"
+		elseif table.find({"Portals", "Dungeon", "Secret Portals"}, Settings.FarmConfig.FarmCategory) then
+			Settings.WorldConfig.WorldDifficulty = "Default"
+		elseif Settings.FarmConfig.FarmCategory ~= "Infinity Castle" then
+			Settings.WorldConfig.WorldDifficulty = "Normal"
+		end
 		SaveSettings()
+		warn("Changed World Level to "..value)
+		
+		getgenv().UpdateWorldDifficulty(value)
+	end, {})
+	
+	local WCSpace_2 = SWorldConfig:AddLabel()
+	
+	local WorldDifficultyLabel = SWorldConfig:AddLabel({Text = "🔫 Select Difficulty"})
+	WorldDifficulty = SWorldConfig:AddDropdown("", function(value)
+		if Settings.WorldConfig.WorldDifficulty == value then return end
+		Settings.WorldConfig.WorldDifficulty = value
+		SaveSettings()
+		warn("Changed World Difficulty to "..value)
 	end, {})
 	
 	getgenv().UpdateWorldType = function(value)
 		WorldType.Reset()
 		if not AAData["World Type"]["Type"][value]["Worlds"] then
-			WorldTypeLabel.Label.Visible = false
-			WorldType.Dropdown.Visible = false
-			SWorldConfigSpace.Label.Visible = false
-			WorldLevelLabel.Label.Visible = false
-			WorldLevel.Dropdown.Visible = false
+			local List = {
+				WorldTypeLabel.Label, WorldType.Dropdown,
+				WCSpace_1.Label,
+				WorldLevelLabel.Label, WorldLevel.Dropdown,
+				WCSpace_2.Label,
+				WorldDifficultyLabel.Label, WorldDifficulty.Label
+			}
+			Visible(List, false)
 		else
-			WorldTypeLabel.Label.Visible = true
-			WorldType.Dropdown.Visible = true
-			SWorldConfigSpace.Label.Visible = true
-			WorldLevelLabel.Label.Visible = true
-			WorldLevel.Dropdown.Visible = true
+			local List = {
+				WorldTypeLabel.Label, WorldType.Dropdown,
+				WCSpace_1.Label,
+				WorldLevelLabel.Label, WorldLevel.Dropdown,
+				WCSpace_2.Label,
+				WorldDifficultyLabel.Label, WorldDifficulty.Label
+			}
+			Visible(List, true)
 			
 			WorldType.Data.Options = AAData["World Type"]["Type"][value]["Worlds"]
 			if Settings.WorldConfig.WorldType and
@@ -439,13 +479,21 @@ local function WorldConfigUI()
 		WorldLevel.Reset()
 		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
 			AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"] then
-			SWorldConfigSpace.Label.Visible = false
-			WorldLevelLabel.Label.Visible = false
-			WorldLevel.Dropdown.Visible = false
+			local List = {
+				WCSpace_1.Label,
+				WorldLevelLabel.Label, WorldLevel.Dropdown,
+				WCSpace_2.Label,
+				WorldDifficultyLabel.Label, WorldDifficulty.Label
+			}
+			Visible(List, false)
 		else
-			SWorldConfigSpace.Label.Visible = true
-			WorldLevelLabel.Label.Visible = true
-			WorldLevel.Dropdown.Visible = true
+			local List = {
+				WCSpace_1.Label,
+				WorldLevelLabel.Label, WorldLevel.Dropdown,
+				WCSpace_2.Label,
+				WorldDifficultyLabel.Label, WorldDifficulty.Label
+			}
+			Visible(List, true)
 
 			WorldLevel.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"]
 			if Settings.WorldConfig.WorldLevel and
@@ -454,13 +502,48 @@ local function WorldConfigUI()
 			end
 			WorldLevel.Data.Value = Settings.WorldConfig.WorldLevel
 			WorldLevel.Section:UpdateDropdown(WorldLevel, WorldLevel.Data.Value, {})
+			
+			getgenv().UpdateWorldDifficulty(WorldLevel.Data.Value)
 		end
 
 		WorldLevel.Section:Resize(true)
 	end
+	getgenv().UpdateWorldDifficulty = function(value)
+		WorldDifficulty.Reset()
+		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
+			AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"] then
+			local List = {
+				WCSpace_2.Label,
+				WorldDifficultyLabel.Label, WorldDifficulty.Label
+			}
+			Visible(List, false)
+		else
+			local List = {
+				WCSpace_2.Label,
+				WorldDifficultyLabel.Label, WorldDifficulty.Label
+			}
+			Visible(List, true)
+			
+			if string.find(Settings.WorldConfig.WorldLevel, "_infinite") or table.find({"Legend Stages", "Raid Worlds"}, Settings.FarmConfig.FarmCategory) then
+				WorldDifficulty.Data.Options = {"Hard"}
+				Settings.WorldConfig.WorldDifficulty = "Hard"
+			elseif table.find({"Portals", "Dungeon", "Secret Portals"}, Settings.FarmConfig.FarmCategory) then
+				WorldDifficulty.Data.Options = {"Default"}
+				Settings.WorldConfig.WorldDifficulty = "Default"
+			elseif Settings.FarmConfig.FarmCategory ~= "Infinity Castle" then
+				WorldDifficulty.Data.Options = {"Normal", "Hard"}
+				Settings.WorldConfig.WorldDifficulty = "Normal"
+			end
+			WorldDifficulty.Data.Value = Settings.WorldConfig.WorldDifficulty
+			WorldDifficulty.Section:UpdateDropdown(WorldDifficulty, WorldDifficulty.Data.Value, {})
+		end
+		
+		WorldDifficulty.Section:Resize(true)
+	end
 	
 	getgenv().UpdateWorldType(FarmCategory.Data.Value)
 	getgenv().UpdateWorldLevel(WorldType.Data.Value)
+	getgenv().UpdateWorldDifficulty(WorldLevel.Data.Value)
 end
 ----------------------------
 
@@ -494,13 +577,14 @@ if game.PlaceId == 8304191830 then
 	HomeUI()
 	AutoFarmConfigUI()
 	WorldConfigUI()
+	warn("Loaded Lobby UI")
 else
 	HomeUI()
 	AutoFarmConfigUI()
 	WorldConfigUI()
+	warn("Loaded Game UI")
 end
 ---------------------
-
 
 -------------------------
 ----- [ FUNCTIONS ] -----
