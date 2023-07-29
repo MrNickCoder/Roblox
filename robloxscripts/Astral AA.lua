@@ -340,6 +340,8 @@ local SWorldConfig = PFarm:AddSection("🌏 World Config 🌏")
 local PUnit = Window:AddPage("Unit Config", "🧙")
 local SUnitConfig = PUnit:AddSection("⚙️ Unit Configuration ⚙️")
 
+local PShop = Window:AddPage("Shop", "💰")
+
 local PMisc = Window:AddPage("Misc [BETA]", "🛠️")
 
 local PDiscord = Window:AddPage("Discord", "🌐")

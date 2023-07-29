@@ -1,7 +1,7 @@
 return {
 	["World Type"] = {
 		["Types"] = {
-			"Story Worlds","Legend Stages","Raid Worlds","Infinity Castle","Portals","Dungeon","Secret Portals"
+			"Story Worlds","Legend Stages","Raid Worlds","Challenges","Infinity Castle","Portals","Dungeon","Secret Portals"
 		};
 		["Type"] = {
 			["Story Worlds"] = {
@@ -148,7 +148,7 @@ return {
 			};
 			["Portals"] = {
 				["Worlds"] = {
-					"Alien Portals","Zeldris Portals","Demon Portals","Dressrosa Portals","Madoka Portals","The Eclipse"
+					"Alien Portals","Zeldris Portals","Demon Portals","Dressrosa Portals","The Eclipse","Summer Events"
 				};
 				["World"] = {
 					["Alien Portals"] = {
@@ -183,21 +183,22 @@ return {
 							};
 						};
 					};
-					["Madoka Portals"] = {
-						["Levels"] = {"portal_item__madoka"};
-						["Level"] = {
-							["portal_item__madoka"] = {
-								["Tiers"] = {"1","2","3","4","5","6","7","8","9","10","11"};
-								["Damage Modifier"] = {"Magic","Physical"};
-								["Challenge"] = {"double_cost","short_range","fast_enemies","regen_enemies","tank_enemies","shield_enemies"};
-							};
-						};
-					};
 					["The Eclipse"] = {
 						["Levels"] = {"portal_item__eclipse"};
 						["Level"] = {
 							["portal_item__eclipse"] = {
 								["Damage Modifier"] = {"Magic","Physical","Fire","Aqua","Storm","Air","Rose","Dark","Light"};
+							};
+						};
+					};
+					["Summer Events"] = {
+						["Levels"] = {"portal_summer"};
+						["Level"] = {
+							["portal_summer"] = {
+								["Worlds"] = {"Planet Namak (Summer)","Shiganshinu District","Cursed Academy (Summer)","Alien Spaceship (Underwater)","Fabled Kingdom (Summer)"};
+								["Tiers"] = {"1","2","3","4","5","6","7","8","9","10"};
+								["Damage Modifier"] = {"Fire","Aqua","Storm","Air","Rose","Dark","Light"};
+								["Challenge"] = {"double_cost","short_range","fast_enemies","regen_enemies","tank_enemies","shield_enemies"};
 							};
 						};
 					};
@@ -239,16 +240,31 @@ return {
 					["Dressrosa Secret Portals"] = {
 						["Levels"] = {"portal_item__doflamingo"};
 					};
-					["Madoka Secret Portals"] = {
-						["Levels"] = {"portal_item__madoka2"};
-					};
 					["The Eclipse Secret"] = {
 						["Levels"] = {"portal_item__femto"};
+					};
+					["Summer Secret"] = {
+						["Levels"] = {"portal_poseidon"};
 					};
 				};
 				["UI"] = {
 					["Auto Replay"] = false;
 					["Auto Portal Replay"] = true;
+					["Auto Next Story"] = false;
+					["Auto Next Level"] = false;
+				};
+			};
+			["Challenges"] = {
+				["Worlds"] = {
+					"Planet Namak","Shiganshinu District","Snowy Town","Hidden Sand Village","Marine's Ford","Ghoul City","Hollow World","Ant Kingdom",
+					"Magic Town","Cursed Academy","Clover Kingdom","Cape Canaveral","Alien Spaceship","Fabled Kingdom","Hero City","Puppet Island",
+					"Virtual Dungeon","Windhym"
+				};
+				["Reward"] = {"Star Fruit", "Rainbow Fruit", "Star Remnant", "Extra Gems", "Extra Gold"};
+				["Challenge"] = {"double_cost","short_range","fast_enemies","regen_enemies","tank_enemies","shield_enemies"};
+				["UI"] = {
+					["Auto Replay"] = false;
+					["Auto Portal Replay"] = false;
 					["Auto Next Story"] = false;
 					["Auto Next Level"] = false;
 				};
