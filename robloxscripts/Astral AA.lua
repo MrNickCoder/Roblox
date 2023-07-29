@@ -83,6 +83,15 @@ function Visible(List, Visible)
 		v.Visible = Visible
 	end
 end
+function Comma_Value(Text)
+	local Value = Text;
+	while true do
+		local Str, Num = string.gsub(Value, "^(-?%d+)(%d%d%d)", "%1,%2");
+		Value = Str
+		if Num ~= 0 then else break end
+	end
+	return Value
+end
 
 ---------------------------------
 ----- [ ITEM DROP RESULTS ] -----
@@ -137,22 +146,13 @@ end
 ----- [ Map & ID Map ] -----
 local function GetCurrentLevelId() if game.Workspace._MAP_CONFIG then return game:GetService("Workspace")._MAP_CONFIG.GetLevelData:InvokeServer()["id"] end end
 local function GetCurrentLevelName() if game.Workspace._MAP_CONFIG then return game:GetService("Workspace")._MAP_CONFIG.GetLevelData:InvokeServer()["name"] end end
-function Comma_Value(Text)
-	local Value = Text;
-	while true do
-		local Str, Num = string.gsub(Value, "^(-?%d+)(%d%d%d)", "%1,%2");
-		Value = Str
-		if Num ~= 0 then else break end
-	end
-	return Value
-end
 ----------------------------
 
 ----- [ Webhook ] -----
 getgenv().item = "-"
 Player.PlayerGui:FindFirstChild("HatchInfo"):FindFirstChild("holder"):FindFirstChild("info1"):FindFirstChild("UnitName").Text = getgenv().item
-function Webhook()
-	if Settings.WebhookEnabled then
+function ResultWebhook()
+	if Settings.ResultWebhook then
 		local URL = Settings.WebhookURL; print("Webhook?")
 		if URL == "" then warn("Webhook URL is empty!"); return end
 
@@ -176,8 +176,10 @@ function Webhook()
 		MapName = game:GetService("Workspace")._MAP_CONFIG.GetLevelData:InvokeServer()["name"]
 		CWaves = game:GetService("Players").LocalPlayer.PlayerGui.ResultsUI.Holder.Middle.WavesCompleted.Text
 		CTime = game:GetService("Players").LocalPlayer.PlayerGui.ResultsUI.Holder.Middle.Timer.Text
-		BattlePassValue = Player.PlayerGui:FindFirstChild("BattlePass"):FindFirstChild("Main"):FindFirstChild("Level"):FindFirstChild("V").Text
-		BattlePass = game:GetService("Players").LocalPlayer.PlayerGui.BattlePass.Main.Level.Title.Text
+		BattlePass = Player.PlayerGui:FindFirstChild("BattlePass"):FindFirstChild("Main"):FindFirstChild("Level"):FindFirstChild("V").Text
+		BattlePass2 = game:GetService("Players").LocalPlayer.PlayerGui.BattlePass.Main.Level.Title.Text
+		BattlePassAllLV = game:GetService("Players").LocalPlayer.PlayerGui.BattlePass.Main.Main.Rewards.Frame.Pages.Home.Amount.Text
+		BattlePassLV = game:GetService("Players").LocalPlayer.PlayerGui.BattlePass.Main.Level.V.Text
 		Waves = CWaves:split(": ")
 
 		if Waves ~= nil and Waves[2] == "999" then Waves[2] = "Use [Auto Leave at Wave] or [Test Webhook]" end
@@ -271,20 +273,34 @@ function Webhook()
 					["fields"] = {
 						{
 							["name"] ="Current Level ✨ & Gems 💎 & Gold 💰 & Portals 🌀",
-							["value"] = "```ini\n"..tostring(game.Players.LocalPlayer.PlayerGui.spawn_units.Lives.Main.Desc.Level.Text)..  " ✨\nCurrent Gold : "..tostring(Comma_Value(game.Players.LocalPlayer._stats.gold_amount.Value)).. " 💰\nCurrent Gems : "..tostring(Comma_Value(game.Players.LocalPlayer._stats.gem_amount.Value)).. " 💎\nCurrent Trophies : "..tostring(Comma_Value(game.Players.LocalPlayer._stats.trophies.Value)).. " 🏆\nCurrent Portal : ".. tostring(Count_Portal_list) .." 🌀```",
+							["value"] = "```ini\n"..tostring(game.Players.LocalPlayer.PlayerGui.spawn_units.Lives.Main.Desc.Level.Text).." ✨\n"..
+								"Current Gold : "..tostring(Comma_Value(game.Players.LocalPlayer._stats.gold_amount.Value)).." 💰\n"..
+								"Current Gems : "..tostring(Comma_Value(game.Players.LocalPlayer._stats.gem_amount.Value)).." 💎\n"..
+								"Current Trophies : "..tostring(Comma_Value(game.Players.LocalPlayer._stats.trophies.Value)).." 🏆\n"..
+								"Current Pearl : "..tostring(Comma_Value(game.Players.LocalPlayer._stats._resourceSummerPearls.Value)).." 🦪\n"..
+								"Current Portal : ".. tostring(Count_Portal_list).." 🌀```",
 						},
 						{
 							["name"] ="Results :",
-							["value"] = " ```ini\nWorld : "..MapName.. " 🌏\nMap : "..World.. " 🗺️\nResults : "..Result.. " ⚔️\nWave End : " ..tostring(Waves[2]).." 🌊\nTime : " ..tostring(TTime[2]).." ⌛\nAll Kill Count : " ..tostring(Comma_Value(game.Players.LocalPlayer._stats.kills.Value)).. " ⚔️\nDMG Deal : " ..tostring(Comma_Value(game.Players.LocalPlayer._stats.damage_dealt.Value)).."⚔️```",
+							["value"] = " ```ini\nWorld : "..MapName.." 🌏\n"..
+								"Map : "..World.." 🗺️\n"..
+								"Results : "..Result.." ⚔️\n"..
+								"Wave End : "..tostring(Waves[2]).." 🌊\n"..
+								"Time : " ..tostring(TTime[2]).." ⌛\n"..
+								"All Kill Count : "..tostring(Comma_Value(game.Players.LocalPlayer._stats.kills.Value)).." ⚔️\n"..
+								"DMG Deal : "..tostring(Comma_Value(game.Players.LocalPlayer._stats.damage_dealt.Value)).." 🩸```",
 							["inline"] = true
 						},
 						{
 							["name"] ="Rewards :",
-							["value"] = "```ini\n" ..Comma_Value(Gold).." Gold 💰\n"..Comma_Value(Gems).." Gems 💎\n"..Comma_Value(Exp[1]).." XP 🧪\n"..Trophy.." Trophy 🏆```",
+							["value"] = "```ini\n" ..Comma_Value(Gold).." Gold 💰\n"..
+								Comma_Value(Gems).." Gems 💎\n"..
+								Comma_Value(Exp[1]).." XP 🧪\n"..
+								Trophy.." Trophy 🏆```",
 						},
 						{
 							["name"] ="Items Drop :",
-							["value"] = "```ini\n" .. TextDropLabel .. "```",
+							["value"] = "```ini\n"..TextDropLabel.."```",
 							["inline"] = false 
 						}
 					}
@@ -348,7 +364,7 @@ local PDiscord = Window:AddPage("Discord", "🌐")
 
 ----- [ Auto Farm Config ] -----
 local FarmCategory;
-local AutoReplay, AutoPortalReplay, AutoNextStory, AutoNextLevel;
+local AutoReplay, AutoPortalReplay, AutoNextStory;
 local function AutoFarmConfigUI()
 	if Settings and not Settings.FarmConfig then Settings.FarmConfig = {} end
 	if Settings and not Settings.WorldConfig then Settings.WorldConfig = {} end
@@ -379,7 +395,6 @@ local function AutoFarmConfigUI()
 	AutoReplay = SFarmConfig:AddToggle("🏃 Auto Replay", function(value) Settings.FarmConfig.AutoReplay = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoReplay or false})
 	AutoPortalReplay = SFarmConfig:AddToggle("🏃 Auto Pick Portal [Replay]", function(value) Settings.FarmConfig.AutoReplayPortal = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoReplayPortal or false})
 	AutoNextStory = SFarmConfig:AddToggle("🏃 Auto Next Story", function(value) Settings.FarmConfig.AutoNextStory = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoNextStory or false})
-	AutoNextLevel = SFarmConfig:AddToggle("🏃 Auto Next Level", function(value) Settings.FarmConfig.AutoNextLevel = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoNextLevel or false})
 	
 	SFarmConfig:AddLabel()
 	SFarmConfig:AddToggle("🏃 Auto Leave", function(value) Settings.FarmConfig.AutoLeave = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoLeave or false})
@@ -391,7 +406,6 @@ local function AutoFarmConfigUI()
 		AutoReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Replay"]
 		AutoPortalReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Portal Replay"]
 		AutoNextStory.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Next Story"]
-		AutoNextLevel.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Next Level"]
 		
 		FarmCategory.Section:Resize(true)
 	end
@@ -424,7 +438,7 @@ local function WorldConfigUI()
 			Settings.WorldConfig.WorldDifficulty = "Hard"
 		elseif table.find({"Portals", "Dungeon", "Secret Portals"}, Settings.FarmConfig.FarmCategory) then
 			Settings.WorldConfig.WorldDifficulty = "Default"
-		elseif Settings.FarmConfig.FarmCategory ~= "Infinity Castle" then
+		else
 			Settings.WorldConfig.WorldDifficulty = "Normal"
 		end
 		SaveSettings()
@@ -532,7 +546,7 @@ local function WorldConfigUI()
 			elseif table.find({"Portals", "Dungeon", "Secret Portals"}, Settings.FarmConfig.FarmCategory) then
 				WorldDifficulty.Data.Options = {"Default"}
 				Settings.WorldConfig.WorldDifficulty = "Default"
-			elseif Settings.FarmConfig.FarmCategory ~= "Infinity Castle" then
+			else
 				WorldDifficulty.Data.Options = {"Normal", "Hard"}
 				Settings.WorldConfig.WorldDifficulty = "Normal"
 			end

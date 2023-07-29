@@ -1,7 +1,7 @@
 return {
 	["World Type"] = {
 		["Types"] = {
-			"Story Worlds","Legend Stages","Raid Worlds","Challenges","Infinity Castle","Portals","Dungeon","Secret Portals"
+			"Story Worlds","Legend Stages","Raid Worlds","Portals","Dungeon","Secret Portals"
 		};
 		["Type"] = {
 			["Story Worlds"] = {
@@ -70,7 +70,6 @@ return {
 					["Auto Replay"] = true;
 					["Auto Portal Replay"] = false;
 					["Auto Next Story"] = true;
-					["Auto Next Level"] = false;
 				};
 			};
 			["Legend Stages"] = {
@@ -102,7 +101,6 @@ return {
 					["Auto Replay"] = true;
 					["Auto Portal Replay"] = false;
 					["Auto Next Story"] = false;
-					["Auto Next Level"] = false;
 				};
 			},
 			["Raid Worlds"] = {
@@ -143,7 +141,6 @@ return {
 					["Auto Replay"] = true;
 					["Auto Portal Replay"] = false;
 					["Auto Next Story"] = false;
-					["Auto Next Level"] = false;
 				};
 			};
 			["Portals"] = {
@@ -195,7 +192,7 @@ return {
 						["Levels"] = {"portal_summer"};
 						["Level"] = {
 							["portal_summer"] = {
-								["Worlds"] = {"Planet Namak (Summer)","Shiganshinu District","Cursed Academy (Summer)","Alien Spaceship (Underwater)","Fabled Kingdom (Summer)"};
+								["Worlds"] = {"Planet Namak (Summer)","Shiganshinu District","Cursed Academy (Summer)","Alien Spaceship (Underwater)","Fabled Kingdom (Summer)","Puppet Island (Summer)"};
 								["Tiers"] = {"1","2","3","4","5","6","7","8","9","10"};
 								["Damage Modifier"] = {"Fire","Aqua","Storm","Air","Rose","Dark","Light"};
 								["Challenge"] = {"double_cost","short_range","fast_enemies","regen_enemies","tank_enemies","shield_enemies"};
@@ -207,7 +204,6 @@ return {
 					["Auto Replay"] = false;
 					["Auto Portal Replay"] = true;
 					["Auto Next Story"] = false;
-					["Auto Next Level"] = false;
 				};
 			};
 			["Dungeon"] = {
@@ -229,7 +225,6 @@ return {
 					["Auto Replay"] = false;
 					["Auto Portal Replay"] = false;
 					["Auto Next Story"] = false;
-					["Auto Next Level"] = false;
 				};
 			};
 			["Secret Portals"] = {
@@ -251,30 +246,6 @@ return {
 					["Auto Replay"] = false;
 					["Auto Portal Replay"] = true;
 					["Auto Next Story"] = false;
-					["Auto Next Level"] = false;
-				};
-			};
-			["Challenges"] = {
-				["Worlds"] = {
-					"Planet Namak","Shiganshinu District","Snowy Town","Hidden Sand Village","Marine's Ford","Ghoul City","Hollow World","Ant Kingdom",
-					"Magic Town","Cursed Academy","Clover Kingdom","Cape Canaveral","Alien Spaceship","Fabled Kingdom","Hero City","Puppet Island",
-					"Virtual Dungeon","Windhym"
-				};
-				["Reward"] = {"Star Fruit", "Rainbow Fruit", "Star Remnant", "Extra Gems", "Extra Gold"};
-				["Challenge"] = {"double_cost","short_range","fast_enemies","regen_enemies","tank_enemies","shield_enemies"};
-				["UI"] = {
-					["Auto Replay"] = false;
-					["Auto Portal Replay"] = false;
-					["Auto Next Story"] = false;
-					["Auto Next Level"] = false;
-				};
-			};
-			["Infinity Castle"] = {
-				["UI"] = {
-					["Auto Replay"] = false;
-					["Auto Portal Replay"] = false;
-					["Auto Next Story"] = false;
-					["Auto Next Level"] = true;
 				};
 			};
 		};
