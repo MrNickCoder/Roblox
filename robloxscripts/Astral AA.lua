@@ -406,12 +406,12 @@ local function AutoFarmConfigUI()
 		AutoReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Replay"]
 		AutoPortalReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Portal Replay"]
 		AutoNextStory.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Next Story"]
-		if not AAData["World Type"]["Type"][value]["UI"]["Auto Replay"] and
-			not AAData["World Type"]["Type"][value]["UI"]["Auto Portal Replay"] and
-			not AAData["World Type"]["Type"][value]["UI"]["Auto Next Story"] then
-			ReplaySeparator.Label.Visible = false
-		else
+		if AAData["World Type"]["Type"][value]["UI"]["Auto Replay"] or
+			AAData["World Type"]["Type"][value]["UI"]["Auto Portal Replay"] or
+		 	AAData["World Type"]["Type"][value]["UI"]["Auto Next Story"] then
 			ReplaySeparator.Label.Visible = true
+		else
+			ReplaySeparator.Label.Visible = false
 		end
 		
 		FarmCategory.Section:Resize(true)
