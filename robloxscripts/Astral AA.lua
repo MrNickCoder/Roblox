@@ -391,7 +391,7 @@ local function AutoFarmConfigUI()
 	SFarmConfig:AddToggle("🔥 Auto Abilities", function(value) Settings.FarmConfig.AutoAbilities = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoAbilities or false})
 	SFarmConfig:AddCheckbox("🧙 Auto Buff 100%", function(value) Settings.FarmConfig.AutoBuff = value; SaveSettings() end, {Options = {"Orwin/Erwin", "Wenda/Wendy", "Leafy/Leafa"}, Selected = Settings.FarmConfig.AutoBuff or {}})
 	
-	SFarmConfig:AddLabel()
+	local ReplaySeparator = SFarmConfig:AddLabel()
 	AutoReplay = SFarmConfig:AddToggle("🏃 Auto Replay", function(value) Settings.FarmConfig.AutoReplay = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoReplay or false})
 	AutoPortalReplay = SFarmConfig:AddToggle("🏃 Auto Pick Portal [Replay]", function(value) Settings.FarmConfig.AutoReplayPortal = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoReplayPortal or false})
 	AutoNextStory = SFarmConfig:AddToggle("🏃 Auto Next Story", function(value) Settings.FarmConfig.AutoNextStory = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoNextStory or false})
@@ -406,6 +406,13 @@ local function AutoFarmConfigUI()
 		AutoReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Replay"]
 		AutoPortalReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Portal Replay"]
 		AutoNextStory.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Next Story"]
+		if not AAData["World Type"]["Type"][value]["UI"]["Auto Replay"] and
+			not AAData["World Type"]["Type"][value]["UI"]["Auto Portal Replay"] and
+			not AAData["World Type"]["Type"][value]["UI"]["Auto Next Story"] then
+			ReplaySeparator.Label.Visible = false
+		else
+			ReplaySeparator.Label.Visible = true
+		end
 		
 		FarmCategory.Section:Resize(true)
 	end
@@ -428,7 +435,7 @@ local function WorldConfigUI()
 		getgenv().UpdateWorldLevel(value)
 	end, {})
 	
-	local WCSpace_1 = SWorldConfig:AddLabel()
+	local WorldLevelSeparator = SWorldConfig:AddLabel()
 	
 	local WorldLevelLabel = SWorldConfig:AddLabel({Text = "🎚️ Select Level"})
 	WorldLevel = SWorldConfig:AddDropdown("", function(value)
@@ -447,7 +454,7 @@ local function WorldConfigUI()
 		getgenv().UpdateWorldDifficulty(value)
 	end, {})
 	
-	local WCSpace_2 = SWorldConfig:AddLabel()
+	local WorldDifficultySeparator = SWorldConfig:AddLabel()
 	
 	local WorldDifficultyLabel = SWorldConfig:AddLabel({Text = "🔫 Select Difficulty"})
 	WorldDifficulty = SWorldConfig:AddDropdown("", function(value)
@@ -462,18 +469,18 @@ local function WorldConfigUI()
 		if not AAData["World Type"]["Type"][value]["Worlds"] then
 			local List = {
 				WorldTypeLabel.Label, WorldType.Dropdown,
-				WCSpace_1.Label,
+				WorldLevelSeparator.Label,
 				WorldLevelLabel.Label, WorldLevel.Dropdown,
-				WCSpace_2.Label,
+				WorldDifficultySeparator.Label,
 				WorldDifficultyLabel.Label, WorldDifficulty.Label
 			}
 			Visible(List, false)
 		else
 			local List = {
 				WorldTypeLabel.Label, WorldType.Dropdown,
-				WCSpace_1.Label,
+				WorldLevelSeparator.Label,
 				WorldLevelLabel.Label, WorldLevel.Dropdown,
-				WCSpace_2.Label,
+				WorldDifficultySeparator.Label,
 				WorldDifficultyLabel.Label, WorldDifficulty.Label
 			}
 			Visible(List, true)
@@ -496,17 +503,17 @@ local function WorldConfigUI()
 		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
 			AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"] then
 			local List = {
-				WCSpace_1.Label,
+				WorldLevelSeparator.Label,
 				WorldLevelLabel.Label, WorldLevel.Dropdown,
-				WCSpace_2.Label,
+				WorldDifficultySeparator.Label,
 				WorldDifficultyLabel.Label, WorldDifficulty.Label
 			}
 			Visible(List, false)
 		else
 			local List = {
-				WCSpace_1.Label,
+				WorldLevelSeparator.Label,
 				WorldLevelLabel.Label, WorldLevel.Dropdown,
-				WCSpace_2.Label,
+				WorldDifficultySeparator.Label,
 				WorldDifficultyLabel.Label, WorldDifficulty.Label
 			}
 			Visible(List, true)
@@ -529,13 +536,13 @@ local function WorldConfigUI()
 		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
 			AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"] then
 			local List = {
-				WCSpace_2.Label,
+				WorldDifficultySeparator.Label,
 				WorldDifficultyLabel.Label, WorldDifficulty.Label
 			}
 			Visible(List, false)
 		else
 			local List = {
-				WCSpace_2.Label,
+				WorldDifficultySeparator.Label,
 				WorldDifficultyLabel.Label, WorldDifficulty.Label
 			}
 			Visible(List, true)
@@ -562,6 +569,12 @@ local function WorldConfigUI()
 	getgenv().UpdateWorldDifficulty(WorldLevel.Data.Value)
 end
 ----------------------------
+
+----- [ Unit Config ] -----
+local function UnitConfigUI()
+	
+end
+---------------------------
 
 ----- [ Home Page ] -----
 local function HomeUI()
@@ -593,11 +606,13 @@ if game.PlaceId == 8304191830 then
 	HomeUI()
 	AutoFarmConfigUI()
 	WorldConfigUI()
+	UnitConfigUI()
 	warn("Loaded Lobby UI")
 else
 	HomeUI()
 	AutoFarmConfigUI()
 	WorldConfigUI()
+	UnitConfigUI()
 	warn("Loaded Game UI")
 end
 ---------------------
