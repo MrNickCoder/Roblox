@@ -192,10 +192,10 @@ return {
 						["Levels"] = {"portal_summer"};
 						["Level"] = {
 							["portal_summer"] = {
-								["Worlds"] = {"Planet Namak (Summer)","Shiganshinu District","Cursed Academy (Summer)","Alien Spaceship (Underwater)","Fabled Kingdom (Summer)","Puppet Island (Summer)"};
+								["Maps"] = {"Planet Namak (Summer)","Shiganshinu District","Cursed Academy (Summer)","Alien Spaceship (Underwater)","Fabled Kingdom (Summer)","Puppet Island (Summer)"};
+								["Damage Modifiers"] = {"Fire","Aqua","Storm","Air","Rose","Dark","Light"};
 								["Tiers"] = {"1","2","3","4","5","6","7","8","9","10"};
-								["Damage Modifier"] = {"Fire","Aqua","Storm","Air","Rose","Dark","Light"};
-								["Challenge"] = {"double_cost","short_range","fast_enemies","regen_enemies","tank_enemies","shield_enemies"};
+								["Challenges"] = {"double_cost","short_range","fast_enemies","regen_enemies","tank_enemies","shield_enemies"};
 							};
 						};
 					};
@@ -208,13 +208,13 @@ return {
 			};
 			["Dungeon"] = {
 				["Worlds"] = {
-					"Cursed Womb","Crused Parade","Anniversary Island"
+					"Cursed Womb","Cursed Parade","Anniversary Island"
 				};
 				["World"] = {
 					["Cursed Womb"] = {
 						["Levels"] = {"jjk_finger"};
 					};
-					["Crused Parade"] = {
+					["Cursed Parade"] = {
 						["Levels"] = {"jjk_raid"};
 					};
 					["Anniversary Island"] = {
