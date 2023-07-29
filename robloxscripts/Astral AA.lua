@@ -374,11 +374,11 @@ local function AutoFarmConfigUI()
 		if Settings.FarmConfig.FarmCategory == value then return end
 		Settings.FarmConfig.FarmCategory = value
 		Settings.WorldConfig.WorldType = AAData["World Type"]["Type"][value]["Worlds"][1]
-		SaveSettings()
 		warn("Changed Farming Type to "..value)
-		
 		getgenv().UpdateOptions(value)
 		getgenv().UpdateWorldType(value)
+		
+		SaveSettings()
 	end, {
 		Options = AAData["World Type"]["Types"],
 		Value = Settings.FarmConfig.FarmCategory or AAData["World Type"]["Types"][1]
@@ -429,10 +429,10 @@ local function WorldConfigUI()
 		if Settings.WorldConfig.WorldType == value then return end
 		Settings.WorldConfig.WorldType = value
 		Settings.WorldConfig.WorldLevel = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"][1]
-		SaveSettings()
 		warn("Changed World Type to "..value)
-
 		getgenv().UpdateWorldLevel(value)
+		
+		SaveSettings()
 	end, {})
 	
 	local WorldLevelSeparator = SWorldConfig:AddLabel()
@@ -448,10 +448,10 @@ local function WorldConfigUI()
 		else
 			Settings.WorldConfig.WorldDifficulty = "Normal"
 		end
-		SaveSettings()
 		warn("Changed World Level to "..value)
-		
 		getgenv().UpdateWorldDifficulty(value)
+		
+		SaveSettings()
 	end, {})
 	
 	local WorldDifficultySeparator = SWorldConfig:AddLabel()
@@ -460,8 +460,9 @@ local function WorldConfigUI()
 	WorldDifficulty = SWorldConfig:AddDropdown("", function(value)
 		if Settings.WorldConfig.WorldDifficulty == value then return end
 		Settings.WorldConfig.WorldDifficulty = value
-		SaveSettings()
 		warn("Changed World Difficulty to "..value)
+		
+		SaveSettings()
 	end, {})
 	
 	getgenv().UpdateWorldType = function(value)
