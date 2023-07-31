@@ -402,6 +402,8 @@ local function AutoFarmConfigUI()
 	SFarmConfig:AddToggle("⭐️ Leave At Wave", function(value) Settings.FarmConfig.WaveLeave = value; SaveSettings() end, {Active = Settings.FarmConfig.WaveLeave or false})
 	SFarmConfig:AddToggle("🏃 Auto Defeat", function(value) Settings.FarmConfig.AutoDefeat = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoDefeat or false})
 	
+	-----------------------------------------
+	
 	getgenv().UpdateOptions = function(value)
 		AutoReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Replay"]
 		AutoPortalReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Portal Replay"]
@@ -422,7 +424,7 @@ end
 -------------------------
 
 ----- [ World Config ] -----
-local WorldType, WorldLevel, WorldDifficulty;
+local WorldType, WorldLevel, WorldDifficulty, WorldMap, WorldDamageModifier, WorldTier, WorldChallenge;
 local function WorldConfigUI()
 	local WorldTypeLabel = SWorldConfig:AddLabel({Text = "🌏 Select World"})
 	WorldType = SWorldConfig:AddDropdown("", function(value)
@@ -450,6 +452,10 @@ local function WorldConfigUI()
 		end
 		warn("Changed World Level to "..value)
 		getgenv().UpdateWorldDifficulty(value)
+		getgenv().UpdateWorldMap(value)
+		getgenv().UpdateWorldDamageModifier(value)
+		getgenv().UpdateWorldTier(value)
+		getgenv().UpdateWorldChallenge(value)
 		
 		SaveSettings()
 	end, {})
@@ -465,6 +471,48 @@ local function WorldConfigUI()
 		SaveSettings()
 	end, {})
 	
+	local WorldMapSeparator = SWorldConfig:AddLabel()
+	
+	WorldMap = SWorldConfig:AddCheckbox("🗺️ Select Maps", function(value)
+		if Settings.WorldConfig.WorldMap == value then return end
+		Settings.WorldConfig.WorldMap = value
+		warn("Changed World Map to "..value)
+
+		SaveSettings()
+	end, {})
+	
+	local WorldDamageModifierSeparator = SWorldConfig:AddLabel()
+
+	WorldDamageModifier = SWorldConfig:AddCheckbox("🩸 Select Damage Modifier", function(value)
+		if Settings.WorldConfig.WorldDamageModifier == value then return end
+		Settings.WorldConfig.WorldDamageModifier = value
+		warn("Changed World Map to "..value)
+
+		SaveSettings()
+	end, {})
+	
+	local WorldTierSeparator = SWorldConfig:AddLabel()
+	
+	WorldTier = SWorldConfig:AddCheckbox("🧱 Select Tier", function(value)
+		if Settings.WorldConfig.WorldTier == value then return end
+		Settings.WorldConfig.WorldTier = value
+		warn("Changed World Tier to "..value)
+
+		SaveSettings()
+	end, {})
+	
+	local WorldChallengeSeparator = SWorldConfig:AddLabel()
+
+	WorldChallenge = SWorldConfig:AddCheckbox("💀 Select Challenge", function(value)
+		if Settings.WorldConfig.WorldChallenge == value then return end
+		Settings.WorldConfig.WorldChallenge = value
+		warn("Changed World Challenge to "..value)
+
+		SaveSettings()
+	end, {})
+	
+	-------------------------------------------
+	
 	getgenv().UpdateWorldType = function(value)
 		WorldType.Reset()
 		if not AAData["World Type"]["Type"][value]["Worlds"] then
@@ -473,18 +521,16 @@ local function WorldConfigUI()
 				WorldLevelSeparator.Label,
 				WorldLevelLabel.Label, WorldLevel.Dropdown,
 				WorldDifficultySeparator.Label,
-				WorldDifficultyLabel.Label, WorldDifficulty.Label
-			}
-			Visible(List, false)
+				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
+			}; Visible(List, false)
 		else
 			local List = {
 				WorldTypeLabel.Label, WorldType.Dropdown,
 				WorldLevelSeparator.Label,
 				WorldLevelLabel.Label, WorldLevel.Dropdown,
 				WorldDifficultySeparator.Label,
-				WorldDifficultyLabel.Label, WorldDifficulty.Label
-			}
-			Visible(List, true)
+				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
+			}; Visible(List, true)
 			
 			WorldType.Data.Options = AAData["World Type"]["Type"][value]["Worlds"]
 			if Settings.WorldConfig.WorldType and
@@ -502,22 +548,20 @@ local function WorldConfigUI()
 	getgenv().UpdateWorldLevel = function(value)
 		WorldLevel.Reset()
 		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
-			AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"] then
+			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"] then
 			local List = {
 				WorldLevelSeparator.Label,
 				WorldLevelLabel.Label, WorldLevel.Dropdown,
 				WorldDifficultySeparator.Label,
-				WorldDifficultyLabel.Label, WorldDifficulty.Label
-			}
-			Visible(List, false)
+				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
+			}; Visible(List, false)
 		else
 			local List = {
 				WorldLevelSeparator.Label,
 				WorldLevelLabel.Label, WorldLevel.Dropdown,
 				WorldDifficultySeparator.Label,
-				WorldDifficultyLabel.Label, WorldDifficulty.Label
-			}
-			Visible(List, true)
+				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
+			}; Visible(List, true)
 
 			WorldLevel.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"]
 			if Settings.WorldConfig.WorldLevel and
@@ -528,6 +572,10 @@ local function WorldConfigUI()
 			WorldLevel.Section:UpdateDropdown(WorldLevel, WorldLevel.Data.Value, {})
 			
 			getgenv().UpdateWorldDifficulty(WorldLevel.Data.Value)
+			getgenv().UpdateWorldMap(WorldLevel.Data.Value)
+			getgenv().UpdateWorldDamageModifier(WorldLevel.Data.Value)
+			getgenv().UpdateWorldTier(WorldLevel.Data.Value)
+			getgenv().UpdateWorldChallenge(WorldLevel.Data.Value)
 		end
 
 		WorldLevel.Section:Resize(true)
@@ -535,18 +583,16 @@ local function WorldConfigUI()
 	getgenv().UpdateWorldDifficulty = function(value)
 		WorldDifficulty.Reset()
 		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
-			AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"] then
+			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"] then
 			local List = {
 				WorldDifficultySeparator.Label,
-				WorldDifficultyLabel.Label, WorldDifficulty.Label
-			}
-			Visible(List, false)
+				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
+			}; Visible(List, false)
 		else
 			local List = {
 				WorldDifficultySeparator.Label,
-				WorldDifficultyLabel.Label, WorldDifficulty.Label
-			}
-			Visible(List, true)
+				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
+			}; Visible(List, true)
 			
 			if string.find(Settings.WorldConfig.WorldLevel, "_infinite") or table.find({"Legend Stages", "Raid Worlds"}, Settings.FarmConfig.FarmCategory) then
 				WorldDifficulty.Data.Options = {"Hard"}
@@ -564,10 +610,110 @@ local function WorldConfigUI()
 		
 		WorldDifficulty.Section:Resize(true)
 	end
+	getgenv().UpdateWorldMap = function(value)
+		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
+			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"] and
+			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"] then
+			local List = {
+				WorldMapSeparator.Label,
+				WorldMap.Checkbox
+			}; Visible(List, false)
+		else
+			local List = {
+				WorldMapSeparator.Label,
+				WorldMap.Checkbox
+			}; Visible(List, true)
+			
+			WorldMap.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
+			if Settings.WorldConfig.WorldMap and
+				not table.find(AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"][value]["Maps"], Settings.WorldConfig.WorldMap) then
+				Settings.WorldConfig.WorldMap = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
+			end
+			WorldMap.Data.Selected = Settings.WorldConfig.WorldMap
+			WorldMap.Section:UpdateRadio(WorldMap, nil, {})
+		end
+		WorldMap.Section:Resize(true)
+	end
+	getgenv().UpdateWorldDamageModifier = function(value)
+		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
+			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"] and
+			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"] then
+			local List = {
+				WorldDamageModifierSeparator.Label,
+				WorldDamageModifier.Checkbox
+			}; Visible(List, false)
+		else
+			local List = {
+				WorldDamageModifierSeparator.Label,
+				WorldDamageModifier.Checkbox
+			}; Visible(List, true)
+
+			WorldDamageModifier.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
+			if Settings.WorldConfig.WorldDamageModifier and
+				not table.find(AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"][value]["Maps"], Settings.WorldConfig.WorldDamageModifier) then
+				Settings.WorldConfig.WorldDamageModifier = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
+			end
+			WorldDamageModifier.Data.Selected = Settings.WorldConfig.WorldDamageModifier
+			WorldDamageModifier.Section:UpdateRadio(WorldDamageModifier, nil, {})
+		end
+		WorldDamageModifier.Section:Resize(true)
+	end
+	getgenv().UpdateWorldTier = function(value)
+		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
+			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"] and
+			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"] then
+			local List = {
+				WorldTierSeparator.Label,
+				WorldTier.Checkbox
+			}; Visible(List, false)
+		else
+			local List = {
+				WorldTierSeparator.Label,
+				WorldTier.Checkbox
+			}; Visible(List, true)
+
+			WorldTier.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
+			if Settings.WorldConfig.WorldTier and
+				not table.find(AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"][value]["Maps"], Settings.WorldConfig.WorldTier) then
+				Settings.WorldConfig.WorldTier = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
+			end
+			WorldTier.Data.Selected = Settings.WorldConfig.WorldTier
+			WorldTier.Section:UpdateRadio(WorldTier, nil, {})
+		end
+		WorldTier.Section:Resize(true)
+	end
+	getgenv().UpdateWorldChallenge = function(value)
+		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
+			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"] and
+			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"] then
+			local List = {
+				WorldChallengeSeparator.Label,
+				WorldChallenge.Checkbox
+			}; Visible(List, false)
+		else
+			local List = {
+				WorldChallengeSeparator.Label,
+				WorldChallenge.Checkbox
+			}; Visible(List, true)
+
+			WorldChallenge.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
+			if Settings.WorldConfig.WorldChallenge and
+				not table.find(AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"][value]["Maps"], Settings.WorldConfig.WorldChallenge) then
+				Settings.WorldConfig.WorldChallenge = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
+			end
+			WorldChallenge.Data.Selected = Settings.WorldConfig.WorldChallenge
+			WorldChallenge.Section:UpdateRadio(WorldChallenge, nil, {})
+		end
+		WorldChallenge.Section:Resize(true)
+	end
 	
 	getgenv().UpdateWorldType(FarmCategory.Data.Value)
 	getgenv().UpdateWorldLevel(WorldType.Data.Value)
 	getgenv().UpdateWorldDifficulty(WorldLevel.Data.Value)
+	getgenv().UpdateWorldMap(WorldLevel.Data.Value)
+	getgenv().UpdateWorldDamageModifier(WorldLevel.Data.Value)
+	getgenv().UpdateWorldTier(WorldLevel.Data.Value)
+	getgenv().UpdateWorldChallenge(WorldLevel.Data.Value)
 end
 ----------------------------
 
