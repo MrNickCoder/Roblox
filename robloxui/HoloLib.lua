@@ -1394,101 +1394,7 @@ do
 		
 		table.insert(self.Modules, Radio)
 		
-		local Selected = MetaTable.Data.Selected or ""
-		local Debounce;
-
-		local Callback = function(Value)
-			if MetaTable.Callback then
-				MetaTable.Callback(Value, function(...)
-					self:UpdateRadio(MetaTable, ...)
-				end)
-			end
-		end
-		
-		local Options = Radio.Options
-		local Debounce;
-		
-		if MetaTable.Data.Options and MetaTable.Data.Options ~= {} then
-			local Lines = math.floor(#MetaTable.Data.Options / 3);
-			if (#MetaTable.Data.Options / 3) % 1 > 0 then Lines = Lines + 1; end
-			
-			local Size = (Lines * 15) + ((Lines - 1) * 10);
-			
-			Radio.Size = UDim2.new(1, 0, 0, 38 + Size)
-			
-			for Index, Item in pairs(MetaTable.Data.Options) do
-				local Option = Utility:Create("ImageButton", {
-					Name = "Option",
-					Parent = Options.Container,
-					BackgroundTransparency = 1,
-					BorderSizePixel = 0,
-					ZIndex = 2,
-				}, {
-					Utility:Create("Frame", {
-						Name = "Radio",
-						BackgroundColor3 = Utility.Themes.TextColor,
-						BorderSizePixel = 0,
-						Size = UDim2.new(0, 15, 0, 15),
-						ZIndex = 2,
-					}, {
-						Utility:Create("UICorner", {
-							CornerRadius = UDim.new(0.5, 0),
-						}),
-						Utility:Create("Frame", {
-							Name = "Fill",
-							AnchorPoint = Vector2.new(0.5, 0.5),
-							BackgroundColor3 = Utility.Themes.DarkContrast,
-							BorderSizePixel = 0,
-							Position = UDim2.new(0.5, 0, 0.5, 0),
-							Size = UDim2.new(0, 13, 0, 13),
-							ZIndex = 3,
-							Visible = false
-						}, {
-							Utility:Create("UICorner", {
-								CornerRadius = UDim.new(0.5, 0),
-							})
-						})
-					}),
-					Utility:Create("TextLabel", {
-						Name = "Item",
-						BackgroundTransparency = 1,
-						BorderSizePixel = 0,
-						Position = UDim2.new(0, 20, 0, 0),
-						Size = UDim2.new(1, -20, 1, 0),
-						ZIndex = 2,
-						Font = Enum.Font.Gotham,
-						Text = Item,
-						TextColor3 = Utility.Themes.TextColor,
-						TextSize = 12,
-						TextTransparency = 0.10000000149012,
-						TextXAlignment = Enum.TextXAlignment.Left
-					})
-				})
-				
-				if MetaTable.Data.Selected ~= nil then
-					if Item == MetaTable.Data.Selected then
-						MetaTable.Data.Selected = Item;
-						self:UpdateRadio(MetaTable, nil, {Radio = Option, Item = Item});
-					end
-				else
-					MetaTable.Data.Selected = Item;
-					self:UpdateRadio(MetaTable, nil, {Radio = Option, Item = Item});
-				end
-				
-				Option.MouseButton1Click:Connect(function()
-					if Debounce then return end
-					Debounce = true;
-					
-					MetaTable.Data.Selected = Item
-					self:UpdateRadio(MetaTable, nil, {Radio = Option, Item = Item});
-					Callback(Item)
-					
-					wait(.1)
-					Debounce = false;
-				end)
-				
-			end
-		end
+		self:UpdateRadio(MetaTable, nil, {})
 		
 		return MetaTable
 	end
@@ -1563,108 +1469,7 @@ do
 
 		table.insert(self.Modules, Checkbox)
 		
-		local Selected = MetaTable.Data.Selected or {}
-		local Debounce;
-
-		local Callback = function(Value)
-			if MetaTable.Callback then
-				MetaTable.Callback(Value, function(...)
-					self:UpdateCheckbox(MetaTable, ...)
-				end)
-			end
-		end
-
-		local Options = Checkbox.Options
-		local Debounce;
-		
-		if MetaTable.Data.Options and MetaTable.Data.Options ~= {} then
-			local Lines = math.floor(#MetaTable.Data.Options / 3);
-			if (#MetaTable.Data.Options / 3) % 1 > 0 then Lines = Lines + 1; end
-
-			local Size = (Lines * 15) + ((Lines - 1) * 10);
-
-			Checkbox.Size = UDim2.new(1, 0, 0, 38 + Size)
-
-			for Index, Item in pairs(MetaTable.Data.Options) do
-				local Option = Utility:Create("ImageButton", {
-					Name = "Option",
-					Parent = Options.Container,
-					BackgroundTransparency = 1,
-					BorderSizePixel = 0,
-					ZIndex = 2,
-				}, {
-					Utility:Create("Frame", {
-						Name = "Checkbox",
-						BackgroundColor3 = Utility.Themes.TextColor,
-						BorderSizePixel = 0,
-						Size = UDim2.new(0, 15, 0, 15),
-						ZIndex = 2,
-					}, {
-						Utility:Create("UICorner", {
-							CornerRadius = UDim.new(0.2, 0),
-						}),
-						Utility:Create("Frame", {
-							Name = "Fill",
-							AnchorPoint = Vector2.new(0.5, 0.5),
-							BackgroundColor3 = Utility.Themes.DarkContrast,
-							BorderSizePixel = 0,
-							Position = UDim2.new(0.5, 0, 0.5, 0),
-							Size = UDim2.new(0, 13, 0, 13),
-							ZIndex = 3,
-							Visible = false
-						}, {
-							Utility:Create("UICorner", {
-								CornerRadius = UDim.new(0.2, 0),
-							})
-						})
-					}),
-					Utility:Create("TextLabel", {
-						Name = "Item",
-						BackgroundTransparency = 1,
-						BorderSizePixel = 0,
-						Position = UDim2.new(0, 20, 0, 0),
-						Size = UDim2.new(1, -20, 1, 0),
-						ZIndex = 2,
-						Font = Enum.Font.Gotham,
-						Text = Item,
-						TextColor3 = Utility.Themes.TextColor,
-						TextSize = 12,
-						TextTransparency = 0.10000000149012,
-						TextXAlignment = Enum.TextXAlignment.Left
-					})
-				})
-
-				if MetaTable.Data.Selected then
-					for Index, Value in pairs(MetaTable.Data.Selected) do
-						if Value ~= Item then continue end
-						
-						self:UpdateCheckbox(MetaTable, nil, {Checkbox = Option, Item = Item, Active = true});
-						break
-					end
-				end
-
-				Option.MouseButton1Click:Connect(function()
-					if Debounce then return end
-					Debounce = true;
-					
-					local NewSelected = {};
-					local Located = false;
-					for Index, Value in pairs(MetaTable.Data.Selected) do
-						if Value == Item then Located = true; continue end
-						table.insert(NewSelected, Value)
-					end
-					if not Located then table.insert(NewSelected, Item) end
-					
-					MetaTable.Data.Selected = NewSelected
-					self:UpdateCheckbox(MetaTable, nil, {Checkbox = Option, Item = Item, Active = not Located});
-					Callback(NewSelected)
-
-					wait(.1)
-					Debounce = false;
-				end)
-
-			end
-		end
+		self:UpdateCheckbox(MetaTable, nil, {})
 		
 		return MetaTable
 	end
@@ -1885,9 +1690,7 @@ do
 	function Section:UpdateDropdown(MetaTable, Title, Data)
 		local Dropdown = self:GetModule(MetaTable.Dropdown)
 
-		if Title then
-			Dropdown.Search.TextBox.Text = Title
-		end
+		if Title then Dropdown.Search.TextBox.Text = Title end
 
 		local Entries = 0
 
@@ -1959,46 +1762,232 @@ do
 	function Section:UpdateRadio(MetaTable, Title, Data)
 		local Radio = self:GetModule(MetaTable.Radio)
 		
-		if Title then Radio.Background.Title.Text = Title; end
+		if Title then Radio.Title.Text = Title; end
+		
+		local Lines = math.floor(#MetaTable.Data.Options / 3);
+		if (#MetaTable.Data.Options / 3) % 1 > 0 then Lines = Lines + 1; end
 
-		for Index, Items in pairs(Radio.Options.Container:GetChildren()) do
-			if Items:IsA("ImageButton") then
-				if Items.Item.Text == Data.Item then
-					Items.Radio.Fill.Visible = true;
-					Items.Radio.Fill.Size = UDim2.new(0, 0, 0, 0)
-					Utility:Tween(Items.Radio.Fill, {Size = UDim2.new(0, 13, 0, 13)}, 0.2)
-				else
-					if Items.Radio.Fill.Visible == true then
-						Items.Radio.Fill.Size = UDim2.new(0, 13, 0, 13)
-						Utility:Tween(Items.Radio.Fill, {Size = UDim2.new(0, 0, 0, 0)}, 0.2)
-						wait(0.2)
-						Items.Radio.Fill.Visible = false;
+		local Size = (Lines * 15) + ((Lines - 1) * 10);
+
+		Radio.Size = UDim2.new(1, 0, 0, 38 + Size)
+		
+		for Index, Button in pairs(Radio.Options.Container:GetChildren()) do
+			if Button:IsA("ImageButton") then Button:Destroy() end
+		end
+		
+		local Debounce;
+		local Animate = function(Item)
+			for Index, Button in pairs(Radio.Options.Container:GetChildren()) do
+				if Button:IsA("ImageButton") then
+					if Button == Item then
+						Button.Radio.Fill.Visible = true;
+						Button.Radio.Fill.Size = UDim2.new(0, 0, 0, 0)
+						Utility:Tween(Button.Radio.Fill, {Size = UDim2.new(0, 13, 0, 13)}, 0.2)
+					else
+						if Button.Radio.Fill.Visible == true then
+							Button.Radio.Fill.Size = UDim2.new(0, 13, 0, 13)
+							Utility:Tween(Button.Radio.Fill, {Size = UDim2.new(0, 0, 0, 0)}, 0.2)
+							wait(0.2)
+							Button.Radio.Fill.Visible = false;
+						end
 					end
 				end
 			end
+		end
+		
+		for Index, Item in pairs(MetaTable.Data.Options) do
+			local Option = Utility:Create("ImageButton", {
+				Name = "Option",
+				Parent = Radio.Options.Container,
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				ZIndex = 2,
+			}, {
+				Utility:Create("Frame", {
+					Name = "Radio",
+					BackgroundColor3 = Utility.Themes.TextColor,
+					BorderSizePixel = 0,
+					Size = UDim2.new(0, 15, 0, 15),
+					ZIndex = 2,
+				}, {
+					Utility:Create("UICorner", {
+						CornerRadius = UDim.new(0.5, 0),
+					}),
+					Utility:Create("Frame", {
+						Name = "Fill",
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						BackgroundColor3 = Utility.Themes.DarkContrast,
+						BorderSizePixel = 0,
+						Position = UDim2.new(0.5, 0, 0.5, 0),
+						Size = UDim2.new(0, 13, 0, 13),
+						ZIndex = 3,
+						Visible = false
+					}, {
+						Utility:Create("UICorner", {
+							CornerRadius = UDim.new(0.5, 0),
+						})
+					})
+				}),
+				Utility:Create("TextLabel", {
+					Name = "Item",
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					Position = UDim2.new(0, 20, 0, 0),
+					Size = UDim2.new(1, -20, 1, 0),
+					ZIndex = 2,
+					Font = Enum.Font.Gotham,
+					Text = Item,
+					TextColor3 = Utility.Themes.TextColor,
+					TextSize = 12,
+					TextTransparency = 0.10000000149012,
+					TextXAlignment = Enum.TextXAlignment.Left
+				})
+			})
+
+			if MetaTable.Data.Selected ~= nil then
+				if Item == MetaTable.Data.Selected then
+					MetaTable.Data.Selected = Item;
+					Option.Radio.Fill.Visible = true;
+				end
+			else
+				MetaTable.Data.Selected = Item;
+				Option.Radio.Fill.Visible = true;
+			end
+
+			Option.MouseButton1Click:Connect(function()
+				if Debounce then return end
+				Debounce = true;
+
+				MetaTable.Data.Selected = Item
+				Animate(Option)
+				if MetaTable.Callback then
+					MetaTable.Callback(Item, function(...)
+						self:UpdateCheckbox(MetaTable, ...)
+					end)
+				end
+
+				wait(.1)
+				Debounce = false;
+			end)
+
 		end
 	end
 	
 	function Section:UpdateCheckbox(MetaTable, Title, Data)
 		local Checkbox = self:GetModule(MetaTable.Checkbox)
 
-		if Title then Checkbox.Background.Title.Text = Title; end
+		if Title then Checkbox.Title.Text = Title end
+		
+		local Lines = math.floor(#MetaTable.Data.Options / 3);
+		if (#MetaTable.Data.Options / 3) % 1 > 0 then Lines = Lines + 1; end
 
-		for Index, Items in pairs(Checkbox.Options.Container:GetChildren()) do
-			if Items:IsA("ImageButton") then
-				if Items.Item.Text == Data.Item then
-					if Data.Active then
-						Items.Checkbox.Fill.Visible = true;
-						Items.Checkbox.Fill.Size = UDim2.new(0, 0, 0, 0)
-						Utility:Tween(Items.Checkbox.Fill, {Size = UDim2.new(0, 13, 0, 13)}, 0.2)
-					else
-						Items.Checkbox.Fill.Size = UDim2.new(0, 13, 0, 13)
-						Utility:Tween(Items.Checkbox.Fill, {Size = UDim2.new(0, 0, 0, 0)}, 0.2)
-						wait(0.2)
-						Items.Checkbox.Fill.Visible = false;
-					end
+		local Size = (Lines * 15) + ((Lines - 1) * 10);
+
+		Checkbox.Size = UDim2.new(1, 0, 0, 38 + Size)
+		
+		for Index, Button in pairs(Checkbox.Options.Container:GetChildren()) do
+			if Button:IsA("ImageButton") then Button:Destroy() end
+		end
+		
+		local Debounce;
+		local Animate = function(Item, Active)
+			if Active then
+				Item.Checkbox.Fill.Visible = true;
+				Item.Checkbox.Fill.Size = UDim2.new(0, 0, 0, 0)
+				Utility:Tween(Item.Checkbox.Fill, {Size = UDim2.new(0, 13, 0, 13)}, 0.2)
+			else
+				Item.Checkbox.Fill.Size = UDim2.new(0, 13, 0, 13)
+				Utility:Tween(Item.Checkbox.Fill, {Size = UDim2.new(0, 0, 0, 0)}, 0.2)
+				wait(0.2)
+				Item.Checkbox.Fill.Visible = false;
+			end
+		end
+		
+		for Index, Item in pairs(MetaTable.Data.Options) do
+			local Option = Utility:Create("ImageButton", {
+				Name = "Option",
+				Parent = Checkbox.Options.Container,
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				ZIndex = 2,
+			}, {
+				Utility:Create("Frame", {
+					Name = "Checkbox",
+					BackgroundColor3 = Utility.Themes.TextColor,
+					BorderSizePixel = 0,
+					Size = UDim2.new(0, 15, 0, 15),
+					ZIndex = 2,
+				}, {
+					Utility:Create("UICorner", {
+						CornerRadius = UDim.new(0.2, 0),
+					}),
+					Utility:Create("Frame", {
+						Name = "Fill",
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						BackgroundColor3 = Utility.Themes.DarkContrast,
+						BorderSizePixel = 0,
+						Position = UDim2.new(0.5, 0, 0.5, 0),
+						Size = UDim2.new(0, 13, 0, 13),
+						ZIndex = 3,
+						Visible = false
+					}, {
+						Utility:Create("UICorner", {
+							CornerRadius = UDim.new(0.2, 0),
+						})
+					})
+				}),
+				Utility:Create("TextLabel", {
+					Name = "Item",
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					Position = UDim2.new(0, 20, 0, 0),
+					Size = UDim2.new(1, -20, 1, 0),
+					ZIndex = 2,
+					Font = Enum.Font.Gotham,
+					Text = Item,
+					TextColor3 = Utility.Themes.TextColor,
+					TextSize = 12,
+					TextTransparency = 0.10000000149012,
+					TextXAlignment = Enum.TextXAlignment.Left
+				})
+			})
+			
+			local Active = false;
+			
+			if MetaTable.Data.Selected then
+				for Index, Value in pairs(MetaTable.Data.Selected) do
+					if Value ~= Item then continue end
+					Active = true
+					
+					Option.Checkbox.Fill.Visible = true;
+					break
 				end
 			end
+			
+			Option.MouseButton1Click:Connect(function()
+				if Debounce then return end
+				Debounce = true;
+
+				local NewSelected = {};
+				local Located = false;
+				for Index, Value in pairs(MetaTable.Data.Selected) do
+					if Value == Item then Located = true; continue end
+					table.insert(NewSelected, Value)
+				end
+				if not Located then table.insert(NewSelected, Item); Active = true else Active = false end
+				Animate(Option, Active)
+				
+				MetaTable.Data.Selected = NewSelected
+				if MetaTable.Callback then
+					MetaTable.Callback(NewSelected, function(...)
+						self:UpdateCheckbox(MetaTable, ...)
+					end)
+				end
+
+				wait(.1)
+				Debounce = false;
+			end)
+			
 		end
 	end
 	
