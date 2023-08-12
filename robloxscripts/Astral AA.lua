@@ -304,7 +304,7 @@ end
 ------------------------------
 ----- [ USER INTERFACE ] -----
 ------------------------------
-if game.CoreGui:FindFirstChild("HoloLibUI") then game.CoreGui["HoloLibUI"]:Destroy() end
+if game.CoreGui:FindFirstChild("HoloLibUI") then getgenv().SHUTDOWN(); game.CoreGui["HoloLibUI"]:Destroy() end
 
 local Directory = "Anime_Adventures/"..game.Players.LocalPlayer.Name
 local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/robloxui/HoloLib.lua"))()
@@ -889,92 +889,164 @@ Window:Enabled(true)
 -------------------------
 ----- [ FUNCTIONS ] -----
 -------------------------
+local Functions = {}
+do
+    ----- [ Auto Buff ] -----
+    function Functions:AutoBuff(Buffer)
+        local Thread = coroutine.create(function()
+            local LocalPlayer = Players.LocalPlayer
+            local Data = AAData["Game Setting"]["Buffers"][Buffer]
 
+            local Container = {}
+            local function RemoveBuffer()
+                local Temp = {}
+                for _, v in pairs(game:GetService("Workspace")._UNITS:GetChildren()) do
+                    if table.find(Data["Name"], v.Name) and v:FindFirstChild("_stats"):FindFirstChild("player").Value == LocalPlayer and not table.find(Temp, v) then
+                        table.insert(Temp, v)
+                    end
+                end
+                for _, v in pairs(Container) do -- Removing Deleted Buffer
+                    if not table.find(Temp, v) then
+                        table.remove(Container, table.find(Container, v))
+                        print(""..Buffer.." Left: "..#Container)
+                    end
+                end
+            end
+            local function AddBuffer() -- Adding Newer Buffer
+                for _, v in pairs(game:GetService("Workspace")._UNITS:GetChildren()) do
+                    if table.find(Data["Name"], v.Name) and v:FindFirstChild("_stats"):FindFirstChild("player").Value == LocalPlayer and not table.find(Container, v) then
+                        table.insert(Container, v)
+                        print(""..Buffer.." Left: "..#Container)
+                    end
+                end
+            end
 
------ [ Auto Leave ] -----
-local PlaceID = 8304191830
-local AllIDs = {}
-local FoundAnything = ""
-local ActualHour = os.date("!*t").hour
-local Deleted = false
-local Last
-local ServerFile = pcall(function() AllIDs = game:GetService('HttpService'):JSONDecode(readfile("NotSameServers.json")) end)
-if not ServerFile then
-	table.insert(AllIDs, ActualHour)
-	writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
+            repeat
+                wait()
+                if not table.find(Settings["Unit Config"].Auto["Buff"], Buffer) then break end
+                
+                RemoveBuffer()
+                AddBuffer()
+
+                for count = 1, 4 do
+                    if #Container < 4 then break end
+                    RemoveBuffer()
+                    if Container[count] ~= nil and Container[count].Parent == game:GetService("Workspace")._UNITS then
+                        game:GetService("ReplicatedStorage"):WaitForChild("endpoints"):WaitForChild("client_to_server"):WaitForChild("use_active_attack"):InvokeServer(Container[count])
+                        print(Buffer..": Buffing")
+                        wait(Data["Delay"])
+                    end
+                end
+            until not table.find(Settings["Unit Config"].Auto["Buff"], Buffer)
+        end)
+        coroutine.resume(Thread)
+        return Thread
+    end
+    coroutine.resume(coroutine.create(function()
+        local Container = {}
+        while task.wait() do
+            for i, _ in pairs(AAData["Game Setting"]["Buffers"]) do
+                if table.find(Settings["Unit Config"].Auto["Buff"], i) and Container[i] == nil then
+                    Container[i] = Functions:AutoBuff(i)
+                    print("Enabled "..i.." Auto Buff")
+                elseif not table.find(Settings["Unit Config"].Auto["Buff"], i) and Container[i] ~= nil then
+                    coroutine.close(Container[i])
+                    Container[i] = nil
+                    print("Disabled "..i.." Auto Buff")
+                end
+            end
+        end
+    end))
+
+    ----- [ Auto Leave ] -----
+    local PlaceID = 8304191830
+    local AllIDs = {}
+    local FoundAnything = ""
+    local ActualHour = os.date("!*t").hour
+    local Deleted = false
+    local Last
+    local ServerFile = pcall(function() AllIDs = game:GetService('HttpService'):JSONDecode(readfile("NotSameServers.json")) end)
+    if not ServerFile then
+        table.insert(AllIDs, ActualHour)
+        writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
+    end
+    function TPReturner()
+        local Site;
+        if FoundAnything == "" then Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
+        else Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. FoundAnything)) end
+
+        local ID = ""
+        if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then FoundAnything = Site.nextPageCursor end
+
+        local Num = 0;
+        local ExtraNum = 0
+        for Index, Server in pairs(Site.data) do
+            ExtraNum += 1
+            local Possible = true
+            ID = tostring(Server.id)
+            if tonumber(Server.maxPlayers) > tonumber(Server.playing) then
+                if ExtraNum ~= 1 and tonumber(Server.playing) < Last or ExtraNum == 1 then Last = tonumber(Server.playing)
+                elseif ExtraNum ~= 1 then continue end
+
+                for _,Existing in pairs(AllIDs) do
+                    if Num ~= 0 then
+                        if ID == tostring(Existing) then Possible = false end
+                    else
+                        if tonumber(ActualHour) ~= tonumber(Existing) then
+                            local delFile = pcall(function()
+                                delfile("NotSameServers.json")
+                                AllIDs = {}
+                                table.insert(AllIDs, ActualHour)
+                            end)
+                        end
+                    end
+                    Num = Num + 1
+                end
+                if Possible == true then
+                    table.insert(AllIDs, ID)
+                    wait()
+                    pcall(function()
+                        writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
+                        wait()
+                        game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
+                    end)
+                    wait(4)
+                end
+            end
+        end
+    end
+    function Teleport()
+        while wait() do
+            pcall(function()
+                TPReturner()
+                if FoundAnything ~= "" then
+                    TPReturner()
+                end
+            end)
+        end
+    end
+    --------------------------
+
+    ----- [ Start of Check Connection ] -----
+    function CheckInternet()
+        warn("Auto Reconnect Loaded")
+        while task.wait(5) do
+            game.CoreGui.RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(a)
+                if a.Name == 'ErrorPrompt' then
+                    task.wait(10)
+                    warn("Trying to Reconnect")
+                    TPReturner()
+                end
+            end)
+        end
+    end
+    -----------------------------------------
 end
-function TPReturner()
-	local Site;
-	if FoundAnything == "" then Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
-	else Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. FoundAnything)) end
 
-	local ID = ""
-	if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then FoundAnything = Site.nextPageCursor end
-
-	local Num = 0;
-	local ExtraNum = 0
-	for Index, Server in pairs(Site.data) do
-		ExtraNum += 1
-		local Possible = true
-		ID = tostring(Server.id)
-		if tonumber(Server.maxPlayers) > tonumber(Server.playing) then
-			if ExtraNum ~= 1 and tonumber(Server.playing) < Last or ExtraNum == 1 then Last = tonumber(Server.playing)
-			elseif ExtraNum ~= 1 then continue end
-
-			for _,Existing in pairs(AllIDs) do
-				if Num ~= 0 then
-					if ID == tostring(Existing) then Possible = false end
-				else
-					if tonumber(ActualHour) ~= tonumber(Existing) then
-						local delFile = pcall(function()
-							delfile("NotSameServers.json")
-							AllIDs = {}
-							table.insert(AllIDs, ActualHour)
-						end)
-					end
-				end
-				Num = Num + 1
-			end
-			if Possible == true then
-				table.insert(AllIDs, ID)
-				wait()
-				pcall(function()
-					writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
-					wait()
-					game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
-				end)
-				wait(4)
-			end
-		end
-	end
-end
-function Teleport()
-	while wait() do
-		pcall(function()
-			TPReturner()
-			if FoundAnything ~= "" then
-				TPReturner()
-			end
-		end)
-	end
-end
 --------------------------
-
------ [ Start of Check Connection ] -----
-function CheckInternet()
-	warn("Auto Reconnect Loaded")
-	while task.wait(5) do
-		game.CoreGui.RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(a)
-			if a.Name == 'ErrorPrompt' then
-				task.wait(10)
-				warn("Trying to Reconnect")
-				TPReturner()
-			end
-		end)
-	end
-end
------------------------------------------
-
+----- [ POST-SETUP ] -----
+--------------------------
+getgenv().SHUTDOWN = function() script:Destroy() end
 warn("Astral Anti-AFK Loaded!!!")
 warn("Astral Hider Name Loaded!!!")
 warn("Astral AA v1 Loaded!!!")
