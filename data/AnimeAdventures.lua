@@ -262,6 +262,22 @@ return {
 		
 		"The Eclipse",
 	};
+	["Game Setting"] = {
+		["Buffers"] = {
+			["Orwin/Erwin"] = {
+				["Name"] = {"erwin","erwin:shiny","erwin_school","erwin_halloween"};
+				["Delay"] = 16.4;
+			};
+			["Wenda/Wendy"] = {
+				["Name"] = {"wendy","wendy:shiny"};
+				["Delay"] = 16.4;
+			};
+			["Leafy/Leafa"] = {
+				["Name"] = {"leafa","leafa:shiny"};
+				["Delay"] = 16.4;
+			};
+		};
+	};
 	["Unit Setting"] = {
 		["Target Priority"] = {"First","Closest","Last","Farthest","Strongest","Weakest","Flying"};
 		["Rarity"] = {"Rare","Epic","Legendary","Mythic","Secret"};
