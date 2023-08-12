@@ -348,12 +348,12 @@ do
 	-----------------------
 
 	----- [ Auto Farm Config ] -----
-	local PFarm;
-	local SFarmSplits = PFarm:AddSplit()
+	local PFarm, SFarmSplits;
 	local FarmCategory;
 	local AutoStart, AutoReplay, AutoPortalReplay, AutoNextStory, AutoLeave;
 	function UISetup:AutoFarm()
 		PFarm = Window:AddPage("Auto Farm", "🤖")
+		SFarmSplits = PFarm:AddSplit()
 		if Settings and not Settings["Farm Config"] then Settings["Farm Config"] = {} end
 		if Settings and not Settings["Farm Config"].Auto then Settings["Farm Config"].Auto = {} end
 		if Settings and not Settings["World Config"] then Settings["World Config"] = {} end
