@@ -12,7 +12,7 @@ do
 		return Value
 	end
 
-	function Combine_Table(...:{any})
+	function Utility:Combine_Table(...:{any})
 		local newTable = {}
 		for _, v in ipairs({...}) do
 			for i, x in ipairs(v) do
