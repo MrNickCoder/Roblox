@@ -319,8 +319,9 @@ local Window = UILibrary.new("[Astral V1] Anime Adventures "..Version.." - "..Ex
 local UISetup = {}
 do
 	----- [ Home Page ] -----
-	local PHome = Window:AddPage("Home", "🏠")
+	local PHome;
 	function UISetup:Home()
+		PHome = Window:AddPage("Home", "🏠")
 		local SDevelopers = PHome:AddSection("Anime Adventures")
 		SDevelopers:AddLabel("📝 Scripted by: Arpon AG#6612 & Forever4D#0001 & HOLYSHz#3819")
 		SDevelopers:AddLabel("📝 Also thanks to Trapstar#7845, bytenode#9646 for the help!")
@@ -347,11 +348,12 @@ do
 	-----------------------
 
 	----- [ Auto Farm Config ] -----
-	local PFarm = Window:AddPage("Auto Farm", "🤖")
+	local PFarm;
 	local SFarmSplits = PFarm:AddSplit()
 	local FarmCategory;
 	local AutoStart, AutoReplay, AutoPortalReplay, AutoNextStory, AutoLeave;
 	function UISetup:AutoFarm()
+		PFarm = Window:AddPage("Auto Farm", "🤖")
 		if Settings and not Settings["Farm Config"] then Settings["Farm Config"] = {} end
 		if Settings and not Settings["Farm Config"].Auto then Settings["Farm Config"].Auto = {} end
 		if Settings and not Settings["World Config"] then Settings["World Config"] = {} end
@@ -675,10 +677,11 @@ do
 	----------------------------
 
 	----- [ Unit Config ] -----
-	local PUnit = Window:AddPage("Unit Config", "🧙")
+	local PUnit;
 	local LoadUnitConfig, TeamSelect;
 	local UnitSettings = {};
 	function UISetup:UnitConfig()
+		PUnit = Window:AddPage("Unit Config", "🧙")
 		if Settings and not Settings["Unit Config"] then Settings["Unit Config"] = {} end
 		if Settings and not Settings["Unit Config"].Auto then Settings["Unit Config"].Auto = {} end
 		local STeamConfig = PUnit:AddSection("🧙 Team Configuration 🧙")
@@ -748,9 +751,10 @@ do
 	---------------------------
 
 	----- [ Macro Config ] -----
-	local PMacro = Window:AddPage("Macro", "🕹️")
+	local PMacro;
 	local MacroConfig, CreateMacro;
 	function UISetup:Macro()
+		PMacro = Window:AddPage("Macro", "🕹️")
 		local SMacroSplits = PMacro:AddSplit()
 		local SMacroStatus = PMacro:AddSection("🕹️ Macro Information 🕹️", {Split = SMacroSplits, Side = "Left"})
 		local SMacroOptions = PMacro:AddSection("⚙️ Macro Options ⚙️", {Split = SMacroSplits, Side = "Left"})
@@ -789,8 +793,9 @@ do
 	----------------------------
 
 	----- [ Shoop and Item Page ] -----
+	local PShopNItems;
 	function UISetup:ShopNItem()
-		local PShopNItems = Window:AddPage("Shop & Items", "💰")
+		PShopNItems = Window:AddPage("Shop & Items", "💰")
 		local SShopSplit = PShopNItems:AddSplit()
 		local SAutoPull = PShopNItems:AddSection("💸 Auto Pull Unit 💸", {Split = SShopSplit, Side = "Left"})
 		local SAutoBuyBulma = PShopNItems:AddSection("🏪 Auto Buy Bulma 🏪", {Split = SShopSplit, Side = "Left"})
@@ -802,8 +807,9 @@ do
 	-----------------------------------
 
 	----- [ Misc Page ] -----
-	local PMisc = Window:AddPage("Misc [BETA]", "🛠️")
+	local PMisc;
 	function UISetup:Misc()
+		PMisc = Window:AddPage("Misc [BETA]", "🛠️")
 		if Settings and not Settings["Misc"] then Settings["Misc"] = {} end
 		if Settings and not Settings["Misc"].Discord then Settings["Misc"].Discord = {} end
 		if Settings and not Settings["Misc"].Device then Settings["Misc"].Device = {} end
