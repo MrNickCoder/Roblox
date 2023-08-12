@@ -155,10 +155,10 @@ do
 
 		local Debounce = false;
 
-		UserInputService.InputBegan:connect(function(Input, Chatting)
+		UserInputService.InputBegan:Connect(function(Input, Chatting)
 			if Chatting then return end
 			if self.Keybinds[Input.KeyCode] then
-				for Index, Bind in pairs(self.Keybinds[Input.KeyCode]) do
+				for _, Bind in pairs(self.Keybinds[Input.KeyCode]) do
 					if Debounce then return end
 					Debounce = true;
 
@@ -170,10 +170,10 @@ do
 			end
 		end)
 
-		UserInputService.InputEnded:connect(function(Input, Chatting)
-			if Chatting then return end
-			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
-				for Index, Callback in pairs(self.Ended) do
+		UserInputService.InputEnded:Connect(function(Input)
+			if Input.UserInputType == Enum.UserInputType.MouseButton1 or
+				Input.UserInputType == Enum.UserInputType.Touch then
+				for _, Callback in pairs(self.Ended) do
 					Callback()
 				end
 			end
@@ -236,7 +236,8 @@ do
 		local DragInput, MousePos, FramePos;
 
 		Frame.InputBegan:connect(function(Input)
-			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+			if Input.UserInputType == Enum.UserInputType.MouseButton1 or
+				Input.UserInputType == Enum.UserInputType.Touch then
 				Dragging = true;
 				MousePos = Input.Position;
 				FramePos = Parent.Position;
@@ -271,7 +272,7 @@ end
 -----------------------
 ----- [ CLASSES ] -----
 -----------------------
-local Library = {}
+local Library = {LastNotification = nil}
 local Page = {}
 local Section = {}
 
@@ -286,10 +287,16 @@ do
 	function Library.new(Title, Data)
 		if not RunService:IsStudio() and CoreGui:FindFirstChild("HoloLibUI") then warn("Hololib:", "instance already exists in coregui!"); return end
 		
+		Data = Data or {Size = UDim2.new(0, 700, 0, 380), ToggleKey = nil, Enabled = true}
+		Data.Size = Data.Size or UDim2.new(0, 700, 0, 380)
+		Data.ToggleKey = Data.ToggleKey or nil
+		Data.Enabled = Data.Enabled or true
+		
 		local Container = Utility:Create("ScreenGui", {
 			Name = "HoloLibUI";
 			ZIndexBehavior = Enum.ZIndexBehavior.Global,
 			ResetOnSpawn = false,
+			Enabled = Data.Enabled,
 		},{
 			Utility:Create("ImageLabel", {
 				Name = "Main",
@@ -298,7 +305,7 @@ do
 				BackgroundTransparency = 1,
 				AnchorPoint = Vector2.new(0.5, 0),
 				Position = UDim2.new(0.5, 0, 0.5, -190),
-				Size = Data and Data.Size or UDim2.new(0, 700, 0, 380),
+				Size = Data.Size,
 				Image = "rbxassetid://4641149554",
 				ImageColor3 = Utility.Themes.Background,
 				ScaleType = Enum.ScaleType.Slice,
@@ -314,7 +321,7 @@ do
 					ImageColor3 = Utility.Themes.Glow,
 					ScaleType = Enum.ScaleType.Slice,
 					SliceCenter = Rect.new(24, 24, 276, 276)
-				}),
+				});
 				Utility:Create("ImageLabel", {
 					Name = "Pages",
 					BackgroundTransparency = 1,
@@ -339,9 +346,9 @@ do
 						Utility:Create("UIListLayout", {
 							SortOrder = Enum.SortOrder.LayoutOrder,
 							Padding = UDim.new(0, 10)
-						})
-					})
-				}),
+						});
+					});
+				});
 				Utility:Create("ImageLabel", {
 					Name = "TopBar",
 					BackgroundTransparency = 1,
@@ -365,7 +372,7 @@ do
 						TextColor3 = Utility.Themes.TextColor,
 						TextSize = 14,
 						TextXAlignment = Enum.TextXAlignment.Left
-					}),
+					});
 					Utility:Create("ImageButton", { -- Minimize Button
 						Name = "Button",
 						BackgroundTransparency = 1,
@@ -388,11 +395,11 @@ do
 							ImageColor3 = Utility.Themes.TextColor,
 							ScaleType = Enum.ScaleType.Slice,
 							SliceCenter = Rect.new(2, 2, 298, 298)
-						})
-					})
-				})
-			})
-		})
+						});
+					});
+				});
+			});
+		});
 		
 		if not RunService:IsStudio() then Container.Parent = CoreGui
 		else Container.Parent = PlayerGui end
@@ -405,8 +412,8 @@ do
 			Container = Container,
 			PagesContainer = Container.Main.Pages.Pages_Container,
 			Pages = {},
-			Size = Data and Data.Size or UDim2.new(0, 700, 0, 380),
-			ToggleKey = Data and Data.ToggleKey or nil,
+			Size = Data.Size,
+			ToggleKey = Data.ToggleKey,
 		}, Library)
 		
 		Container.Main.TopBar.Button.MouseButton1Click:Connect(function()
@@ -417,7 +424,6 @@ do
 			if Chatting then return end
 			if MetaTable.ToggleKey and MetaTable.ToggleKey ~= nil then
 				if typeof(MetaTable.ToggleKey) == "string" then MetaTable.ToggleKey = Enum.KeyCode[MetaTable.ToggleKey] end
-				
 				
 				if Input.KeyCode == MetaTable.ToggleKey then
 					MetaTable:Toggle()
@@ -454,7 +460,7 @@ do
 				TextSize = 12,
 				TextTransparency = 0.65,
 				TextXAlignment = Enum.TextXAlignment.Left
-			}),
+			});
 			(tonumber(Icon) ~= nil and Utility:Create("ImageLabel", {
 				Name = "Icon", 
 				AnchorPoint = Vector2.new(0, 0.5),
@@ -477,8 +483,8 @@ do
 				TextColor3 = Utility.Themes.TextColor,
 				TextSize = 12,
 				TextTransparency = 0.65,
-			})
-		})
+			});
+		});
 
 		local Container = Utility:Create("ScrollingFrame", {
 			Name = Title,
@@ -488,7 +494,7 @@ do
 			BorderSizePixel = 0,
 			Position = UDim2.new(0, 134, 0, 46),
 			Size = UDim2.new(1, -142, 1, -56),
-			CanvasSize = UDim2.new(0, 0, 0, 466),
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
 			ScrollBarThickness = 3,
 			ScrollBarImageColor3 = Utility.Themes.DarkContrast,
 			Visible = false
@@ -496,8 +502,13 @@ do
 			Utility:Create("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				Padding = UDim.new(0, 10)
+			});
+			Utility:Create("UIPadding", {
+				PaddingBottom = UDim.new(0, 10)
 			})
-		})
+		});
+		
+		Container.CanvasSize = UDim2.new(0, 0, 0, Container.AbsoluteSize.Y)
 
 		return setmetatable({
 			Library = Library,
@@ -507,10 +518,9 @@ do
 		}, Page)
 	end
 	
-	function Section.new(Page, Title)
+	function Section.new(Page, Title, Split)
 		local Container = Utility:Create("ImageLabel", {
 			Name = Title,
-			Parent = Page.Container,
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, -10, 0, 28),
 			ZIndex = 2,
@@ -523,10 +533,12 @@ do
 			Utility:Create("Frame", {
 				Name = "Container",
 				Active = true,
+				AutomaticSize = Enum.AutomaticSize.Y,
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
-				Position = UDim2.new(0, 8, 0, 8),
-				Size = UDim2.new(1, -16, 1, -16)
+				--Position = UDim2.new(0, 8, 0, 8),
+				--Size = UDim2.new(1, -16, 1, -16)
+				Size = UDim2.new(1, 0, 0, 0)
 			}, {
 				Utility:Create("TextLabel", {
 					Name = "Title",
@@ -539,13 +551,29 @@ do
 					TextSize = 12,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					TextTransparency = 1
-				}),
+				});
 				Utility:Create("UIListLayout", {
 					SortOrder = Enum.SortOrder.LayoutOrder,
 					Padding = UDim.new(0, 4)
-				})
-			})
-		})
+				});
+			});
+			Utility:Create("UIPadding", {
+				PaddingBottom = UDim.new(0, 8),
+				PaddingLeft = UDim.new(0, 8),
+				PaddingRight = UDim.new(0, 8),
+				PaddingTop = UDim.new(0, 8),
+			});
+		});
+		
+		Container.Parent = Page.Container
+		
+		if Split and Split.Split then
+			if not Split.Side then Split.Side = "Left" end
+			
+			if Split.Split["Container_"..Split.Side] then
+				Container.Parent = Split.Split["Container_"..Split.Side]
+			end
+		end
 
 		return setmetatable({
 			Page = Page,
@@ -638,21 +666,168 @@ do
 		self.Toggling = false
 	end
 	
+	function Library:Notify(Title, Text, Callback)
+		if self.ActiveNotification then
+			self.ActiveNotification = self.ActiveNotification()
+		end
+		
+		local Notification = Utility:Create("ImageLabel", {
+			Name = "Notification",
+			Parent = self.Container,
+			Draggable = true,
+			Active = true,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, 200, 0, 60),
+			Image = "rbxassetid://5028857472",
+			ImageColor3 = Utility.Themes.Background,
+			ScaleType = Enum.ScaleType.Slice,
+			SliceCenter = Rect.new(4, 4, 296, 296),
+			ZIndex = 3,
+			ClipsDescendants = true
+		}, {
+			Utility:Create("UIPadding", {
+				PaddingBottom = UDim.new(0, 8),
+				PaddingLeft = UDim.new(0, 10),
+				PaddingRight = UDim.new(0, 10),
+				PaddingTop = UDim.new(0, 8),
+			});
+			Utility:Create("ImageLabel", {
+				Name = "Flash",
+				Position = UDim2.new(0, -10, 0, -8),
+				Size = UDim2.new(1, 20, 1, 16),
+				BackgroundTransparency = 1,
+				Image = "rbxassetid://4641149554",
+				ImageColor3 = Utility.Themes.TextColor,
+				ZIndex = 5
+			});
+			Utility:Create("ImageLabel", {
+				Name = "Glow",
+				BackgroundTransparency = 1,
+				Position = UDim2.new(0, -25, 0, -23),
+				Size = UDim2.new(1, 50, 1, 46),
+				ZIndex = 2,
+				Image = "rbxassetid://5028857084",
+				ImageColor3 = Utility.Themes.Glow,
+				ScaleType = Enum.ScaleType.Slice,
+				SliceCenter = Rect.new(24, 24, 276, 276)
+			});
+			Utility:Create("TextLabel", {
+				Name = "Title",
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, -40, 0, 16),
+				ZIndex = 4,
+				Font = Enum.Font.GothamBold,
+				TextColor3 = Utility.Themes.TextColor,
+				TextSize = 14.000,
+				TextXAlignment = Enum.TextXAlignment.Left
+			});
+			Utility:Create("TextLabel", {
+				Name = "Text",
+				BackgroundTransparency = 1,
+				Position = UDim2.new(0, 0, 1, -16),
+				Size = UDim2.new(1, -40, 0, 16),
+				ZIndex = 4,
+				Font = Enum.Font.Gotham,
+				TextColor3 = Utility.Themes.TextColor,
+				TextSize = 12.000,
+				TextXAlignment = Enum.TextXAlignment.Left
+			});
+			Utility:Create("ImageButton", {
+				Name = "Accept",
+				BackgroundTransparency = 1,
+				Position = UDim2.new(1, -16, 0, 0),
+				Size = UDim2.new(0, 16, 0, 16),
+				Image = "rbxassetid://5012538259",
+				ImageColor3 = Utility.Themes.TextColor,
+				ZIndex = 4
+			});
+			Utility:Create("ImageButton", {
+				Name = "Decline",
+				BackgroundTransparency = 1,
+				Position = UDim2.new(1, -16, 1, -16),
+				Size = UDim2.new(0, 16, 0, 16),
+				Image = "rbxassetid://5012538583",
+				ImageColor3 = Utility.Themes.TextColor,
+				ZIndex = 4
+			})
+		})
+		
+		-- Position and Size
+		Title = Title or "Notification"
+		Text = Text or ""
+
+		Notification.Title.Text = Title
+		Notification.Text.Text = Text
+
+		local Padding = 10
+		local TextSize = Notification.Text.TextBounds
+
+		Notification.Position = Library.LastNotification or UDim2.new(0, Padding, 1, -(Notification.AbsoluteSize.Y + Padding))
+		Notification.Size = UDim2.new(0, 0, 0, 60)
+
+		Utility:Tween(Notification, {Size = UDim2.new(0, TextSize.X + 70, 0, 60)}, 0.2)
+		wait(0.2)
+
+		Notification.ClipsDescendants = false
+		Utility:Tween(Notification.Flash, {
+			Size = UDim2.new(0, 0, 0, 60),
+			Position = UDim2.new(1, 10, 0, -8)
+		}, 0.2)
+
+		-- Callbacks
+		local Active = true
+		local Close = function()
+			if not Active then return end
+
+			Active = false
+			Notification.ClipsDescendants = true
+
+			Library.LastNotification = Notification.Position
+			Notification.Flash.Position = UDim2.new(0, -10, 0, -8)
+			Utility:Tween(Notification.Flash, {Size = UDim2.new(1, 20, 1, 16)}, 0.2)
+
+			wait(0.2)
+			Utility:Tween(Notification, {
+				Size = UDim2.new(0, 0, 0, 60),
+				Position = Notification.Position + UDim2.new(0, TextSize.X + 70, 0, 0)
+			}, 0.2)
+
+			wait(0.2)
+			Notification:Destroy()
+		end
+
+		self.ActiveNotification = Close
+
+		Notification.Accept.MouseButton1Click:Connect(function()
+			if not Active then return end
+			if Callback then Callback(true) end
+			Close()
+		end)
+
+		Notification.Decline.MouseButton1Click:Connect(function()
+			if not Active then return end
+			if Callback then Callback(false) end
+			Close()
+		end)
+	end
+	
+	function Library:Enabled(Enabled)
+		self.Container.Enabled = Enabled
+	end
+	
 	---------------------------
 	----- [ New MODULES ] -----
 	---------------------------
-	function Section:AddLabel(Data)
-		Data = Data or {Text = ""}
-		
+	function Section:AddLabel(Text)
 		local Label = Utility:Create("TextLabel", {
-			Name = "Label",
+			Name = "TextLabel",
 			Parent = self.Container,
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0, 14),
 			ZIndex = 2,
 			Font = Enum.Font.Gotham,
-			Text = Data.Text,
+			Text = Text or "",
 			TextColor3 = Utility.Themes.TextColor,
 			TextSize = 12,
 			TextTransparency = 0.10000000149012,
@@ -660,13 +835,17 @@ do
 			TextXAlignment = Enum.TextXAlignment.Left
 		})
 		
+		Label:GetPropertyChangedSignal("Visible"):Connect(function() self:Resize(true) end)
+		
+		local Functions = {}
 		local MetaTable = setmetatable({
 			Section = self,
 			Label = Label,
-			Data = Data,
+			Text = Text,
+			Functions = Functions,
 		}, {})
 		
-		table.insert(self.Modules, Label)
+		table.insert(self.Modules, MetaTable.Label)
 		
 		return MetaTable
 	end
@@ -697,19 +876,23 @@ do
 			})
 		})
 		
+		Button:GetPropertyChangedSignal("Visible"):Connect(function() self:Resize(true) end)
+		
+		local Functions = {}
 		local MetaTable = setmetatable({
 			Section = self,
 			Button = Button,
 			Title = Title,
 			Callback = Callback,
+			Functions = Functions,
 		}, {})
 
-		table.insert(self.Modules, Button)
+		table.insert(self.Modules, MetaTable.Button)
 
 		local Text = Button.Title
 		local Debounce = false;
-
-		Button.MouseButton1Click:Connect(function()
+		
+		function Functions:Click()
 			if Debounce then return end
 
 			-- [ Animation ]
@@ -724,11 +907,15 @@ do
 
 			if MetaTable.Callback then
 				MetaTable.Callback(function(...)
-					self:UpdateButton(MetaTable, ...)
+					MetaTable.Section:UpdateButton(MetaTable, ...)
 				end)
 			end
 
 			Debounce = false
+		end
+		
+		Button.MouseButton1Click:Connect(function()
+			Functions:Click()
 		end)
 
 		return MetaTable
@@ -736,6 +923,7 @@ do
 	
 	function Section:AddToggle(Title, Callback, Data)
 		Data = Data or {Active = false}
+		Data.Active = Data.Active or false
 		
 		local Toggle = Utility:Create("ImageButton", {
 			Name = "Toggle",
@@ -789,34 +977,47 @@ do
 			})
 		})
 		
+		Toggle:GetPropertyChangedSignal("Visible"):Connect(function() self:Resize(true) end)
+		
+		local Functions = {}
 		local MetaTable = setmetatable({
 			Section = self,
 			Toggle = Toggle,
 			Title = Title,
 			Data = Data,
 			Callback = Callback,
+			Functions = Functions,
 		}, {})
 
-		table.insert(self.Modules, Toggle)
+		table.insert(self.Modules, MetaTable.Toggle)
 
 		self:UpdateToggle(MetaTable, nil, {Value = MetaTable.Data.Active})
-
-		Toggle.MouseButton1Click:Connect(function()
+		
+		function Functions:Toggle()
 			MetaTable.Data.Active = not MetaTable.Data.Active
-			self:UpdateToggle(MetaTable, nil, {Value = MetaTable.Data.Active})
+			MetaTable.Section:UpdateToggle(MetaTable, nil, {Value = MetaTable.Data.Active})
 
 			if MetaTable.Callback then
 				MetaTable.Callback(MetaTable.Data.Active, function(...)
-					self:UpdateToggle(MetaTable, ...)
+					MetaTable.Section:UpdateToggle(MetaTable, ...)
 				end)
 			end
+		end
+		
+		Toggle.MouseButton1Click:Connect(function()
+			Functions:Toggle()
 		end)
 
 		return MetaTable
 	end
 	
 	function Section:AddTextbox(Title, Callback, Data)
-		Data = Data or {Text = ""}
+		Data = Data or {Text = "", Placeholder = "", MultiLine = false, Pattern = "", RequireEntered = false}
+		Data.Text = Data.Text or ""
+		Data.Placeholder = Data.Placeholder or ""
+		Data.MultiLine = Data.MultiLine or false
+		Data.Pattern = Data.Pattern or ""
+		Data.RequireEntered = Data.RequireEntered or false
 		
 		local Textbox = Utility:Create("ImageButton", {
 			Name = "Textbox",
@@ -830,12 +1031,18 @@ do
 			ScaleType = Enum.ScaleType.Slice,
 			SliceCenter = Rect.new(2, 2, 298, 298)
 		}, {
+			Utility:Create("UIPadding", {
+				PaddingBottom = UDim.new(0, 7),
+				PaddingLeft = UDim.new(0, 10),
+				PaddingRight = UDim.new(0, 10),
+				PaddingTop = UDim.new(0, 7)
+			}),
 			Utility:Create("TextLabel", {
 				Name = "Title",
 				AnchorPoint = Vector2.new(0, 0.5),
 				BackgroundTransparency = 1,
-				Position = UDim2.new(0, 10, 0.5, 1),
-				Size = UDim2.new(0.5, 0, 1, 0),
+				Position = UDim2.new(0, 0, 0, 9),
+				Size = UDim2.new(0.5, 0, 0, 30),
 				ZIndex = 3,
 				Font = Enum.Font.Gotham,
 				Text = Title,
@@ -846,83 +1053,171 @@ do
 			}),
 			Utility:Create("ImageLabel", {
 				Name = "Button",
+				AnchorPoint = Vector2.new(1, 0),
 				BackgroundTransparency = 1,
-				Position = UDim2.new(1, -110, 0.5, -8),
-				Size = UDim2.new(0, 100, 0, 16),
-				ZIndex = 2,
+				Position = UDim2.new(1, 0, 0, 0),
+				Size = UDim2.new(0, 100, 1, 0),
+				ZIndex = 3,
 				Image = "rbxassetid://5028857472",
 				ImageColor3 = Utility.Themes.LightContrast,
 				ScaleType = Enum.ScaleType.Slice,
 				SliceCenter = Rect.new(2, 2, 298, 298)
 			}, {
-				Utility:Create("TextBox", {
-					Name = "Textbox", 
+				Utility:Create("ScrollingFrame", {
+					Name = "TextContainer",
 					BackgroundTransparency = 1,
-					TextTruncate = Enum.TextTruncate.AtEnd,
 					Position = UDim2.new(0, 5, 0, 0),
 					Size = UDim2.new(1, -10, 1, 0),
-					ZIndex = 3,
-					Font = Enum.Font.GothamBold,
-					Text = Data.Text,
-					TextColor3 = Utility.Themes.TextColor,
-					TextSize = 11,
-					ClearTextOnFocus = false
+					ZIndex = 4,
+					ClipsDescendants = true,
+					AutomaticCanvasSize = Enum.AutomaticSize.Y,
+					CanvasSize = UDim2.new(0, 0, 0, 0),
+					ScrollBarThickness = 0
+				}, {
+					Utility:Create("UIPadding", {
+						PaddingBottom = UDim.new(0, 2),
+					}),
+					Utility:Create("TextLabel", {
+						Name = "Placeholder",
+						AutomaticSize = Enum.AutomaticSize.Y,
+						BackgroundTransparency = 1,
+						Size = UDim2.new(1, 0, 1, 0),
+						ZIndex = 4,
+						Font = Enum.Font.GothamBold,
+						Text = Data.Placeholder,
+						TextColor3 = Utility.Themes.TextColor,
+						TextTransparency = 0.5,
+						TextSize = 11,
+					}, {
+						Utility:Create("TextBox", {
+							Name = "Textbox", 
+							AutomaticSize = Enum.AutomaticSize.Y,
+							BackgroundTransparency = 1,
+							MultiLine = Data.MultiLine or false,
+							Size = UDim2.new(1, 0, 1, 0),
+							ZIndex = 4,
+							Font = Enum.Font.GothamBold,
+							Text = Data.Text,
+							TextColor3 = Utility.Themes.TextColor,
+							TextSize = 11,
+							TextWrapped = true,
+							ClearTextOnFocus = false
+						})
+					})
 				})
 			})
 		})
 		
+		Textbox:GetPropertyChangedSignal("Visible"):Connect(function() self:Resize(true) end)
+		
+		local Functions = {}
 		local MetaTable = setmetatable({
 			Section = self,
 			Textbox = Textbox,
 			Title = Title,
 			Data = Data,
 			Callback = Callback,
+			Functions = Functions,
 		}, {})
 
-		table.insert(self.Modules, Textbox)
+		table.insert(self.Modules, MetaTable.Textbox)
 
 		local Button = Textbox.Button
-		local Input = Button.Textbox
+		local Placeholder = Button.TextContainer.Placeholder
+		local Input = Placeholder.Textbox
+		
+		if Input.Text == "" then Placeholder.Text = MetaTable.Data.Placeholder
+		else Placeholder.Text = "" end
+		
+		function Functions:Focus()
+			if Textbox.Button.Size ~= UDim2.new(0, 100, 1, 0) then return end
 
-		Textbox.MouseButton1Click:Connect(function()
-			if Textbox.Button.Size ~= UDim2.new(0, 100, 0, 16) then return end
-
-			Utility:Tween(Textbox.Button, {Size = UDim2.new(0, 200, 0, 16), Position = UDim2.new(1, -210, 0.5, -8)}, 0.2)
-			wait()
-
-			Input.TextXAlignment = Enum.TextXAlignment.Left
 			Input:CaptureFocus()
+		end
+		
+		Textbox.MouseButton1Click:Connect(function()
+			Functions:Focus()
 		end)
 
 		Input:GetPropertyChangedSignal("Text"):Connect(function()
+			if Input.Text == "" then Placeholder.Text = MetaTable.Data.Placeholder
+			else Placeholder.Text = "" end
+			
+			if Input.Text ~= "" and MetaTable.Data.Pattern ~= "" then
+				if string.find(Input.Text, MetaTable.Data.Pattern) then
+					local I, J = string.find(Input.Text, MetaTable.Data.Pattern)
+					Input.Text = Input.Text:sub(I, J)
+				else Input.Text = "" end
+			end
+			
 			MetaTable.Data.Text = Input.Text
-			if Button.ImageTransparency == 0 and (Button.Size == UDim2.new(0, 200, 0, 16) or Button.Size == UDim2.new(0, 100, 0, 16)) then Utility:Pop(Button, 10) end -- i know, i dont like this either
-
-			if MetaTable.Callback then
-				MetaTable.Callback(Input.Text, nil, function(...)
-					self:UpdateTextbox(MetaTable, ...)
-				end)
+			if Button.ImageTransparency == 0 and (Button.Size == UDim2.new(1, 0, 1, 0) or Button.Size == UDim2.new(0, 100, 1, 0)) then
+				Utility:Pop(Button, 10)
+			end -- i know, i dont like this either
+			
+			if not MetaTable.Data.RequireEntered then
+				if MetaTable.Callback then
+					MetaTable.Callback(Input.Text, nil, function(...)
+						self:UpdateTextbox(MetaTable, ...)
+					end)
+				end
 			end
 		end)
+		
+		Input:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+			Button.TextContainer.CanvasPosition = Vector2.new(0, Button.TextContainer.AbsoluteCanvasSize.Y)
+		end)
+		
+		Textbox:GetPropertyChangedSignal("Size"):Connect(function()
+			self:Resize()
+		end)
+		
+		Input.Focused:Connect(function()
+			if MetaTable.Data.MultiLine then Utility:Tween(Textbox, {Size = UDim2.new(1, 0, 0, 100)}, 0.2)
+			else Utility:Tween(Textbox, {Size = UDim2.new(1, 0, 0, 30)}, 0.2) end
+			Utility:Tween(Textbox.Button, {Size = UDim2.new(1, 0, 1, 0)}, 0.2)
+			wait()
+			
+			Placeholder.TextXAlignment = Enum.TextXAlignment.Left
+			Input.TextXAlignment = Enum.TextXAlignment.Left
+			if MetaTable.Data.MultiLine then
+				Placeholder.TextYAlignment = Enum.TextYAlignment.Top
+				Input.TextYAlignment = Enum.TextYAlignment.Top
+			else
+				Placeholder.TextYAlignment = Enum.TextYAlignment.Center
+				Input.TextYAlignment = Enum.TextYAlignment.Center
+			end
+			wait(0.2)
+			Textbox.Title.Visible = false
+		end)
 
-		Input.FocusLost:Connect(function()
+		Input.FocusLost:Connect(function(enterPressed)
 			MetaTable.Data.Text = Input.Text
+			Placeholder.TextXAlignment = Enum.TextXAlignment.Center
+			Placeholder.TextYAlignment = Enum.TextYAlignment.Center
 			Input.TextXAlignment = Enum.TextXAlignment.Center
-
-			Utility:Tween(Textbox.Button, {Size = UDim2.new(0, 100, 0, 16), Position = UDim2.new(1, -110, 0.5, -8)}, 0.2)
-
-			if MetaTable.Callback then
+			Input.TextYAlignment = Enum.TextYAlignment.Center
+			
+			Utility:Tween(Textbox, {Size = UDim2.new(1, 0, 0, 30)}, 0.2)
+			Utility:Tween(Textbox.Button, {Size = UDim2.new(0, 100, 1, 0)}, 0.2)
+			
+			if MetaTable.Callback and (MetaTable.Data.RequireEntered and enterPressed) then
 				MetaTable.Callback(Input.Text, true, function(...)
 					self:UpdateTextbox(MetaTable, ...)
 				end)
 			end
+			
+			wait(0.2)
+			Textbox.Title.Visible = true
+			Button.TextContainer.CanvasPosition = Vector2.new(0, Button.TextContainer.AbsoluteCanvasSize.Y)
 		end)
-
+		
 		return MetaTable
 	end
 	
 	function Section:AddKeybind(Title, Callback, ChangedCallback, Data)
 		Data = Data or {Key = nil}
+		Data.Key = Data.Key or nil
 		if typeof(Data.Key) == "string" then Data.Key = Enum.KeyCode[Data.Key] end
 		
 		local Keybind = Utility:Create("ImageButton", {
@@ -976,6 +1271,9 @@ do
 			})
 		})
 		
+		Keybind:GetPropertyChangedSignal("Visible"):Connect(function() self:Resize(true) end)
+		
+		local Functions = {}
 		local MetaTable = setmetatable({
 			Section = self,
 			Keybind = Keybind,
@@ -983,9 +1281,10 @@ do
 			Data = Data,
 			Callback = Callback,
 			ChangedCallback = ChangedCallback,
+			Functions = Functions,
 		}, {})
 
-		table.insert(self.Modules, Keybind)
+		table.insert(self.Modules, MetaTable.Keybind)
 
 		local Text = Keybind.Button.Text
 		local Button = Keybind.Button
@@ -997,21 +1296,23 @@ do
 		end
 
 		self.Binds[Keybind] = {Callback = function()
-			Animate()
+			if MetaTable.Section.Container.Parent.Visible then
+				Animate()
 
-			if MetaTable.Callback then
-				MetaTable.Callback(function(...)
-					self:UpdateKeybind(MetaTable, ...)
-				end)
+				if MetaTable.Callback then
+					MetaTable.Callback(function(...)
+						self:UpdateKeybind(MetaTable, ...)
+					end)
+				end
 			end
 		end}
 
 		if MetaTable.Data.Key and MetaTable.Callback then self:UpdateKeybind(MetaTable, nil, {Key = MetaTable.Data.Key}) end
 		
-		Keybind.MouseButton1Click:Connect(function()
+		function Functions:SetKey()
 			Animate()
 
-			if self.Binds[Keybind].Connection then return self:UpdateKeybind(MetaTable) end -- unbind
+			if MetaTable.Section.Binds[Keybind].Connection then return MetaTable.Section:UpdateKeybind(MetaTable) end -- unbind
 
 			if Text.Text == "None" then -- new bind
 				Text.Text = "..."
@@ -1019,15 +1320,19 @@ do
 				local Key = Utility:KeyPressed()
 				MetaTable.Data.Key = Key.KeyCode
 
-				self:UpdateKeybind(MetaTable, nil, {Key = Key.KeyCode})
+				MetaTable.Section:UpdateKeybind(MetaTable, nil, {Key = Key.KeyCode})
 				Animate()
 
 				if MetaTable.ChangedCallback then
 					MetaTable.ChangedCallback(Key, function(...)
-						self:UpdateKeybind(MetaTable, ...)
+						MetaTable.Section:UpdateKeybind(MetaTable, ...)
 					end)
 				end
 			end
+		end
+		
+		Keybind.MouseButton1Click:Connect(function()
+			Functions:SetKey()
 		end)
 
 		return MetaTable
@@ -1035,6 +1340,9 @@ do
 	
 	function Section:AddSlider(Title, Callback, Data)
 		Data = Data or {Value = 1, Min = 0, Max = 1}
+		Data.Value = Data.Value or 1
+		Data.Min = Data.Min or 0
+		Data.Max = Data.Max or 1
 		
 		local Slider = Utility:Create("ImageButton", {
 			Name = "Slider",
@@ -1120,15 +1428,19 @@ do
 			})
 		})
 		
+		Slider:GetPropertyChangedSignal("Visible"):Connect(function() self:Resize(true) end)
+		
+		local Functions = {}
 		local MetaTable = setmetatable({
 			Section = self,
 			Slider = Slider,
 			Title = Title,
 			Data = Data,
 			Callback = Callback,
+			Functions = Functions,
 		}, {})
 
-		table.insert(self.Modules, Slider)
+		table.insert(self.Modules, MetaTable.Slider)
 
 		local Allowed = {
 			[""] = true,
@@ -1151,21 +1463,24 @@ do
 		self:UpdateSlider(MetaTable, nil, {Value = MetaTable.Data.Value, Min = MetaTable.Data.Min, Max = MetaTable.Data.Max})
 
 		Utility:DraggingEnded(function() Dragging = false end)
+		
+		Slider.InputBegan:Connect(function(Input)
+			if Input.UserInputType == Enum.UserInputType.MouseButton1 or
+				Input.UserInputType == Enum.UserInputType.Touch then
+				Dragging = true
 
-		Slider.MouseButton1Down:Connect(function(Input)
-			Dragging = true
+				while Dragging do
+					Utility:Tween(Circle, {ImageTransparency = 0}, 0.1)
 
-			while Dragging do
-				Utility:Tween(Circle, {ImageTransparency = 0}, 0.1)
+					MetaTable.Data.Value = self:UpdateSlider(MetaTable, nil, {Value = nil, Min = MetaTable.Data.Min, Max = MetaTable.Data.Max, LValue = MetaTable.Data.Value})
+					Callback(MetaTable.Data.Value)
 
-				MetaTable.Data.Value = self:UpdateSlider(MetaTable, nil, {Value = nil, Min = MetaTable.Data.Min, Max = MetaTable.Data.Max, LValue = MetaTable.Data.Value})
-				Callback(MetaTable.Data.Value)
+					Utility:Wait()
+				end
 
-				Utility:Wait()
+				wait(0.5)
+				Utility:Tween(Circle, {ImageTransparency = 1}, 0.2)
 			end
-
-			wait(0.5)
-			Utility:Tween(Circle, {ImageTransparency = 1}, 0.2)
 		end)
 
 		Textbox.FocusLost:Connect(function()
@@ -1179,7 +1494,7 @@ do
 			local Text = Textbox.Text
 
 			if not Allowed[Text] and not tonumber(Text) then
-				Textbox.Text = Text:Sub(1, #Text - 1)
+				Textbox.Text = Text:sub(1, #Text - 1)
 			elseif not Allowed[Text] then	
 				MetaTable.Data.Value = self:UpdateSlider(MetaTable, nil, {Value = tonumber(Text) or MetaTable.Data.Value, Min = MetaTable.Data.Min, Max = MetaTable.Data.Max})
 				Callback(MetaTable.Data.Value)
@@ -1190,7 +1505,11 @@ do
 	end
 
 	function Section:AddDropdown(Title, Callback, Data)
-		Data = Data or {Options = {}}
+		Data = Data or {Options = {}, Value = nil, MultiValue = false, ExpandLimit = 3}
+		Data.Options = Data.Options or {}
+		Data.Value = Data.Value or nil
+		Data.MultiValue = Data.MultiValue or false
+		Data.ExpandLimit = Data.ExpandLimit or 3
 		
 		local Dropdown = Utility:Create("Frame", {
 			Name = "Dropdown",
@@ -1214,32 +1533,71 @@ do
 				ScaleType = Enum.ScaleType.Slice,
 				SliceCenter = Rect.new(2, 2, 298, 298)
 			}, {
-				Utility:Create("TextBox", {
-					Name = "TextBox",
-					AnchorPoint = Vector2.new(0, 0.5),
-					BackgroundTransparency = 1,
-					TextTruncate = Enum.TextTruncate.AtEnd,
-					Position = UDim2.new(0, 10, 0.5, 1),
-					Size = UDim2.new(1, -42, 1, 0),
-					ZIndex = 3,
-					Font = Enum.Font.Gotham,
-					Text = Data.Value or Title,
-					TextColor3 = Utility.Themes.TextColor,
-					TextSize = 12,
-					TextTransparency = 0.10000000149012,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					ClearTextOnFocus = false
-				}),
-				Utility:Create("ImageButton", {
-					Name = "Button",
+				Utility:Create("Frame", {
+					Name = "Container",
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
-					Position = UDim2.new(1, -28, 0.5, -9),
-					Size = UDim2.new(0, 18, 0, 18),
-					ZIndex = 3,
-					Image = "rbxassetid://5012539403",
-					ImageColor3 = Utility.Themes.TextColor,
-					SliceCenter = Rect.new(2, 2, 298, 298)
+					Size = UDim2.new(1, 0, 1, 0),
+					ZIndex = 2
+				}, {
+					Utility:Create("UIListLayout", {
+						FillDirection = Enum.FillDirection.Horizontal,
+						HorizontalAlignment = Enum.HorizontalAlignment.Right,
+						VerticalAlignment = Enum.VerticalAlignment.Center
+					}),
+					Utility:Create("UIPadding", {
+						PaddingLeft = UDim.new(0, 10),
+						PaddingRight = UDim.new(0, 10)
+					}),
+					Utility:Create("TextLabel", {
+						Name = "1 Title",
+						AnchorPoint = Vector2.new(0, 0.5),
+						AutomaticSize = Enum.AutomaticSize.X,
+						BackgroundTransparency = 1,
+						Size = UDim2.new(0, 0, 1, 0),
+						ZIndex = 3,
+						Font = Enum.Font.Gotham,
+						Text = Title or "",
+						TextColor3 = Utility.Themes.TextColor,
+						TextSize = 12,
+						TextTransparency = 0.10000000149012,
+						TextXAlignment = Enum.TextXAlignment.Left,
+						ClipsDescendants = true
+					}),
+					Utility:Create("TextBox", {
+						Name = "2 TextBox",
+						AnchorPoint = Vector2.new(0, 0.5),
+						BackgroundTransparency = 1,
+						TextTruncate = Enum.TextTruncate.AtEnd,
+						Size = UDim2.new(1, 0, 1, 0),
+						ZIndex = 3,
+						Font = Enum.Font.Gotham,
+						Text = (not Data.MultiValue and (Data.Value or Data.Options[1])) or "",
+						TextColor3 = Utility.Themes.TextColor,
+						TextSize = 12,
+						TextTransparency = 0.10000000149012,
+						TextXAlignment = Enum.TextXAlignment.Left,
+						ClearTextOnFocus = false
+					}),
+					Utility:Create("Frame", {
+						Name = "3 Button",
+						BackgroundTransparency = 1,
+						BorderSizePixel = 0,
+						Position = UDim2.new(1, -28, 0.5, -9),
+						Size = UDim2.new(0, 18, 0, 18),
+						ZIndex = 3,
+					}, {
+						Utility:Create("ImageButton", {
+							Name = "Button",
+							BackgroundTransparency = 1,
+							BorderSizePixel = 0,
+							Size = UDim2.new(1, 0, 1, 0),
+							ZIndex = 3,
+							Image = "rbxassetid://5012539403",
+							ImageColor3 = Utility.Themes.TextColor,
+							SliceCenter = Rect.new(2, 2, 298, 298)
+						})
+					})
 				})
 			}),
 			Utility:Create("ImageLabel", {
@@ -1274,46 +1632,71 @@ do
 			})
 		})
 		
+		Dropdown:GetPropertyChangedSignal("Visible"):Connect(function() self:Resize(true) end)
+		
+		local Functions = {}
 		local MetaTable = setmetatable({
 			Section = self,
 			Dropdown = Dropdown,
 			Title = Title,
 			Data = Data,
 			Callback = Callback,
+			Functions = Functions,
 		}, {})
 		
-		table.insert(self.Modules, Dropdown)
+		table.insert(self.Modules, MetaTable.Dropdown)
 
 		local Search = Dropdown.Search
 		local Focused
-		
-		MetaTable.Reset = function()
-			self:UpdateDropdown(MetaTable, nil, {Options = {}})
+			
+		function Functions:Hide()
+			MetaTable.Section:UpdateDropdown(MetaTable, nil, {})
 		end
 		
-		Search.Button.MouseButton1Click:Connect(function()
-			if Search.Button.Rotation == 0 then
+		Search.Container["1 Title"].InputBegan:Connect(function(Input)
+			if Input.UserInputType == Enum.UserInputType.MouseButton1 or
+				Input.UserInputType == Enum.UserInputType.Touch then
+				Search.Container["2 TextBox"]:CaptureFocus();
+			end
+		end)
+		
+		Search.Container["2 TextBox"].Size = UDim2.new(1, -(Search.Container["1 Title"].AbsoluteSize.X + 18), 1, 0)
+		
+		Search.Container["3 Button"].Button.MouseButton1Click:Connect(function()
+			if Search.Container["3 Button"].Button.Rotation == 0 then
 				self:UpdateDropdown(MetaTable, nil, {Options = MetaTable.Data.Options})
 			else
 				self:UpdateDropdown(MetaTable, nil, {})
 			end
 		end)
 
-		Search.TextBox.Focused:Connect(function()
-			if Search.Button.Rotation == 0 then
+		Search.Container["2 TextBox"].Focused:Connect(function()
+			if Search.Container["3 Button"].Button.Rotation == 0 then
 				self:UpdateDropdown(MetaTable, nil, {Options = MetaTable.Data.Options})
 			end
 
 			Focused = true
+			Utility:Tween(Dropdown.Search.Container["2 TextBox"], {
+				Size = UDim2.new(1, -18, 1, 0)
+			}, 0.2)
+			Search.Container["1 Title"].Visible = false
 		end)
 
-		Search.TextBox.FocusLost:Connect(function() Focused = false end)
+		Search.Container["2 TextBox"].FocusLost:Connect(function()
+			Focused = false
+			Utility:Tween(Dropdown.Search.Container["2 TextBox"], {
+				Size = UDim2.new(1, -(Dropdown.Search.Container["1 Title"].AbsoluteSize.X + 18), 1, 0)
+			}, 0.2)
+			Search.Container["1 Title"].Visible = true
+			if MetaTable.Data.MultiValue then
+				Search.Container["2 TextBox"].Text = ""
+			end
+		end)
 
-		Search.TextBox:GetPropertyChangedSignal("Text"):Connect(function()
+		Search.Container["2 TextBox"]:GetPropertyChangedSignal("Text"):Connect(function()
 			if Focused then
-				local Options = Utility:Sort(Search.TextBox.Text, MetaTable.Data.Options)
+				local Options = Utility:Sort(Search.Container["2 TextBox"].Text, MetaTable.Data.Options)
 				Options = #Options ~= 0 and Options
-				print(Options)
 
 				self:UpdateDropdown(MetaTable, nil, {Options = Options})
 			end
@@ -1325,7 +1708,10 @@ do
 	end
 	
 	function Section:AddRadio(Title, Callback, Data)
-		Data = Data or {Options = {}, Selected = nil}
+		Data = Data or {Options = {}, Selected = nil, Column = 3}
+		Data.Options = Data.Options or {}
+		Data.Selected = Data.Selected or nil
+		Data.Column = Data.Column or 3
 		
 		local Radio = Utility:Create("ImageLabel", {
 			Name = "Radio",
@@ -1375,7 +1761,7 @@ do
 				}, {
 					Utility:Create("UIGridLayout", {
 						CellPadding = UDim2.new(0, 10, 0, 10),
-						CellSize = UDim2.new(0.32, 0, 0, 15),
+						CellSize = UDim2.new(0.32, -10, 0, 15),
 						FillDirectionMaxCells = 3,
 						HorizontalAlignment = Enum.HorizontalAlignment.Center,
 						VerticalAlignment = Enum.VerticalAlignment.Center,
@@ -1384,23 +1770,30 @@ do
 			})
 		})
 		
+		Radio:GetPropertyChangedSignal("Visible"):Connect(function() self:Resize(true) end)
+		
+		local Functions = {}
 		local MetaTable = setmetatable({
 			Section = self,
 			Radio = Radio,
 			Title = Title,
 			Data = Data,
 			Callback = Callback,
+			Functions = Functions,
 		}, {})
 		
-		table.insert(self.Modules, Radio)
+		table.insert(self.Modules, MetaTable.Radio)
 		
-		self:UpdateRadio(MetaTable, nil, {})
+		self:UpdateRadio(MetaTable, MetaTable.Title, {})
 		
 		return MetaTable
 	end
 	
 	function Section:AddCheckbox(Title, Callback, Data)
-		Data = Data or {Options = {}, Selected = {}}
+		Data = Data or {Options = {}, Selected = {}, Column = 3}
+		Data.Options = Data.Options or {}
+		Data.Selected = Data.Selected or {}
+		Data.Column = Data.Column or 3
 		
 		local Checkbox = Utility:Create("ImageLabel", {
 			Name = "Checkbox",
@@ -1450,7 +1843,7 @@ do
 				}, {
 					Utility:Create("UIGridLayout", {
 						CellPadding = UDim2.new(0, 10, 0, 10),
-						CellSize = UDim2.new(0.32, 0, 0, 15),
+						CellSize = UDim2.new(0.32, -10, 0, 15),
 						FillDirectionMaxCells = 3,
 						HorizontalAlignment = Enum.HorizontalAlignment.Center,
 						VerticalAlignment = Enum.VerticalAlignment.Center,
@@ -1459,17 +1852,21 @@ do
 			})
 		})
 		
+		Checkbox:GetPropertyChangedSignal("Visible"):Connect(function() self:Resize(true) end)
+		
+		local Functions = {}
 		local MetaTable = setmetatable({
 			Section = self,
 			Checkbox = Checkbox,
 			Title = Title,
 			Data = Data,
 			Callback = Callback,
+			Functions = Functions,
 		}, {})
 
-		table.insert(self.Modules, Checkbox)
+		table.insert(self.Modules, MetaTable.Checkbox)
 		
-		self:UpdateCheckbox(MetaTable, nil, {})
+		self:UpdateCheckbox(MetaTable, MetaTable.Title, {})
 		
 		return MetaTable
 	end
@@ -1564,7 +1961,56 @@ do
 			Page:Resize()
 		end
 	end
+	
+	function Page:AddSplit()
+		local Split = Utility:Create("Frame", {
+			Name = "Split",
+			Parent = self.Container,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 0),
+			ZIndex = 2,
+			ClipsDescendants = true
+		}, {
+			Utility:Create("Frame", {
+				Name = "Left",
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0.5, 0, 0, 0),
+				ZIndex = 2,
+				ClipsDescendants = true
+			}, {
+				Utility:Create("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 10)
+				});
+			});
+			Utility:Create("Frame", {
+				Name = "Right",
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0.5, 0, 0, 0),
+				ZIndex = 2,
+				ClipsDescendants = true
+			}, {
+				Utility:Create("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 10)
+				});
+			});
+			Utility:Create("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, 0),
+				FillDirection = Enum.FillDirection.Horizontal
+			});
+		})
 
+		return setmetatable({
+			Container_Left = Split.Left,
+			Container_Right = Split.Right,
+		}, {})
+	end
+	
 	function Page:Resize(Scroll)
 		local Padding = 10
 		local Size = 0
@@ -1573,14 +2019,19 @@ do
 			Size = Size + Section.Container.Parent.AbsoluteSize.Y + Padding
 		end
 
-		self.Container.CanvasSize = UDim2.new(0, 0, 0, Size)
+		--self.Container.CanvasSize = UDim2.new(0, 0, 0, Size)
 		self.Container.ScrollBarImageTransparency = Size > self.Container.AbsoluteSize.Y
 
 		if Scroll then
 			Utility:Tween(self.Container, {CanvasPosition = Vector2.new(0, self.LastPosition or 0)}, 0.2)
 		end
 	end
-
+	
+	function Page:Enabled(Enabled)
+		self.Button.Visible = Enabled
+		self.Container.Visible = Enabled
+	end
+	
 	function Section:Resize(Smooth)
 		if self.Page.Library.FocusedPage ~= self.Page then return end
 		
@@ -1600,6 +2051,10 @@ do
 			self.Page:Resize()
 		end
 	end
+
+	function Section:Enabled(Enabled)
+		self.Container.Parent.Visible = Enabled
+	end
 	
 	function Section:GetModule(Info)
 		if table.find(self.Modules, Info) then return Info end
@@ -1616,6 +2071,12 @@ do
 	------------------------------
 	----- [ MODULE UPDATES ] -----
 	------------------------------
+	function Section:UpdateLabel(MetaTable, Text)
+		local Label = self:GetModule(MetaTable.Label)
+		
+		Label.Text = Text
+	end
+	
 	function Section:UpdateButton(MetaTable, Title)
 		local Button = self:GetModule(MetaTable.Button)
 
@@ -1645,7 +2106,8 @@ do
 		local Textbox = self:GetModule(MetaTable.Textbox)
 
 		if Title then Textbox.Title.Text = Title end
-		if Data.Text then Textbox.Button.Textbox.Text = Data.Text end
+		if Data and Data.Placeholder then Textbox.Button.TextContainer.Placeholder.Text = Data.Placeholder end
+		if Data and Data.Text then Textbox.Button.TextContainer.Placeholder.Textbox.Text = Data.Text end
 	end
 	
 	function Section:UpdateKeybind(MetaTable, Title, Data)
@@ -1658,7 +2120,7 @@ do
 
 		if Bind.Connection then Bind.Connection = Bind.Connection:UnBind() end
 
-		if Data.Key then
+		if Data and Data.Key then
 			self.Binds[Keybind].Connection = Utility:BindToKey(Data.Key, Bind.Callback)
 			Text.Text = Data.Key.Name
 		else
@@ -1674,10 +2136,11 @@ do
 		local Bar = Slider.Slider.Bar
 		local Percent = (Mouse.X - Bar.AbsolutePosition.X) / Bar.AbsoluteSize.X
 
-		if Data.Value then Percent = (Data.Value - Data.Min) / (Data.Max - Data.Min) end -- support negative ranges
+		if Data and Data.Value then Percent = (Data.Value - Data.Min) / (Data.Max - Data.Min) end -- support negative ranges
 
 		Percent = math.clamp(Percent, 0, 1)
 		local Value = Data.Value or math.floor(Data.Min + (Data.Max - Data.Min) * Percent)
+		Value = math.clamp(Value, MetaTable.Data.Min, MetaTable.Data.Max)
 
 		Slider.TextBox.Text = Value
 		Utility:Tween(Bar.Fill, {Size = UDim2.new(Percent, 0, 1, 0)}, 0.1)
@@ -1690,7 +2153,17 @@ do
 	function Section:UpdateDropdown(MetaTable, Title, Data)
 		local Dropdown = self:GetModule(MetaTable.Dropdown)
 
-		if Title then Dropdown.Search.TextBox.Text = Title end
+		if Title then
+			Dropdown.Search.Container["1 Title"].Text = Title
+			Dropdown.Search.Container["2 TextBox"].Size = UDim2.new(1, -(Dropdown.Search.Container["1 Title"].AbsoluteSize.X + 18), 1, 0)
+		end
+		if Data and Data.Value then
+			if typeof(Data.Value) == "table" then
+				Dropdown.Search.Container["2 TextBox"].Text = ""
+			else
+				Dropdown.Search.Container["2 TextBox"].Text = Data.Value
+			end
+		end
 
 		local Entries = 0
 
@@ -1699,8 +2172,17 @@ do
 		for Index, Button in pairs(Dropdown.List.Frame:GetChildren()) do
 			if Button:IsA("ImageButton") then Button:Destroy() end
 		end
-
-		for Index, Value in pairs(Data and Data.Options or {}) do
+		
+		local Debounce;
+		local Animate = function(Item, Active)
+			if Active then
+				Utility:Tween(Item, {ImageColor3 = Utility.Themes.TextColor}, 0.2)
+			else
+				Utility:Tween(Item, {ImageColor3 = Utility.Themes.DarkContrast}, 0.2)
+			end
+		end
+		
+		for Index, Item in pairs(Data and Data.Options or {}) do
 			local Button = Utility:Create("ImageButton", {
 				Parent = Dropdown.List.Frame,
 				BackgroundTransparency = 1,
@@ -1712,30 +2194,96 @@ do
 				ScaleType = Enum.ScaleType.Slice,
 				SliceCenter = Rect.new(2, 2, 298, 298)
 			}, {
-				Utility:Create("TextLabel", {
+				Utility:Create("UIPadding", {
+					PaddingBottom = UDim.new(0, 2),
+					PaddingLeft = UDim.new(0, 2),
+					PaddingRight = UDim.new(0, 2),
+					PaddingTop = UDim.new(0, 2)
+				}),
+				Utility:Create("ImageLabel", {
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 10, 0, 0),
-					Size = UDim2.new(1, -10, 1, 0),
+					BorderSizePixel = 0,
+					Size = UDim2.new(1, 0, 1, 0),
 					ZIndex = 3,
-					Font = Enum.Font.Gotham,
-					Text = Value,
-					TextColor3 = Utility.Themes.TextColor,
-					TextSize = 12,
-					TextXAlignment = "Left",
-					TextTransparency = 0.10000000149012
+					Image = "rbxassetid://5028857472",
+					ImageColor3 = Utility.Themes.DarkContrast,
+					ScaleType = Enum.ScaleType.Slice,
+					SliceCenter = Rect.new(2, 2, 298, 298)
+				}, {
+					Utility:Create("UIPadding", {
+						PaddingLeft = UDim.new(0, 8),
+						PaddingRight = UDim.new(0, 8),
+					}),
+					Utility:Create("TextLabel", {
+						BackgroundTransparency = 1,
+						Size = UDim2.new(1, 0, 1, 0),
+						ZIndex = 3,
+						Font = Enum.Font.Gotham,
+						Text = Item,
+						TextColor3 = Utility.Themes.TextColor,
+						TextSize = 12,
+						TextXAlignment = "Left",
+						TextTransparency = 0.10000000149012
+					})
 				})
 			})
+			
+			local Active = false;
+
+			if MetaTable.Data.Value then
+				if typeof(MetaTable.Data.Value) == "table" then
+					for Index, Value in pairs(MetaTable.Data.Value) do
+						if Value ~= Item then continue end
+						Active = true
+						break
+					end
+				elseif MetaTable.Data.Value == Item then
+					Active = true
+				end
+				
+				if Active then
+					Button.ImageColor3 = Utility.Themes.TextColor;
+				end
+			end
 
 			Button.MouseButton1Click:Connect(function()
-				MetaTable.Data.Value = Value
+				if Debounce then return end
+				Debounce = true;
 				
-				if MetaTable.Callback then
-					MetaTable.Callback(Value, function(...)
-						self:UpdateDropdown(Dropdown, ...)
-					end)
-				end
+				if MetaTable.Data.MultiValue then
+					local NewSelected = {};
+					local Located = false;
+					
+					if MetaTable.Data.Value then
+						for Index, Value in pairs(MetaTable.Data.Value) do
+							if Value == Item then Located = true; continue end
+							table.insert(NewSelected, Value)
+						end
+					end
+					
+					if not Located then table.insert(NewSelected, Item); Active = true else Active = false end
+					Animate(Button, Active)
+					
+					MetaTable.Data.Value = NewSelected
+					if MetaTable.Callback then
+						MetaTable.Callback(NewSelected, function(...)
+							self:UpdateCheckbox(MetaTable, ...)
+						end)
+					end
+				else
+					MetaTable.Data.Value = Item
 
-				self:UpdateDropdown(MetaTable, Value, {})
+					if MetaTable.Callback then
+						MetaTable.Callback(Item, function(...)
+							self:UpdateDropdown(Dropdown, ...)
+						end)
+					end
+
+					self:UpdateDropdown(MetaTable, nil, {Value = Item})
+				end
+				
+				wait(.1)
+				Debounce = false;
 			end)
 
 			Entries = Entries + 1
@@ -1743,10 +2291,10 @@ do
 
 		local Frame = Dropdown.List.Frame
 
-		Utility:Tween(Dropdown, {Size = UDim2.new(1, 0, 0, (Entries == 0 and 30) or math.clamp(Entries, 0, 3) * 34 + 38)}, 0.3)
-		Utility:Tween(Dropdown.Search.Button, {Rotation = (Data and Data.Options) and 180 or 0}, 0.3)
+		Utility:Tween(Dropdown, {Size = UDim2.new(1, 0, 0, (Entries == 0 and 30) or math.clamp(Entries, 0, MetaTable.Data.ExpandLimit) * 34 + 38)}, 0.3)
+		Utility:Tween(Dropdown.Search.Container["3 Button"].Button, {Rotation = (Data and Data.Options) and 180 or 0}, 0.3)
 
-		if Entries > 3 then
+		if Entries > MetaTable.Data.ExpandLimit then
 			for Index, Button in pairs(Dropdown.List.Frame:GetChildren()) do
 				if Button:IsA("ImageButton") then Button.Size = UDim2.new(1, -6, 0, 30) end
 			end
@@ -1764,12 +2312,14 @@ do
 		
 		if Title then Radio.Title.Text = Title; end
 		
-		local Lines = math.floor(#MetaTable.Data.Options / 3);
-		if (#MetaTable.Data.Options / 3) % 1 > 0 then Lines = Lines + 1; end
+		local Lines = math.floor(#MetaTable.Data.Options / MetaTable.Data.Column);
+		if (#MetaTable.Data.Options / MetaTable.Data.Column) % 1 > 0 then Lines = Lines + 1; end
 
 		local Size = (Lines * 15) + ((Lines - 1) * 10);
 
 		Radio.Size = UDim2.new(1, 0, 0, 38 + Size)
+		Radio.Options.Container.UIGridLayout.FillDirectionMaxCells = MetaTable.Data.Column
+		Radio.Options.Container.UIGridLayout.CellSize = UDim2.new((math.round(100/MetaTable.Data.Column)-1)/100, -10, 0, 15)
 		
 		for Index, Button in pairs(Radio.Options.Container:GetChildren()) do
 			if Button:IsA("ImageButton") then Button:Destroy() end
@@ -1878,12 +2428,14 @@ do
 
 		if Title then Checkbox.Title.Text = Title end
 		
-		local Lines = math.floor(#MetaTable.Data.Options / 3);
-		if (#MetaTable.Data.Options / 3) % 1 > 0 then Lines = Lines + 1; end
+		local Lines = math.floor(#MetaTable.Data.Options / MetaTable.Data.Column);
+		if (#MetaTable.Data.Options / MetaTable.Data.Column) % 1 > 0 then Lines = Lines + 1; end
 
 		local Size = (Lines * 15) + ((Lines - 1) * 10);
 
 		Checkbox.Size = UDim2.new(1, 0, 0, 38 + Size)
+		Checkbox.Options.Container.UIGridLayout.FillDirectionMaxCells = MetaTable.Data.Column
+		Checkbox.Options.Container.UIGridLayout.CellSize = UDim2.new((math.round(100/MetaTable.Data.Column)-1)/100, -10, 0, 15)
 		
 		for Index, Button in pairs(Checkbox.Options.Container:GetChildren()) do
 			if Button:IsA("ImageButton") then Button:Destroy() end
@@ -1970,9 +2522,11 @@ do
 
 				local NewSelected = {};
 				local Located = false;
-				for Index, Value in pairs(MetaTable.Data.Selected) do
-					if Value == Item then Located = true; continue end
-					table.insert(NewSelected, Value)
+				if MetaTable.Data.Selected then
+					for Index, Value in pairs(MetaTable.Data.Selected) do
+						if Value == Item then Located = true; continue end
+						table.insert(NewSelected, Value)
+					end
 				end
 				if not Located then table.insert(NewSelected, Item); Active = true else Active = false end
 				Animate(Option, Active)

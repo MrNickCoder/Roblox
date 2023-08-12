@@ -145,14 +145,14 @@ return {
 			};
 			["Portals"] = {
 				["Worlds"] = {
-					"Alien Portals","Zeldris Portals","Demon Portals","Dressrosa Portals","The Eclipse","Summer Events"
+					"Alien Portals","Zeldris Portals","Demon Portals","Dressrosa Portals","The Eclipse","Summer Hunt"
 				};
 				["World"] = {
 					["Alien Portals"] = {
 						["Levels"] = {"portal_boros_g"};
 						["Level"] = {
 							["portal_boros_g"] = {
-								["Damage Modifier"] = {"Magic","Physical","Fire","Aqua","Storm","Air","Rose","Dark","Light"};
+								["Damage Modifiers"] = {"Magic","Physical","Fire","Aqua","Storm","Air","Rose","Dark","Light"};
 							};
 						};
 					};
@@ -160,7 +160,7 @@ return {
 						["Levels"] = {"april_portal_item"};
 						["Level"] = {
 							["april_portal_item"] = {
-								["Damage Modifier"] = {"Magic","Physical","Fire","Aqua","Storm","Air","Rose","Dark","Light"};
+								["Damage Modifiers"] = {"Magic","Physical","Fire","Aqua","Storm","Air","Rose","Dark","Light"};
 							};
 						};
 					};
@@ -168,7 +168,7 @@ return {
 						["Levels"] = {"portal_zeldris"};
 						["Level"] = {
 							["portal_zeldris"] = {
-								["Damage Modifier"] = {"Magic","Physical","Fire","Aqua","Storm","Air","Rose","Dark","Light"};
+								["Damage Modifiers"] = {"Magic","Physical","Fire","Aqua","Storm","Air","Rose","Dark","Light"};
 							};
 						};
 					};
@@ -176,7 +176,7 @@ return {
 						["Levels"] = {"portal_item__dressrosa"};
 						["Level"] = {
 							["portal_item__dressrosa"] = {
-								["Damage Modifier"] = {"Magic","Physical","Fire","Aqua","Storm","Air","Rose","Dark","Light"};
+								["Damage Modifiers"] = {"Magic","Physical","Fire","Aqua","Storm","Air","Rose","Dark","Light"};
 							};
 						};
 					};
@@ -184,17 +184,17 @@ return {
 						["Levels"] = {"portal_item__eclipse"};
 						["Level"] = {
 							["portal_item__eclipse"] = {
-								["Damage Modifier"] = {"Magic","Physical","Fire","Aqua","Storm","Air","Rose","Dark","Light"};
+								["Damage Modifiers"] = {"Magic","Physical","Fire","Aqua","Storm","Air","Rose","Dark","Light"};
 							};
 						};
 					};
-					["Summer Events"] = {
+					["Summer Hunt"] = {
 						["Levels"] = {"portal_summer"};
 						["Level"] = {
 							["portal_summer"] = {
-								["Maps"] = {"Planet Namak (Summer)","Shiganshinu District","Cursed Academy (Summer)","Alien Spaceship (Underwater)","Fabled Kingdom (Summer)","Puppet Island (Summer)"};
+								["Maps"] = {"Planet Namak (Summer)","Shiganshinu District","Ant Kingdom (Summer)","Cursed Academy (Summer)","Alien Spaceship (Underwater)","Fabled Kingdom (Summer)","Puppet Island (Summer)"};
 								["Damage Modifiers"] = {"Fire","Aqua","Storm","Air","Rose","Dark","Light"};
-								["Tiers"] = {"1","2","3","4","5","6","7","8","9","10"};
+								["Tiers"] = {"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"};
 								["Challenges"] = {"double_cost","short_range","fast_enemies","regen_enemies","tank_enemies","shield_enemies"};
 							};
 						};
@@ -229,10 +229,10 @@ return {
 			};
 			["Secret Portals"] = {
 				["Worlds"] = {
-					"Dressrosa Secret Portals","Madoka Secret Portals","The Eclipse Secret"
+					"Dressrosa Secret","The Eclipse Secret","Summer Secret"
 				};
 				["World"] = {
-					["Dressrosa Secret Portals"] = {
+					["Dressrosa Secret"] = {
 						["Levels"] = {"portal_item__doflamingo"};
 					};
 					["The Eclipse Secret"] = {
@@ -249,5 +249,33 @@ return {
 				};
 			};
 		};
+	};
+	["Maps"] = {
+		"Planet Namak","Shiganshinu District","Snowy Town","Hidden Sand Village",
+		"Marine's Ford","Ghoul City","Hollow World","Ant Kingdom","Magic Town",
+		"Cursed Academy","Clover Kingdom","Cape Canaveral","Alien Spaceship",
+		"Fabled Kingdom","Hero City","Puppet Island","Virtual Dungeon","Windhym",
+		
+		"Infinity Train","West City","Storm Hideout","Entertainment District",
+		
+		"Karakora Town",
+		
+		"The Eclipse",
+	};
+	["Unit Setting"] = {
+		["Target Priority"] = {"First","Closest","Last","Farthest","Strongest","Weakest","Flying"};
+		["Rarity"] = {"Rare","Epic","Legendary","Mythic","Secret"};
+	};
+	["Skin Setting"] = {
+		["Type"] = {"Halloween Skins","Christmas Skins","Summer Skins"};
+		["Rarity"] = {"Rare","Epic","Legendary","Mythic"};
+	};
+	["Item Setting"] = {
+		["Rarity"] = {"Common","Rare","Epic","Legendary","Mythic","Secret"};
+	};
+	["Codes"] = {
+		"SUMMER2023","ANNIVERSARY","TOURNAMENTUIFIX","AINCRAD",
+		"BILLION",
+		"SubToKelvingts","SubToKelvingts","TOADBOIGAMING","KingLuffy","noclypso","subtosnowrbx","Cxrsed","FictioNTheFirst","subtomaokuma",
 	};
 }

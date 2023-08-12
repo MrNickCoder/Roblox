@@ -18,6 +18,12 @@ else
 	repeat task.wait() until game:GetService("Workspace")["_waves_started"].Value == true
 end
 
+-----------------------
+----- [ UTILITY ] -----
+-----------------------
+local Utility = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/modules/UtilityModule.lua"))()
+function InLobby() return (game.PlaceId == 8304191830) end
+
 ------------------------
 ----- [ SETTINGS ] -----
 ------------------------
@@ -25,28 +31,8 @@ local Folder = "Astral_V1_Anime_Adventures" --
 local File = game:GetService("Players").LocalPlayer.Name .. "_AnimeAdventures.json"
 
 Settings = {}
-function SaveSettings()
-	local HttpService = game:GetService("HttpService")
-	if not isfolder(Folder) then makefolder(Folder) end
-
-	writefile(Folder .. "/" .. File, HttpService:JSONEncode(Settings))
-	Settings = LoadSettings()
-	warn("Settings Saved!")
-end
-function LoadSettings()
-	local Success, Error = pcall(function()
-		local HttpService = game:GetService("HttpService")
-		if not isfolder(Folder) then makefolder(Folder) end
-
-		return HttpService:JSONDecode(readfile(Folder .. "/" .. File))
-	end)
-
-	if Success then return Error
-	else
-		SaveSettings()
-		return LoadSettings
-	end
-end
+function SaveSettings() Settings = Utility:SaveConfig(Settings, Folder, File); warn("Settings Saved!") end
+function LoadSettings() return Utility:SaveConfig(Settings, Folder, File) end
 Settings = LoadSettings()
 
 ----- [ Start of Get Level Data of Map [Added by HOLYSHz] ] -----
@@ -57,7 +43,7 @@ function GetLevelData()
 	return List
 end
 
-if game.PlaceId ~= 8304191830 then GetLevelData() end
+if not InLobby() then GetLevelData() end
 -----------------------------------------------------------------
 
 ------------------------
@@ -74,24 +60,6 @@ local UserInputService		= game:GetService("UserInputService")
 --------------------------
 local Player				= Players.LocalPlayer
 local Mouse					= Player:GetMouse()
-
------------------------
------ [ UTILITY ] -----
------------------------
-function Visible(List, Visible)
-	for i, v in pairs(List) do
-		v.Visible = Visible
-	end
-end
-function Comma_Value(Text)
-	local Value = Text;
-	while true do
-		local Str, Num = string.gsub(Value, "^(-?%d+)(%d%d%d)", "%1,%2");
-		Value = Str
-		if Num ~= 0 then else break end
-	end
-	return Value
-end
 
 ---------------------------------
 ----- [ ITEM DROP RESULTS ] -----
@@ -274,10 +242,10 @@ function ResultWebhook()
 						{
 							["name"] ="Current Level ✨ & Gems 💎 & Gold 💰 & Portals 🌀",
 							["value"] = "```ini\n"..tostring(game.Players.LocalPlayer.PlayerGui.spawn_units.Lives.Main.Desc.Level.Text).." ✨\n"..
-								"Current Gold : "..tostring(Comma_Value(game.Players.LocalPlayer._stats.gold_amount.Value)).." 💰\n"..
-								"Current Gems : "..tostring(Comma_Value(game.Players.LocalPlayer._stats.gem_amount.Value)).." 💎\n"..
-								"Current Trophies : "..tostring(Comma_Value(game.Players.LocalPlayer._stats.trophies.Value)).." 🏆\n"..
-								"Current Pearl : "..tostring(Comma_Value(game.Players.LocalPlayer._stats._resourceSummerPearls.Value)).." 🦪\n"..
+								"Current Gold : "..tostring(Utility:Comma_Value(game.Players.LocalPlayer._stats.gold_amount.Value)).." 💰\n"..
+								"Current Gems : "..tostring(Utility:Comma_Value(game.Players.LocalPlayer._stats.gem_amount.Value)).." 💎\n"..
+								"Current Trophies : "..tostring(Utility:Comma_Value(game.Players.LocalPlayer._stats.trophies.Value)).." 🏆\n"..
+								"Current Pearl : "..tostring(Utility:Comma_Value(game.Players.LocalPlayer._stats._resourceSummerPearls.Value)).." 🦪\n"..
 								"Current Portal : ".. tostring(Count_Portal_list).." 🌀```",
 						},
 						{
@@ -287,15 +255,15 @@ function ResultWebhook()
 								"Results : "..Result.." ⚔️\n"..
 								"Wave End : "..tostring(Waves[2]).." 🌊\n"..
 								"Time : " ..tostring(TTime[2]).." ⌛\n"..
-								"All Kill Count : "..tostring(Comma_Value(game.Players.LocalPlayer._stats.kills.Value)).." ⚔️\n"..
-								"DMG Deal : "..tostring(Comma_Value(game.Players.LocalPlayer._stats.damage_dealt.Value)).." 🩸```",
+								"All Kill Count : "..tostring(Utility:Comma_Value(game.Players.LocalPlayer._stats.kills.Value)).." ⚔️\n"..
+								"DMG Deal : "..tostring(Utility:Comma_Value(game.Players.LocalPlayer._stats.damage_dealt.Value)).." 🩸```",
 							["inline"] = true
 						},
 						{
 							["name"] ="Rewards :",
 							["value"] = "```ini\n" ..Comma_Value(Gold).." Gold 💰\n"..
-								Comma_Value(Gems).." Gems 💎\n"..
-								Comma_Value(Exp[1]).." XP 🧪\n"..
+								Utility:Comma_Value(Gems).." Gems 💎\n"..
+								Utility:Comma_Value(Exp[1]).." XP 🧪\n"..
 								Trophy.." Trophy 🏆```",
 						},
 						{
@@ -340,428 +308,576 @@ if game.CoreGui:FindFirstChild("HoloLibUI") then game.CoreGui["HoloLibUI"]:Destr
 
 local Directory = "Anime_Adventures/"..game.Players.LocalPlayer.Name
 local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/robloxui/HoloLib.lua"))()
-local AAData = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/animeadventures/AAData.lua"))()
+local AAData = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/data/AnimeAdventures.lua"))()
 local Executor = tostring(identifyexecutor())
-local Window = UILibrary.new("[Astral V1] Anime Adventures "..Version.." - "..Executor)
-Window.ToggleKey = Enum.KeyCode.P
+local Window = UILibrary.new("[Astral V1] Anime Adventures "..Version.." - "..Executor, {
+	Size = UDim2.new(0, 700, 0, 400),
+	ToggleKey = Enum.KeyCode.P,
+	Enabled = false,
+})
 
-local PHome = Window:AddPage("Home", "🏠")
-local SDevelopers = PHome:AddSection("Anime Adventures")
-local SHelp = PHome:AddSection("❓ Help ❓")
-
-local PFarm = Window:AddPage("Auto Farm", "🤖")
-local SFarmConfig = PFarm:AddSection("⚙️ Auto Farm Configuration ⚙️")
-local SWorldConfig = PFarm:AddSection("🌏 World Config 🌏")
-
-local PUnit = Window:AddPage("Unit Config", "🧙")
-local SUnitConfig = PUnit:AddSection("⚙️ Unit Configuration ⚙️")
-
-local PShop = Window:AddPage("Shop", "💰")
-
-local PMisc = Window:AddPage("Misc [BETA]", "🛠️")
-
-local PDiscord = Window:AddPage("Discord", "🌐")
-
------ [ Auto Farm Config ] -----
-local FarmCategory;
-local AutoReplay, AutoPortalReplay, AutoNextStory;
-local function AutoFarmConfigUI()
-	if Settings and not Settings.FarmConfig then Settings.FarmConfig = {} end
-	if Settings and not Settings.WorldConfig then Settings.WorldConfig = {} end
-	
-	SFarmConfig:AddLabel({Text = "🔱 Farm Category"})
-	FarmCategory = SFarmConfig:AddDropdown("Pick Category", function(value)
-		if Settings.FarmConfig.FarmCategory == value then return end
-		Settings.FarmConfig.FarmCategory = value
-		Settings.WorldConfig.WorldType = AAData["World Type"]["Type"][value]["Worlds"][1]
-		warn("Changed Farming Type to "..value)
-		getgenv().UpdateOptions(value)
-		getgenv().UpdateWorldType(value)
+local UISetup = {}
+do
+	----- [ Home Page ] -----
+	local PHome = Window:AddPage("Home", "🏠")
+	function UISetup:Home()
+		local SDevelopers = PHome:AddSection("Anime Adventures")
+		SDevelopers:AddLabel("📝 Scripted by: Arpon AG#6612 & Forever4D#0001 & HOLYSHz#3819")
+		SDevelopers:AddLabel("📝 Also thanks to Trapstar#7845, bytenode#9646 for the help!")
+		SDevelopers:AddLabel("📝 Improved by: NickCoder")
+		SDevelopers:AddLabel("📝 UI By: NickCoder")
+		SDevelopers:AddLabel("🔧 To toggle the UI press \" P \"")
 		
-		SaveSettings()
-	end, {
-		Options = AAData["World Type"]["Types"],
-		Value = Settings.FarmConfig.FarmCategory or AAData["World Type"]["Types"][1]
-	})
-	
-	SFarmConfig:AddLabel()
-	SFarmConfig:AddToggle("🌾 Auto Start", function(value) Settings.FarmConfig.AutoStart = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoStart or false})
-	SFarmConfig:AddToggle("👨‍🌾 Auto Place Unit", function(value) Settings.FarmConfig.AutoPlace = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoPlace or false})
-	SFarmConfig:AddToggle("⭐️ Auto Upgrade Units", function(value) Settings.FarmConfig.AutoUpgrade = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoUpgrade or false})
-	SFarmConfig:AddToggle("🔥 Auto Abilities", function(value) Settings.FarmConfig.AutoAbilities = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoAbilities or false})
-	SFarmConfig:AddCheckbox("🧙 Auto Buff 100%", function(value) Settings.FarmConfig.AutoBuff = value; SaveSettings() end, {Options = {"Orwin/Erwin", "Wenda/Wendy", "Leafy/Leafa"}, Selected = Settings.FarmConfig.AutoBuff or {}})
-	
-	local ReplaySeparator = SFarmConfig:AddLabel()
-	AutoReplay = SFarmConfig:AddToggle("🏃 Auto Replay", function(value) Settings.FarmConfig.AutoReplay = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoReplay or false})
-	AutoPortalReplay = SFarmConfig:AddToggle("🏃 Auto Pick Portal [Replay]", function(value) Settings.FarmConfig.AutoReplayPortal = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoReplayPortal or false})
-	AutoNextStory = SFarmConfig:AddToggle("🏃 Auto Next Story", function(value) Settings.FarmConfig.AutoNextStory = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoNextStory or false})
-	
-	SFarmConfig:AddLabel()
-	SFarmConfig:AddToggle("🏃 Auto Leave", function(value) Settings.FarmConfig.AutoLeave = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoLeave or false})
-	SFarmConfig:AddToggle("⭐️ Sell Units At Wave", function(value) Settings.FarmConfig.WaveSell = value; SaveSettings() end, {Active = Settings.FarmConfig.WaveSell or false})
-	SFarmConfig:AddToggle("⭐️ Leave At Wave", function(value) Settings.FarmConfig.WaveLeave = value; SaveSettings() end, {Active = Settings.FarmConfig.WaveLeave or false})
-	SFarmConfig:AddToggle("🏃 Auto Defeat", function(value) Settings.FarmConfig.AutoDefeat = value; SaveSettings() end, {Active = Settings.FarmConfig.AutoDefeat or false})
-	
-	-----------------------------------------
-	
-	getgenv().UpdateOptions = function(value)
-		AutoReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Replay"]
-		AutoPortalReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Portal Replay"]
-		AutoNextStory.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Next Story"]
-		if AAData["World Type"]["Type"][value]["UI"]["Auto Replay"] or
-			AAData["World Type"]["Type"][value]["UI"]["Auto Portal Replay"] or
-		 	AAData["World Type"]["Type"][value]["UI"]["Auto Next Story"] then
-			ReplaySeparator.Label.Visible = true
-		else
-			ReplaySeparator.Label.Visible = false
-		end
-		
-		FarmCategory.Section:Resize(true)
+		local SHelp = PHome:AddSection("❓ Help ❓")
+		SHelp:AddLabel("double_cost = 'High Cost'")
+		SHelp:AddLabel("short_range = 'Short Range'")
+		SHelp:AddLabel("fast_enemies = 'Fast Enemies'")
+		SHelp:AddLabel("regen_enemies = 'Regen Enemies'")
+		SHelp:AddLabel("tank_enemies = 'Tank Enemies'")
+		SHelp:AddLabel("shield_enemies = 'Shield Enemies'")
+		SHelp:AddLabel("triple_cost = 'Triple Cost'")
+		SHelp:AddLabel("hyper_regen_enemies = 'Hyper-Regen Enemies'")
+		SHelp:AddLabel("hyper_shield_enemies = 'Steel-Plated Enemies'")
+		SHelp:AddLabel("godspeed_enemies = 'Godspeed Enemies'")
+		SHelp:AddLabel("flying_enemies = 'Flying Enemies'")
+		SHelp:AddLabel("mini_range = 'Mini-Range'")
+
+		Window:SelectPage(PHome, true)
 	end
-	
-	getgenv().UpdateOptions(FarmCategory.Data.Value)
-end
--------------------------
+	-----------------------
 
------ [ World Config ] -----
-local WorldType, WorldLevel, WorldDifficulty, WorldMap, WorldDamageModifier, WorldTier, WorldChallenge;
-local function WorldConfigUI()
-	local WorldTypeLabel = SWorldConfig:AddLabel({Text = "🌏 Select World"})
-	WorldType = SWorldConfig:AddDropdown("", function(value)
-		if Settings.WorldConfig.WorldType == value then return end
-		Settings.WorldConfig.WorldType = value
-		Settings.WorldConfig.WorldLevel = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"][1]
-		warn("Changed World Type to "..value)
-		getgenv().UpdateWorldLevel(value)
+	----- [ Auto Farm Config ] -----
+	local PFarm = Window:AddPage("Auto Farm", "🤖")
+	local SFarmSplits = PFarm:AddSplit()
+	local FarmCategory;
+	local AutoStart, AutoReplay, AutoPortalReplay, AutoNextStory, AutoLeave;
+	function UISetup:AutoFarm()
+		if Settings and not Settings["Farm Config"] then Settings["Farm Config"] = {} end
+		if Settings and not Settings["Farm Config"].Auto then Settings["Farm Config"].Auto = {} end
+		if Settings and not Settings["World Config"] then Settings["World Config"] = {} end
+		local SFarmConfig = PFarm:AddSection("⚙️ Auto Farm Configuration ⚙️", {Split = SFarmSplits, Side = "Left"})
+
+		SFarmConfig:AddLabel("🔱 Farm Category")
+		FarmCategory = SFarmConfig:AddDropdown("", function(value)
+			if Settings["Farm Config"]["Category"] == value then return end
+			Settings["Farm Config"]["Category"] = value
+			Settings["World Config"]["Type"] = AAData["World Type"]["Type"][value]["Worlds"][1]
+			warn("Changed Farming Type to "..value)
+			getgenv().UpdateOptions(value)
+			getgenv().UpdateWorldType(value)
+
+			SaveSettings()
+		end, {
+			Options = AAData["World Type"]["Types"],
+			Value = Settings["Farm Config"]["Category"] or AAData["World Type"]["Types"][1],
+			ExpandLimit = 5
+		})
+
+		SFarmConfig:AddLabel()
+		AutoStart = SFarmConfig:AddToggle("🌾 Auto Start", function(value) Settings["Farm Config"].Auto["Start"] = value; SaveSettings() end, {Active = Settings["Farm Config"].Auto["Start"] or false})
+		AutoReplay = SFarmConfig:AddToggle("🏃 Auto Replay", function(value) Settings["Farm Config"].Auto["Replay"] = value; SaveSettings() end, {Active = Settings["Farm Config"].Auto["Replay"] or false})
+		AutoPortalReplay = SFarmConfig:AddToggle("🏃 Auto Pick Portal [Replay]", function(value) Settings["Farm Config"].Auto["Replay Portal"] = value; SaveSettings() end, {Active = Settings["Farm Config"].Auto["Replay Portal"] or false})
+		AutoNextStory = SFarmConfig:AddToggle("🏃 Auto Next Story", function(value) Settings["Farm Config"].Auto["Next Story"] = value; SaveSettings() end, {Active = Settings["Farm Config"].Auto["Next Story"] or false})
+		AutoLeave = SFarmConfig:AddToggle("🏃 Auto Leave", function(value) Settings["Farm Config"].Auto["Leave"] = value; SaveSettings() end, {Active = Settings["Farm Config"].Auto["Leave"] or false})
 		
-		SaveSettings()
-	end, {})
-	
-	local WorldLevelSeparator = SWorldConfig:AddLabel()
-	
-	local WorldLevelLabel = SWorldConfig:AddLabel({Text = "🎚️ Select Level"})
-	WorldLevel = SWorldConfig:AddDropdown("", function(value)
-		if Settings.WorldConfig.WorldLevel == value then return end
-		Settings.WorldConfig.WorldLevel = value
-		if string.find(Settings.WorldConfig.WorldLevel, "_infinite") or table.find({"Legend Stages", "Raid Worlds"}, Settings.FarmConfig.FarmCategory) then
-			Settings.WorldConfig.WorldDifficulty = "Hard"
-		elseif table.find({"Portals", "Dungeon", "Secret Portals"}, Settings.FarmConfig.FarmCategory) then
-			Settings.WorldConfig.WorldDifficulty = "Default"
-		else
-			Settings.WorldConfig.WorldDifficulty = "Normal"
+		SFarmConfig:AddLabel()
+		SFarmConfig:AddToggle("⭐️ Sell Units At Wave", function(value) Settings["Farm Config"].Auto["Wave Sell"] = value; SaveSettings() end, {Active = Settings["Farm Config"].Auto["Wave Sell"] or false})
+		SFarmConfig:AddToggle("⭐️ Leave At Wave", function(value) Settings["Farm Config"].Auto["Wave Leave"] = value; SaveSettings() end, {Active = Settings["Farm Config"].Auto["Wave Leave"] or false})
+		SFarmConfig:AddTextbox("🏃 Sell or Leave At Wave", function(value) Settings["Farm Config"].Auto["Wave Sell or Leave"] = value; SaveSettings() end, {Placeholder = "Value", Text = Settings["Farm Config"].Auto["Wave Sell or Leave"] or "", Pattern = "[%d-]+"})
+
+		-----------------------------------------
+
+		getgenv().UpdateOptions = function(value)
+			AutoReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Replay"]
+			AutoPortalReplay.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Portal Replay"]
+			AutoNextStory.Toggle.Visible = AAData["World Type"]["Type"][value]["UI"]["Auto Next Story"]
 		end
-		warn("Changed World Level to "..value)
-		getgenv().UpdateWorldDifficulty(value)
-		getgenv().UpdateWorldMap(value)
-		getgenv().UpdateWorldDamageModifier(value)
-		getgenv().UpdateWorldTier(value)
-		getgenv().UpdateWorldChallenge(value)
+
+		getgenv().UpdateOptions(FarmCategory.Data.Value)
 		
-		SaveSettings()
-	end, {})
-	
-	local WorldDifficultySeparator = SWorldConfig:AddLabel()
-	
-	local WorldDifficultyLabel = SWorldConfig:AddLabel({Text = "🔫 Select Difficulty"})
-	WorldDifficulty = SWorldConfig:AddDropdown("", function(value)
-		if Settings.WorldConfig.WorldDifficulty == value then return end
-		Settings.WorldConfig.WorldDifficulty = value
-		warn("Changed World Difficulty to "..value)
+		UISetup:WorldConfig()
+	end
+	-------------------------
+
+	----- [ World Config ] -----
+	local WorldType, WorldLevel, WorldDifficulty, IgnoredMap, IgnoredDamageModifier, IgnoredTier, IgnoredChallenge;
+	function UISetup:WorldConfig()
+		if Settings and not Settings["World Config"].Ignored then Settings["World Config"].Ignored = {} end
+		local SWorldConfig = PFarm:AddSection("🌏 World Config 🌏", {Split = SFarmSplits, Side = "Right"})
 		
-		SaveSettings()
-	end, {})
-	
-	local WorldMapSeparator = SWorldConfig:AddLabel()
-	
-	WorldMap = SWorldConfig:AddCheckbox("🗺️ Select Maps", function(value)
-		if Settings.WorldConfig.WorldMap == value then return end
-		Settings.WorldConfig.WorldMap = value
-		warn("Changed World Map to "..value)
-
-		SaveSettings()
-	end, {})
-	
-	local WorldDamageModifierSeparator = SWorldConfig:AddLabel()
-
-	WorldDamageModifier = SWorldConfig:AddCheckbox("🩸 Select Damage Modifier", function(value)
-		if Settings.WorldConfig.WorldDamageModifier == value then return end
-		Settings.WorldConfig.WorldDamageModifier = value
-		warn("Changed World Map to "..value)
-
-		SaveSettings()
-	end, {})
-	
-	local WorldTierSeparator = SWorldConfig:AddLabel()
-	
-	WorldTier = SWorldConfig:AddCheckbox("🧱 Select Tier", function(value)
-		if Settings.WorldConfig.WorldTier == value then return end
-		Settings.WorldConfig.WorldTier = value
-		warn("Changed World Tier to "..value)
-
-		SaveSettings()
-	end, {})
-	
-	local WorldChallengeSeparator = SWorldConfig:AddLabel()
-
-	WorldChallenge = SWorldConfig:AddCheckbox("💀 Select Challenge", function(value)
-		if Settings.WorldConfig.WorldChallenge == value then return end
-		Settings.WorldConfig.WorldChallenge = value
-		warn("Changed World Challenge to "..value)
-
-		SaveSettings()
-	end, {})
-	
-	-------------------------------------------
-	
-	getgenv().UpdateWorldType = function(value)
-		WorldType.Reset()
-		if not AAData["World Type"]["Type"][value]["Worlds"] then
-			local List = {
-				WorldTypeLabel.Label, WorldType.Dropdown,
-				WorldLevelSeparator.Label,
-				WorldLevelLabel.Label, WorldLevel.Dropdown,
-				WorldDifficultySeparator.Label,
-				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
-			}; Visible(List, false)
-		else
-			local List = {
-				WorldTypeLabel.Label, WorldType.Dropdown,
-				WorldLevelSeparator.Label,
-				WorldLevelLabel.Label, WorldLevel.Dropdown,
-				WorldDifficultySeparator.Label,
-				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
-			}; Visible(List, true)
-			
-			WorldType.Data.Options = AAData["World Type"]["Type"][value]["Worlds"]
-			if Settings.WorldConfig.WorldType and
-				not table.find(AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"], Settings.WorldConfig.WorldType) then
-				Settings.WorldConfig.WorldType = AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"][1]
+		local WorldTypeLabel = SWorldConfig:AddLabel("🌏 Select World")
+		WorldType = SWorldConfig:AddDropdown("", function(value)
+			if Settings["World Config"]["Type"] == value then return end
+			Settings["World Config"]["Type"] = value
+			if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value] then
+				Settings["World Config"]["Level"] = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"][1]
 			end
-			WorldType.Data.Value = Settings.WorldConfig.WorldType
-			WorldType.Section:UpdateDropdown(WorldType, WorldType.Data.Value, {})
-			
-			getgenv().UpdateWorldLevel(WorldType.Data.Value)
-		end
+			getgenv().UpdateWorldLevel(value)
+			warn("World Type Changed to "..value)
 
-		WorldType.Section:Resize(true)
-	end
-	getgenv().UpdateWorldLevel = function(value)
-		WorldLevel.Reset()
-		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
-			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"] then
-			local List = {
-				WorldLevelSeparator.Label,
-				WorldLevelLabel.Label, WorldLevel.Dropdown,
-				WorldDifficultySeparator.Label,
-				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
-			}; Visible(List, false)
-		else
-			local List = {
-				WorldLevelSeparator.Label,
-				WorldLevelLabel.Label, WorldLevel.Dropdown,
-				WorldDifficultySeparator.Label,
-				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
-			}; Visible(List, true)
+			SaveSettings()
+		end, {ExpandLimit = 5})
 
-			WorldLevel.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"]
-			if Settings.WorldConfig.WorldLevel and
-				not table.find(AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"], Settings.WorldConfig.WorldLevel) then
-				Settings.WorldConfig.WorldLevel = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"][1]
-			end
-			WorldLevel.Data.Value = Settings.WorldConfig.WorldLevel
-			WorldLevel.Section:UpdateDropdown(WorldLevel, WorldLevel.Data.Value, {})
-			
-			getgenv().UpdateWorldDifficulty(WorldLevel.Data.Value)
-			getgenv().UpdateWorldMap(WorldLevel.Data.Value)
-			getgenv().UpdateWorldDamageModifier(WorldLevel.Data.Value)
-			getgenv().UpdateWorldTier(WorldLevel.Data.Value)
-			getgenv().UpdateWorldChallenge(WorldLevel.Data.Value)
-		end
-
-		WorldLevel.Section:Resize(true)
-	end
-	getgenv().UpdateWorldDifficulty = function(value)
-		WorldDifficulty.Reset()
-		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
-			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"] then
-			local List = {
-				WorldDifficultySeparator.Label,
-				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
-			}; Visible(List, false)
-		else
-			local List = {
-				WorldDifficultySeparator.Label,
-				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
-			}; Visible(List, true)
-			
-			if string.find(Settings.WorldConfig.WorldLevel, "_infinite") or table.find({"Legend Stages", "Raid Worlds"}, Settings.FarmConfig.FarmCategory) then
-				WorldDifficulty.Data.Options = {"Hard"}
-				Settings.WorldConfig.WorldDifficulty = "Hard"
-			elseif table.find({"Portals", "Dungeon", "Secret Portals"}, Settings.FarmConfig.FarmCategory) then
-				WorldDifficulty.Data.Options = {"Default"}
-				Settings.WorldConfig.WorldDifficulty = "Default"
+		local WorldLevelSeparator = SWorldConfig:AddLabel()
+		local WorldLevelLabel = SWorldConfig:AddLabel("🎚️ Select Level")
+		WorldLevel = SWorldConfig:AddDropdown("", function(value)
+			if Settings["World Config"]["Level"] == value then return end
+			Settings["World Config"]["Level"] = value
+			if string.find(Settings["World Config"]["Level"], "_infinite") or table.find({"Legend Stages", "Raid Worlds"}, Settings["Farm Config"]["Category"]) then
+				Settings["World Config"]["Difficulty"] = "Hard"
+			elseif table.find({"Portals", "Dungeon", "Secret Portals"}, Settings["Farm Config"]["Category"]) then
+				Settings["World Config"]["Difficulty"] = "Default"
 			else
-				WorldDifficulty.Data.Options = {"Normal", "Hard"}
-				Settings.WorldConfig.WorldDifficulty = "Normal"
+				Settings["World Config"]["Difficulty"] = "Normal"
 			end
-			WorldDifficulty.Data.Value = Settings.WorldConfig.WorldDifficulty
-			WorldDifficulty.Section:UpdateDropdown(WorldDifficulty, WorldDifficulty.Data.Value, {})
+			if FarmCategory.Data.Value == "Story Worlds" then
+				if string.find(Settings["World Config"]["Level"], "_infinite") then AutoNextStory.Toggle.Visible = false
+				else AutoNextStory.Toggle.Visible = true end
+			end
+			
+			warn("World Level Changed to "..value)
+			getgenv().UpdateWorldDifficulty(value)
+			getgenv().UpdateIgnoredMap(value)
+			getgenv().UpdateIgnoredDamageModifier(value)
+			getgenv().UpdateIgnoredTier(value)
+			getgenv().UpdateIgnoredChallenge(value)
+
+			SaveSettings()
+		end, {})
+
+		local WorldDifficultySeparator = SWorldConfig:AddLabel()
+		local WorldDifficultyLabel = SWorldConfig:AddLabel("🔫 Select Difficulty")
+		WorldDifficulty = SWorldConfig:AddDropdown("", function(value)
+			if Settings["World Config"]["Difficulty"] == value then return end
+			Settings["World Config"]["Difficulty"] = value
+			warn("Changed World Difficulty to "..value)
+
+			SaveSettings()
+		end, {})
+		
+		local IgnoredSeperator = SWorldConfig:AddLabel()
+		
+		IgnoredMap = SWorldConfig:AddDropdown("🗺️ Ignored Maps", function(value)
+			if Settings["World Config"].Ignored["Map"] == value then return end
+			Settings["World Config"].Ignored["Map"] = value
+			warn("Ignored World Map Changed to "..table.concat(value, ", "))
+
+			SaveSettings()
+		end, {MultiValue = true, ExpandLimit = 5})
+		IgnoredDamageModifier = SWorldConfig:AddDropdown("🩸 Ignored Damage Modifier", function(value)
+			if Settings["World Config"].Ignored["Damage Modifier"] == value then return end
+			Settings["World Config"].Ignored["Damage Modifier"] = value
+			warn("Ignored World Damage Modifier Changed to "..table.concat(value, ", "))
+
+			SaveSettings()
+		end, {MultiValue = true, ExpandLimit = 5})
+		IgnoredTier = SWorldConfig:AddDropdown("🧱 Ignored Tier", function(value)
+			if Settings["World Config"].Ignored["Tier"] == value then return end
+			Settings["World Config"].Ignored["Tier"] = value
+			warn("Ignored World Tier Changed to "..table.concat(value, ", "))
+
+			SaveSettings()
+		end, {MultiValue = true, ExpandLimit = 5})
+		IgnoredChallenge = SWorldConfig:AddDropdown("💀 Ignored Challenge", function(value)
+			if Settings["World Config"].Ignored["Challenge"] == value then return end
+			Settings["World Config"].Ignored["Challenge"] = value
+			warn("Ignored World Challenge Changed to "..table.concat(value, ", "))
+
+			SaveSettings()
+		end, {MultiValue = true, ExpandLimit = 5})
+
+		-------------------------------------------
+
+		getgenv().UpdateWorldType = function(value)
+			WorldType.Functions:Hide()
+			local visible = false
+			if AAData["World Type"]["Type"][value]["Worlds"] then
+				WorldType.Data.Options = AAData["World Type"]["Type"][value]["Worlds"]
+				if not Settings["World Config"]["Type"] or
+					not table.find(AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"], Settings["World Config"]["Type"]) then
+					Settings["World Config"]["Type"] = AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"][1]
+				end
+				WorldType.Data.Value = Settings["World Config"]["Type"]
+				WorldType.Section:UpdateDropdown(WorldType, nil, {Value = WorldType.Data.Value})
+
+				getgenv().UpdateWorldLevel(WorldType.Data.Value)
+				
+				visible = true
+			end
+			local List = {
+				WorldTypeLabel.Label, WorldType.Dropdown,
+				WorldLevelSeparator.Label,
+				WorldLevelLabel.Label, WorldLevel.Dropdown,
+				WorldDifficultySeparator.Label,
+				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
+			}; Visible(List, visible)
+		end
+		getgenv().UpdateWorldLevel = function(value:string)
+			WorldLevel.Functions:Hide()
+			local visible = false
+			if AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] then
+				if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value] then
+					if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"] then
+						WorldLevel.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"]
+						if not Settings["World Config"]["Level"] or
+							not table.find(AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"], Settings["World Config"]["Level"]) then
+							Settings["World Config"]["Level"] = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][value]["Levels"][1]
+						end
+						if FarmCategory.Data.Value == "Story Worlds" then
+							if string.find(Settings["World Config"]["Level"], "_infinite") then AutoNextStory.Toggle.Visible = false
+							else AutoNextStory.Toggle.Visible = true end
+						end
+						WorldLevel.Data.Value = Settings["World Config"]["Level"]
+						WorldLevel.Section:UpdateDropdown(WorldLevel, nil, {Value = WorldLevel.Data.Value})
+
+						getgenv().UpdateWorldDifficulty(value)
+						getgenv().UpdateIgnoredMap(WorldLevel.Data.Value)
+						getgenv().UpdateIgnoredDamageModifier(WorldLevel.Data.Value)
+						getgenv().UpdateIgnoredTier(WorldLevel.Data.Value)
+						getgenv().UpdateIgnoredChallenge(WorldLevel.Data.Value)
+						
+						visible = true
+					end
+				end
+			end
+			local List = {
+				WorldLevelSeparator.Label,
+				WorldLevelLabel.Label, WorldLevel.Dropdown,
+				WorldDifficultySeparator.Label,
+				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
+			}; Visible(List, visible)
+		end
+		getgenv().UpdateWorldDifficulty = function(value:string)
+			WorldDifficulty.Functions:Hide()
+			local List = {
+				WorldDifficultySeparator.Label,
+				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown,
+				
+			};
+			local visible = false
+			if AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] then
+				if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value] then
+					if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"] then
+						if (Settings["World Config"]["World Level"] and string.find(Settings["World Config"]["World Level"], "_infinite")) or
+							(Settings["Farm Config"]["Farm Category"] and table.find({"Legend Stages", "Raid Worlds"}, Settings["Farm Config"]["Farm Category"])) then
+							WorldDifficulty.Data.Options = {"Hard"}
+							Settings["World Config"]["World Difficulty"] = "Hard"
+						elseif (Settings["Farm Config"]["Farm Category"] and table.find({"Portals", "Dungeon", "Secret Portals"}, Settings["Farm Config"]["Farm Category"])) then
+							WorldDifficulty.Data.Options = {"Default"}
+							Settings["World Config"]["World Difficulty"] = "Default"
+						else
+							WorldDifficulty.Data.Options = {"Normal", "Hard"}
+							Settings["World Config"]["World Difficulty"] = "Normal"
+						end
+						WorldDifficulty.Data.Value = Settings["World Config"]["World Difficulty"]
+						WorldDifficulty.Section:UpdateDropdown(WorldDifficulty, nil, {Value = WorldDifficulty.Data.Value})
+						
+						local ignoring = false
+						for _, v in pairs({"Maps","Damage Modifiers","Tiers","Challenges"}) do
+							if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"] then break end
+							if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][WorldLevel.Data.Value][v] then ignoring = true; break end
+						end
+						
+						if ignoring then IgnoredSeperator.Label.Visible = true
+						else IgnoredSeperator.Label.Visible = false end
+						
+						visible = true
+					end
+				end
+			end
+			Visible(List, visible)
+		end
+		getgenv().UpdateIgnoredMap = function(value:string)
+			local List = {IgnoredMap.Dropdown}
+			local visible = false
+			if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"] then
+				if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value] then
+					if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"] then
+						IgnoredMap.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
+						if not Settings["World Config"].Ignored["Map"] then
+							Settings["World Config"].Ignored["Map"] = {}
+						end
+						IgnoredMap.Data.Value = Settings["World Config"].Ignored["Map"]
+						IgnoredMap.Section:UpdateDropdown(IgnoredMap, nil, {Value = IgnoredMap.Data.Value})
+						
+						visible = true
+					end
+				end
+			end
+			Visible(List, visible)
+		end
+		getgenv().UpdateIgnoredDamageModifier = function(value:string)
+			local List = {IgnoredDamageModifier.Dropdown};
+			local visible = false
+			if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"] then
+				if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value] then
+					if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Damage Modifiers"] then
+						IgnoredDamageModifier.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Damage Modifiers"]
+						if not Settings["World Config"].Ignored["Damage Modifier"] then
+							Settings["World Config"].Ignored["Damage Modifier"] = {}
+						end
+						IgnoredDamageModifier.Data.Value = Settings["World Config"].Ignored["Damage Modifier"]
+						IgnoredDamageModifier.Section:UpdateDropdown(IgnoredDamageModifier, nil, {Value = IgnoredDamageModifier.Data.Value})
+						
+						visible = true
+					end
+				end
+			end
+			Visible(List, visible)
+		end
+		getgenv().UpdateIgnoredTier = function(value:string)
+			local List = {IgnoredTier.Dropdown};
+			local visible = false
+			if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"] then
+				if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value] then
+					if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Tiers"] then
+						IgnoredTier.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Tiers"]
+						if not Settings["World Config"].Ignored["Tier"] then
+							Settings["World Config"].Ignored["Tier"] = {}
+						end
+						IgnoredTier.Data.Value = Settings["World Config"].Ignored["Tier"]
+						IgnoredTier.Section:UpdateDropdown(IgnoredTier, nil, {Value = IgnoredTier.Data.Value})
+						
+						visible = true
+					end
+				end
+			end
+			Visible(List, visible)
+		end
+		getgenv().UpdateIgnoredChallenge = function(value:string)
+			local List = {IgnoredChallenge.Dropdown};
+			local visible = false
+			if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"] then
+				if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value] then
+					if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Challenges"] then
+						IgnoredChallenge.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Challenges"]
+						if not Settings["World Config"].Ignored["Challenge"] then
+							Settings["World Config"].Ignored["Challenge"] = {}
+						end
+						IgnoredChallenge.Data.Value = Settings["World Config"].Ignored["Challenge"]
+						IgnoredChallenge.Section:UpdateDropdown(IgnoredChallenge, nil, {Value = IgnoredChallenge.Data.Value})
+						
+						visible = true
+					end
+				end
+			end
+			Visible(List, visible)
+		end
+
+		getgenv().UpdateWorldType(FarmCategory.Data.Value)
+		getgenv().UpdateWorldLevel(WorldType.Data.Value)
+		getgenv().UpdateWorldDifficulty(WorldType.Data.Value)
+		getgenv().UpdateIgnoredMap(WorldLevel.Data.Value)
+		getgenv().UpdateIgnoredDamageModifier(WorldLevel.Data.Value)
+		getgenv().UpdateIgnoredTier(WorldLevel.Data.Value)
+		getgenv().UpdateIgnoredChallenge(WorldLevel.Data.Value)
+	end
+	----------------------------
+
+	----- [ Unit Config ] -----
+	local PUnit = Window:AddPage("Unit Config", "🧙")
+	local LoadUnitConfig, TeamSelect;
+	local UnitSettings = {};
+	function UISetup:UnitConfig()
+		if Settings and not Settings["Unit Config"] then Settings["Unit Config"] = {} end
+		if Settings and not Settings["Unit Config"].Auto then Settings["Unit Config"].Auto = {} end
+		local STeamConfig = PUnit:AddSection("🧙 Team Configuration 🧙")
+		if InLobby() then STeamConfig:Enabled(false) end
+		local SUnitConfig = PUnit:AddSection("⚙️ Unit Configuration ⚙️")
+		local SUnitSplits = PUnit:AddSplit()
+
+		TeamSelect = STeamConfig:AddDropdown("🧙 Select Team: ", function(value)
+
+		end, {Options = {"Team 1","Team 2","Team 3","Team 4","Team 5"}})
+
+		LoadUnitConfig = SUnitConfig:AddDropdown("🧙 Load Unit Config: ", function(value)
+
+		end, {Options = {"Default"}, Value = "Default"})
+		SUnitConfig:AddButton("💾 Save Unit Config", function(value)
+
+		end)
+		SUnitConfig:AddButton("🔥 Delete Unit Config", function(value)
+
+		end)
+		SUnitConfig:AddLabel()
+		if not InLobby() then SUnitConfig:AddToggle("🚩 Modify Units Positions", function(value) getgenv().ModifyPosition(value) end, {Active = false}) end
+		SUnitConfig:AddToggle("👨‍🌾 Auto Place Unit", function(value) Settings["Unit Config"].Auto["Place"] = value; SaveSettings() end, {Active = Settings["Unit Config"].Auto["Place"] or false})
+		SUnitConfig:AddToggle("⭐️ Auto Upgrade Units", function(value) Settings["Unit Config"].Auto["Upgrade"] = value; SaveSettings() end, {Active = Settings["Unit Config"].Auto["Upgrade"] or false})
+		SUnitConfig:AddToggle("🔥 Auto Abilities", function(value) Settings["Unit Config"].Auto["Abilities"] = value; SaveSettings() end, {Active = Settings["Unit Config"].Auto["Abilities"] or false})
+		SUnitConfig:AddDropdown("🧙 Auto Buff 100%", function(value) Settings["Unit Config"].Auto["Buff"] = value; SaveSettings() end, {MultiValue = true, Options = {"Orwin/Erwin", "Wenda/Wendy", "Leafy/Leafa"}, Value = Settings["Unit Config"].Auto["Buff"] or {}})
+
+		
+		for UnitSlot = 1, 6 do
+			UnitSettings[UnitSlot] = {}
+			local USettings = UnitSettings[UnitSlot]
+			if UnitSlot % 2 ~= 0 then USettings["Section"] = PUnit:AddSection("🧙⚙️ Unit "..UnitSlot..": ", {Split = SUnitSplits, Side = "Left"})
+			else USettings["Section"] = PUnit:AddSection("🧙⚙️ Unit "..UnitSlot..": ", {Split = SUnitSplits, Side = "Right"}) end
+
+			USettings["Enable"] = USettings["Section"]:AddToggle("⚙️ Use Unit Settings", function(value) end, {Active = false})
+
+			if not InLobby() then
+				USettings["Section"]:AddToggle("📍 Show Position", function(value) end)
+				USettings["Single"] = USettings["Section"]:AddButton("🚩 Set Position [Single]", function() end)
+				USettings["Group"] = USettings["Section"]:AddButton("🚩 Set Position [Group]", function() end)
+				USettings["Spread"] = USettings["Section"]:AddButton("🚩 Get Positions [Spread]", function() end)
+			end
+
+			USettings["Target"] = USettings["Section"]:AddDropdown("🎯 Target Priority: ", function(value) end, {Options = AAData["Unit Setting"]["Target Priority"], Value = "First"})
+			USettings["Place"] = USettings["Section"]:AddTextbox("Place from wave: ", function(value) end, {Placeholder = "Wave", Text = "1", Pattern = "[%d-]+"})
+			USettings["Upgrade"] = USettings["Section"]:AddTextbox("Upgrade from wave: ", function(value) end, {Placeholder = "Wave", Text = "1", Pattern = "[%d-]+"})
+			USettings["Sell"] = USettings["Section"]:AddTextbox("Auto Sell at wave: ", function(value) end, {Placeholder = "Wave", Text = "99", Pattern = "[%d-]+"})
+			USettings["Total"] = USettings["Section"]:AddSlider("Total Units: ", function(value) end, {Value = "6", Min = "0", Max = "6"})
+			USettings["Upgrade Cap"] = USettings["Section"]:AddSlider("Upgrade Cap: ", function(value) end, {Value = "0", Min = "0", Max = "15"})
+		end
+
+		-------------------------------------------
+
+		if not InLobby() then
+			getgenv().ModifyPosition = function(value)
+				for UnitSlot = 1, 6 do
+					local USettings = UnitSettings[UnitSlot]
+					USettings["Single"].Button.Visible = value
+					USettings["Group"].Button.Visible = value
+					USettings["Spread"].Button.Visible = value
+				end
+			end
+
+			getgenv().ModifyPosition(false)
+		end
+	end
+	---------------------------
+
+	----- [ Macro Config ] -----
+	local PMacro = Window:AddPage("Macro", "🕹️")
+	local MacroConfig, CreateMacro;
+	function UISetup:Macro()
+		local SMacroSplits = PMacro:AddSplit()
+		local SMacroStatus = PMacro:AddSection("🕹️ Macro Information 🕹️", {Split = SMacroSplits, Side = "Left"})
+		local SMacroOptions = PMacro:AddSection("⚙️ Macro Options ⚙️", {Split = SMacroSplits, Side = "Left"})
+		local SMacroUnits = PMacro:AddSection("🧙 Macro Units 🧙", {Split = SMacroSplits, Side = "Left"})
+		local SMacroMaps = PMacro:AddSection("🌏 Macro Maps 🌏", {Split = SMacroSplits, Side = "Right"})
+		
+		SMacroStatus:AddLabel("Status: N/A")
+		SMacroStatus:AddLabel("Action: N/A")
+		SMacroStatus:AddLabel("Type: N/A")
+		SMacroStatus:AddLabel("Unit: N/A")
+		SMacroStatus:AddLabel("Currently Waiting For Money: N/A")
+		
+		MacroConfig = SMacroOptions:AddDropdown("🕹️ Macro: ", function(value)
+
+		end, {})
+		CreateMacro = SMacroOptions:AddTextbox("💾 Create Macro", function(value)
+			table.insert(MacroConfig.Data.Options, value)
+			CreateMacro.Data.Text = ""
+			CreateMacro.Section:UpdateTextbox(CreateMacro, nil, {Text = CreateMacro.Data.Text})
+		end, {Placeholder = "Macro Name", RequireEntered = true})
+		SMacroOptions:AddToggle("⏺️ Record", function(value) end)
+		SMacroOptions:AddToggle("⚡ Record Abilities", function(value) end)
+		SMacroOptions:AddButton("🔥 Delete Macro", function() end)
+		SMacroOptions:AddToggle("▶️ Play Macro", function(value) end)
+		
+		SMacroUnits:AddButton("🧙 Equip Macro Units", function() end)
+		
+		for _, Map in pairs(AAData["Maps"]) do
+			local MacroMap = SMacroMaps:AddDropdown(Map..": ", function(value) end, {Value = "None", ExpandLimit = 5})
+			MacroMap.Data.Options = Combine_Table({"None"}, MacroConfig.Data.Options)
 		end
 		
-		WorldDifficulty.Section:Resize(true)
+		-------------------------------------------
+		
 	end
-	getgenv().UpdateWorldMap = function(value)
-		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
-			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"] and
-			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"] then
-			local List = {
-				WorldMapSeparator.Label,
-				WorldMap.Checkbox
-			}; Visible(List, false)
-		else
-			local List = {
-				WorldMapSeparator.Label,
-				WorldMap.Checkbox
-			}; Visible(List, true)
-			
-			WorldMap.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
-			if Settings.WorldConfig.WorldMap and
-				not table.find(AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"][value]["Maps"], Settings.WorldConfig.WorldMap) then
-				Settings.WorldConfig.WorldMap = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
-			end
-			WorldMap.Data.Selected = Settings.WorldConfig.WorldMap
-			WorldMap.Section:UpdateRadio(WorldMap, nil, {})
-		end
-		WorldMap.Section:Resize(true)
-	end
-	getgenv().UpdateWorldDamageModifier = function(value)
-		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
-			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"] and
-			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"] then
-			local List = {
-				WorldDamageModifierSeparator.Label,
-				WorldDamageModifier.Checkbox
-			}; Visible(List, false)
-		else
-			local List = {
-				WorldDamageModifierSeparator.Label,
-				WorldDamageModifier.Checkbox
-			}; Visible(List, true)
+	----------------------------
 
-			WorldDamageModifier.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
-			if Settings.WorldConfig.WorldDamageModifier and
-				not table.find(AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"][value]["Maps"], Settings.WorldConfig.WorldDamageModifier) then
-				Settings.WorldConfig.WorldDamageModifier = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
-			end
-			WorldDamageModifier.Data.Selected = Settings.WorldConfig.WorldDamageModifier
-			WorldDamageModifier.Section:UpdateRadio(WorldDamageModifier, nil, {})
-		end
-		WorldDamageModifier.Section:Resize(true)
+	----- [ Shoop and Item Page ] -----
+	function UISetup:ShopNItem()
+		local PShopNItems = Window:AddPage("Shop & Items", "💰")
+		local SShopSplit = PShopNItems:AddSplit()
+		local SAutoPull = PShopNItems:AddSection("💸 Auto Pull Unit 💸", {Split = SShopSplit, Side = "Left"})
+		local SAutoBuyBulma = PShopNItems:AddSection("🏪 Auto Buy Bulma 🏪", {Split = SShopSplit, Side = "Left"})
+		local SAutoBuyEscanor = PShopNItems:AddSection("🛒 Auto Buy Escanor 🛒", {Split = SShopSplit, Side = "Left"})
+		local SAutoCraftRelic = PShopNItems:AddSection("🗡️ Auto Craft Relic 🗡️", {Split = SShopSplit, Side = "Left"})
+		local SAutoSellPortals = PShopNItems:AddSection("🌀 Auto Sell Portals 🌀", {Split = SShopSplit, Side = "Right"})
+		local SAutoSellSkins = PShopNItems:AddSection("👗 Auto Sell Skins 👗", {Split = SShopSplit, Side = "Right"})
 	end
-	getgenv().UpdateWorldTier = function(value)
-		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
-			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"] and
-			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"] then
-			local List = {
-				WorldTierSeparator.Label,
-				WorldTier.Checkbox
-			}; Visible(List, false)
-		else
-			local List = {
-				WorldTierSeparator.Label,
-				WorldTier.Checkbox
-			}; Visible(List, true)
+	-----------------------------------
 
-			WorldTier.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
-			if Settings.WorldConfig.WorldTier and
-				not table.find(AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"][value]["Maps"], Settings.WorldConfig.WorldTier) then
-				Settings.WorldConfig.WorldTier = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
+	----- [ Misc Page ] -----
+	local PMisc = Window:AddPage("Misc [BETA]", "🛠️")
+	function UISetup:Misc()
+		if Settings and not Settings["Misc"] then Settings["Misc"] = {} end
+		if Settings and not Settings["Misc"].Discord then Settings["Misc"].Discord = {} end
+		if Settings and not Settings["Misc"].Device then Settings["Misc"].Device = {} end
+		if Settings and not Settings["Misc"].Map then Settings["Misc"].Map = {} end
+		if Settings and not Settings["Misc"].Script then Settings["Misc"].Script = {} end
+		if Settings and not Settings["Misc"].Players then Settings["Misc"].Players = {} end
+		
+		local SDiscordWebhook = PMisc:AddSection("🌐 Discord Webhook 🌐")
+		local SMiscSplit = PMisc:AddSplit()
+		local SDevicePerformance = PMisc:AddSection("🖥️ Device Performance 🖥️", {Split = SMiscSplit, Side = "Left"})
+		local SLaggyBETA = PMisc:AddSection("LAGGY Config (BETA)", {Split = SMiscSplit, Side = "Left"})
+		local SMapPerformance = PMisc:AddSection("🌏 Map Performance 🌏", {Split = SMiscSplit, Side = "Right"})
+		local SScriptSettings = PMisc:AddSection("⌛ Script Settings ⌛", {Split = SMiscSplit, Side = "Right"})
+		local SPlayersModification = PMisc:AddSection("🐱 Players Modification 🐱", {Split = SMiscSplit, Side = "Right"})
+		local SOtherConfig = PMisc:AddSection("⚙️ Other Config ⚙️", {Split = SMiscSplit, Side = "Right"})
+		local SReset = PMisc:AddSection("🤖 Reset 🤖", {Split = SMiscSplit, Side = "Right"})
+		
+		--- [ Discord ] ---
+		SDiscordWebhook:AddTextbox("Webhook Urls", function(value) Settings["Misc"].Discord["Webhook"] = value; SaveSettings() end, {Placeholder = "URL", MultiLine = true})
+		SDiscordWebhook:AddTextbox("Sniper Webhook Urls", function(value) Settings["Misc"].Discord["Sniper Webhook"] = value; SaveSettings() end, {Placeholder = "URL", MultiLine = true})
+		SDiscordWebhook:AddTextbox("Baby Webhook Urls", function(value) Settings["Misc"].Discord["Baby Webhook"] = value; SaveSettings() end, {Placeholder = "URL", MultiLine = true})
+		
+		--- [ Device Performance ] ---
+		SDevicePerformance:AddToggle("🖥️ Low CPU Mode", function(value) Settings["Misc"].Device["Low CPU Mode"] = value; SaveSettings() end, {Active = Settings["Misc"].Device["Low CPU Mode"] or false})
+		SDevicePerformance:AddToggle("🔫 Boost FPS Mode", function(value) Settings["Misc"].Device["Boost FPS Mode"] = value; SaveSettings() end, {Active = Settings["Misc"].Device["Boost FPS Mode"] or false})
+		
+		--- [ LAGGY ] ---
+		
+		--- [ Map Performance ] ---
+		SMapPerformance:AddToggle("🗺️ Delete Map", function(value) Settings["Misc"].Map["Delete Map"] = value; SaveSettings() end, {Active = Settings["Misc"].Map["Delete Map"] or false})
+		SMapPerformance:AddToggle("👇 Place Anywhere", function(value) Settings["Misc"].Map["Place Anywhere"] = value; SaveSettings() end, {Active = Settings["Misc"].Map["Place Anywhere"] or false})
+		SMapPerformance:AddButton("Activate Place Anywhere", function() end)
+		SMapPerformance:AddToggle("⛰️ Delete Hill [Disable hill placing]", function(value) Settings["Misc"].Map["Delete Hill"] = value; SaveSettings() end, {Active = Settings["Misc"].Map["Delete Hill"] or false})
+		SMapPerformance:AddButton("Activate Delete Hill", function() end)
+		
+		--- [ Script Settings ] ---
+		SScriptSettings:AddToggle("⌛ Auto Load Script", function(value) Settings["Misc"].Script["Auto Load Script"] = value; SaveSettings() end, {Active = Settings["Misc"].Script["Auto Load Script"] or false})
+		
+		--- [ Players Modification ] ---
+		SPlayersModification:AddToggle("🐱 Hide Name Player", function(value) Settings["Misc"].Players["Hide Name"] = value; SaveSettings() end, {Active = Settings["Misc"].Players["Hide Name"] or false})
+		
+		--- [ Other Config ] ---
+		SOtherConfig:AddButton("Redeem All Codes", function()
+			for _, code in pairs(AAData["Codes"]) do
+				pcall(function() game:GetService("ReplicatedStorage").endpoints["client_to_server"]["redeem_code"]:InvokeServer(code)() end)
 			end
-			WorldTier.Data.Selected = Settings.WorldConfig.WorldTier
-			WorldTier.Section:UpdateRadio(WorldTier, nil, {})
-		end
-		WorldTier.Section:Resize(true)
+			Window:Notify("Info", "Done Collecting Codes")
+		end)
+		SOtherConfig:AddButton("Return To Lobby", function() end)
+		
+		--- [ Reset ] ---
+		
 	end
-	getgenv().UpdateWorldChallenge = function(value)
-		if not AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] and
-			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"] and
-			not AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"] then
-			local List = {
-				WorldChallengeSeparator.Label,
-				WorldChallenge.Checkbox
-			}; Visible(List, false)
-		else
-			local List = {
-				WorldChallengeSeparator.Label,
-				WorldChallenge.Checkbox
-			}; Visible(List, true)
-
-			WorldChallenge.Data.Options = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
-			if Settings.WorldConfig.WorldChallenge and
-				not table.find(AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"][value]["Maps"], Settings.WorldConfig.WorldChallenge) then
-				Settings.WorldConfig.WorldChallenge = AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"][value]["Maps"]
-			end
-			WorldChallenge.Data.Selected = Settings.WorldConfig.WorldChallenge
-			WorldChallenge.Section:UpdateRadio(WorldChallenge, nil, {})
-		end
-		WorldChallenge.Section:Resize(true)
-	end
-	
-	getgenv().UpdateWorldType(FarmCategory.Data.Value)
-	getgenv().UpdateWorldLevel(WorldType.Data.Value)
-	getgenv().UpdateWorldDifficulty(WorldLevel.Data.Value)
-	getgenv().UpdateWorldMap(WorldLevel.Data.Value)
-	getgenv().UpdateWorldDamageModifier(WorldLevel.Data.Value)
-	getgenv().UpdateWorldTier(WorldLevel.Data.Value)
-	getgenv().UpdateWorldChallenge(WorldLevel.Data.Value)
+	-------------------------
 end
-----------------------------
-
------ [ Unit Config ] -----
-local function UnitConfigUI()
-	
-end
----------------------------
-
------ [ Home Page ] -----
-local function HomeUI()
-	SDevelopers:AddLabel({Text = "📝 Scripted by: Arpon AG#6612 & Forever4D#0001 & HOLYSHz#3819"})
-	SDevelopers:AddLabel({Text = "📝 Also thanks to Trapstar#7845, bytenode#9646 for the help!"})
-	SDevelopers:AddLabel({Text = "📝 Improved by: NickCoder"})
-	SDevelopers:AddLabel({Text = "📝 UI By: NickCoder"})
-	SDevelopers:AddLabel({Text = "🔧 To toggle the UI press \" P \""})
-	
-	SHelp:AddLabel({Text = "double_cost = 'High Cost'"})
-	SHelp:AddLabel({Text = "short_range = 'Short Range'"})
-	SHelp:AddLabel({Text = "fast_enemies = 'Fast Enemies'"})
-	SHelp:AddLabel({Text = "regen_enemies = 'Regen Enemies'"})
-	SHelp:AddLabel({Text = "tank_enemies = 'Tank Enemies'"})
-	SHelp:AddLabel({Text = "shield_enemies = 'Shield Enemies'"})
-	SHelp:AddLabel({Text = "triple_cost = 'Triple Cost'"})
-	SHelp:AddLabel({Text = "hyper_regen_enemies = 'Hyper-Regen Enemies'"})
-	SHelp:AddLabel({Text = "hyper_shield_enemies = 'Steel-Plated Enemies'"})
-	SHelp:AddLabel({Text = "godspeed_enemies = 'Godspeed Enemies'"})
-	SHelp:AddLabel({Text = "flying_enemies = 'Flying Enemies'"})
-	SHelp:AddLabel({Text = "mini_range = 'Mini-Range'"})
-	
-	Window:SelectPage(PHome, true)
-end
------------------------
 
 ----- [ Setup ] -----
-if game.PlaceId == 8304191830 then
-	HomeUI()
-	AutoFarmConfigUI()
-	WorldConfigUI()
-	UnitConfigUI()
+if InLobby() then
+	UISetup:Home()
+	UISetup:AutoFarm()
+	UISetup:UnitConfig()
+	UISetup:Macro()
+	UISetup:ShopNItem()
+	UISetup:Misc()
 	warn("Loaded Lobby UI")
 else
-	HomeUI()
-	AutoFarmConfigUI()
-	WorldConfigUI()
-	UnitConfigUI()
+	UISetup:Home()
+	UISetup:AutoFarm()
+	UISetup:UnitConfig()
+	UISetup:Macro()
+	UISetup:Misc()
 	warn("Loaded Game UI")
 end
+Window:Enabled(true)
 ---------------------
 
 -------------------------
@@ -858,10 +974,10 @@ warn("Astral Hider Name Loaded!!!")
 warn("Astral AA v1 Loaded!!!")
 warn("All Loaded !!!")
 
-if game.PlaceId == 8304191830 then
+if InLobby() then
 	repeat task.wait(0.5) until Workspace:WaitForChild(game.Players.LocalPlayer.Name)
 	CheckInternet()
-elseif game.PlaceId ~= 8304191830 then
+elseif not InLobby() then
 	repeat task.wait(0.5) until Workspace:WaitForChild("_terrain")
 	CheckInternet()
 end

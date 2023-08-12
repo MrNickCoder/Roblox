@@ -1,4 +1,5 @@
 local Utility = {}
+
 do
 	
 	function Utility:Comma_Value(Text)
