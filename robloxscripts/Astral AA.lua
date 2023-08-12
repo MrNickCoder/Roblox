@@ -32,7 +32,7 @@ local File = game:GetService("Players").LocalPlayer.Name .. "_AnimeAdventures.js
 
 Settings = {}
 function SaveSettings() Settings = Utility:SaveConfig(Settings, Folder, File); warn("Settings Saved!") end
-function LoadSettings() return Utility:SaveConfig(Settings, Folder, File) end
+function LoadSettings() return Utility:LoadConfig(Settings, Folder, File) end
 Settings = LoadSettings()
 
 ----- [ Start of Get Level Data of Map [Added by HOLYSHz] ] -----
