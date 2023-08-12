@@ -510,7 +510,7 @@ do
 				WorldLevelLabel.Label, WorldLevel.Dropdown,
 				WorldDifficultySeparator.Label,
 				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
-			}; Visible(List, visible)
+			}; Utility:Show(List, visible)
 		end
 		getgenv().UpdateWorldLevel = function(value:string)
 			WorldLevel.Functions:Hide()
@@ -545,7 +545,7 @@ do
 				WorldLevelLabel.Label, WorldLevel.Dropdown,
 				WorldDifficultySeparator.Label,
 				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
-			}; Visible(List, visible)
+			}; Utility:Show(List, visible)
 		end
 		getgenv().UpdateWorldDifficulty = function(value:string)
 			WorldDifficulty.Functions:Hide()
@@ -585,7 +585,7 @@ do
 					end
 				end
 			end
-			Visible(List, visible)
+			Utility:Show(List, visible)
 		end
 		getgenv().UpdateIgnoredMap = function(value:string)
 			local List = {IgnoredMap.Dropdown}
@@ -604,7 +604,7 @@ do
 					end
 				end
 			end
-			Visible(List, visible)
+			Utility:Show(List, visible)
 		end
 		getgenv().UpdateIgnoredDamageModifier = function(value:string)
 			local List = {IgnoredDamageModifier.Dropdown};
@@ -623,7 +623,7 @@ do
 					end
 				end
 			end
-			Visible(List, visible)
+			Utility:Show(List, visible)
 		end
 		getgenv().UpdateIgnoredTier = function(value:string)
 			local List = {IgnoredTier.Dropdown};
@@ -642,7 +642,7 @@ do
 					end
 				end
 			end
-			Visible(List, visible)
+			Utility:Show(List, visible)
 		end
 		getgenv().UpdateIgnoredChallenge = function(value:string)
 			local List = {IgnoredChallenge.Dropdown};
@@ -661,7 +661,7 @@ do
 					end
 				end
 			end
-			Visible(List, visible)
+			Utility:Show(List, visible)
 		end
 
 		getgenv().UpdateWorldType(FarmCategory.Data.Value)
