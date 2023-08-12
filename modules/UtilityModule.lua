@@ -19,7 +19,6 @@ do
 				table.insert(newTable, x)
 			end
 		end
-	
 		return newTable
 	end
 	
