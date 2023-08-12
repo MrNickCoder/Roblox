@@ -780,7 +780,7 @@ do
 		
 		for _, Map in pairs(AAData["Maps"]) do
 			local MacroMap = SMacroMaps:AddDropdown(Map..": ", function(value) end, {Value = "None", ExpandLimit = 5})
-			MacroMap.Data.Options = Combine_Table({"None"}, MacroConfig.Data.Options)
+			MacroMap.Data.Options = Utility:Combine_Table({"None"}, MacroConfig.Data.Options)
 		end
 		
 		-------------------------------------------
