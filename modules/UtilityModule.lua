@@ -1,4 +1,5 @@
 local Utility = {}
+local Threads = {}
 
 do
 	
@@ -48,6 +49,26 @@ do
 		else return Utility:SaveConfig(Config, Directory, File) end
 	end
 	
+	function Utility:Thread(ID, Callback)
+		local Thread = coroutine.create(Callback)
+
+		local MetaTable = {}
+		do
+			function MetaTable:Start() coroutine.resume(Thread); Threads[ID] = Thread end
+			function MetaTable:Stop() coroutine.close(Thread); Threads[ID] = nil end
+			function MetaTable:Status() return coroutine.status(Thread) end
+		end
+
+		return setmetatable({
+			Thread = Thread
+		}, MetaTable)
+	end
+
+	function Utility:StopAllThreads()
+		for _, v in pairs(Threads) do
+			if v:Status() == "running" then v:Stop() end
+		end
+	end
 end
 
 return Utility
