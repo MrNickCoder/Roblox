@@ -625,46 +625,46 @@ do
 
 	function Library:Toggle()
 		if self.Toggling then return end
-
-		self.Toggling = true
-
-		if not self.Container.Main then return end
-		local Container = self.Container.Main
-		local Topbar = Container.TopBar
-		local Frame = Topbar.Button.Frame
+		if self.Container.Main then
+			self.Toggling = true
 		
-		local Position = {
-			In = UDim2.new(0, 2, 0.5, -6),
-			Out = UDim2.new(0, 20, 0.5, -6)
-		}
+			local Container = self.Container.Main
+			local Topbar = Container.TopBar
+			local Frame = Topbar.Button.Frame
+			
+			local Position = {
+				In = UDim2.new(0, 2, 0.5, -6),
+				Out = UDim2.new(0, 20, 0.5, -6)
+			}
 
-		if self.Minimized then
-			if self.FocusedPage then self.FocusedPage.Container.Visible = true end
-			
-			Utility:Tween(Frame, {Size = UDim2.new(1, -22, 1, -9), Position = Position["In"] + UDim2.new(0, 0, 0, 2.5)}, 0.2)
-			wait(0.1)
-			Utility:Tween(Frame, {Size = UDim2.new(1, -22, 1, -4), Position = Position["In"]}, 0.1)
-			
-			Utility:Tween(Container, {Size = self.Size}, 0.2)
-			wait(0.2)
+			if self.Minimized then
+				if self.FocusedPage then self.FocusedPage.Container.Visible = true end
+				
+				Utility:Tween(Frame, {Size = UDim2.new(1, -22, 1, -9), Position = Position["In"] + UDim2.new(0, 0, 0, 2.5)}, 0.2)
+				wait(0.1)
+				Utility:Tween(Frame, {Size = UDim2.new(1, -22, 1, -4), Position = Position["In"]}, 0.1)
+				
+				Utility:Tween(Container, {Size = self.Size}, 0.2)
+				wait(0.2)
 
-			--Container.ClipsDescendants = false
-			self.Minimized = false
-		else
-			self.Minimized = true
-			--Container.ClipsDescendants = true
-			
-			Utility:Tween(Frame, {Size = UDim2.new(1, -22, 1, -9), Position = Position["Out"] + UDim2.new(0, 0, 0, 2.5)}, 0.2)
-			wait(0.1)
-			Utility:Tween(Frame, {Size = UDim2.new(1, -22, 1, -4), Position = Position["Out"]}, 0.1)
+				--Container.ClipsDescendants = false
+				self.Minimized = false
+			else
+				self.Minimized = true
+				--Container.ClipsDescendants = true
+				
+				Utility:Tween(Frame, {Size = UDim2.new(1, -22, 1, -9), Position = Position["Out"] + UDim2.new(0, 0, 0, 2.5)}, 0.2)
+				wait(0.1)
+				Utility:Tween(Frame, {Size = UDim2.new(1, -22, 1, -4), Position = Position["Out"]}, 0.1)
 
-			Utility:Tween(Container, {Size = UDim2.new(0, self.Size.X.Offset, 0, Topbar.Size.Y.Offset)}, 0.2)
-			wait(0.2)
-			
-			if self.FocusedPage then self.FocusedPage.Container.Visible = false end
+				Utility:Tween(Container, {Size = UDim2.new(0, self.Size.X.Offset, 0, Topbar.Size.Y.Offset)}, 0.2)
+				wait(0.2)
+				
+				if self.FocusedPage then self.FocusedPage.Container.Visible = false end
+			end
+
+			self.Toggling = false
 		end
-
-		self.Toggling = false
 	end
 	
 	function Library:Notify(Title, Text, Callback)
