@@ -1,20 +1,5 @@
 local Threads = {}
 
-local ThreadMethods = {}
-do
-	function ThreadMethods.new(ID, Callback)
-		local Thread = coroutine.create(Callback)
-
-		return setmetatable({
-			ID = ID,
-			Thread = Thread,
-		}, ThreadMethods)
-	end
-	function ThreadMethods:Start() coroutine.resume(self.Thread); Threads[self.ID] = self.Thread end
-	function ThreadMethods:Stop() coroutine.close(self.Thread); Threads[self.ID] = nil end
-	function ThreadMethods:Status() return coroutine.status(self.Thread) end
-end
-
 local Utility = {}
 do
 	
@@ -64,7 +49,17 @@ do
 		else return Utility:SaveConfig(Config, Directory, File) end
 	end
 	
-	function Utility:Thread(...) return ThreadMethods.new(...) end
+	function Utility:Thread(ID:string, Callback)
+		local Thread = coroutine.create(Callback)
+
+		return setmetatable({
+			ID = ID,
+			Thread = Thread,
+			Start = function() coroutine.resume(Thread); Threads[ID] = Thread end,
+			Stop = function() coroutine.close(Thread); Threads[ID] = nil end,
+			Status = function() return coroutine.status(Thread) end,
+		}, {})
+	end
 
 	function Utility:StopAllThreads()
 		for _, v in pairs(Threads) do
