@@ -2152,6 +2152,11 @@ do
 
 		if Title then Slider.Title.Text = Title end
 
+		if Data then
+			if not Data.Min then Data.Min = MetaTable.Data.Min end
+			if not Data.Max then Data.Max = MetaTable.Data.Max end
+		end
+
 		local Bar = Slider.Slider.Bar
 		local Percent = (Mouse.X - Bar.AbsolutePosition.X) / Bar.AbsoluteSize.X
 
