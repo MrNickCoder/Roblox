@@ -1,6 +1,6 @@
-local Threads = {}
-
-local Utility = {}
+local Utility = {
+	Threads = {}
+}
 do
 	
 	function Utility:Comma_Value(Text:string)
@@ -55,14 +55,14 @@ do
 		return setmetatable({
 			ID = ID,
 			Thread = Thread,
-			Start = function() coroutine.resume(Thread); Threads[ID] = Thread end,
-			Stop = function() coroutine.close(Thread); Threads[ID] = nil end,
+			Start = function() coroutine.resume(Thread); Utility.Threads[ID] = Thread end,
+			Stop = function() coroutine.close(Thread); Utility.Threads[ID] = nil end,
 			Status = function() return coroutine.status(Thread) end,
 		}, {})
 	end
 
 	function Utility:StopAllThreads()
-		for _, v in pairs(Threads) do
+		for i, v in pairs(Utility.Threads) do
 			if v:Status() == "running" then v:Stop() end
 		end
 	end
