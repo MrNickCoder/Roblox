@@ -2105,8 +2105,6 @@ do
 	function Section:UpdateToggle(MetaTable, Title, Data)
 		local Toggle = self:GetModule(MetaTable.Toggle)
 
-		Data.Active = Data.Active or MetaTable.Data.Active
-
 		local Position = {
 			In = UDim2.new(0, 2, 0.5, -6),
 			Out = UDim2.new(0, 20, 0.5, -6)
@@ -2151,9 +2149,6 @@ do
 	
 	function Section:UpdateSlider(MetaTable, Title, Data)
 		local Slider = self:GetModule(MetaTable.Slider)
-
-		Data.Min = Data.Min or MetaTable.Data.Min
-		Data.Max = Data.Max or MetaTable.Data.Max
 
 		if Title then Slider.Title.Text = Title end
 
