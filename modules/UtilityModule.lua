@@ -57,15 +57,12 @@ do
 			Thread = Thread,
 			Start = function() coroutine.resume(Thread); Utility.Threads[ID] = Thread end,
 			Stop = function() coroutine.close(Thread); Utility.Threads[ID] = nil end,
-			Status = function() return coroutine.status(Thread) end,
 		}, {})
 	end
 
 	function Utility:StopAllThreads()
 		for i, v in pairs(Utility.Threads) do
-			print(i)
-			print(v)
-			if Utility.Threads[i]:Status() == "running" then Utility.Threads[i]:Stop() end
+			Utility.Threads[i]:Stop()
 		end
 	end
 end
