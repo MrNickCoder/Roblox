@@ -51,12 +51,13 @@ do
 	
 	function Utility:Thread(ID:string, Callback)
 		local Thread = coroutine.create(Callback)
+		self.Threads[ID] = Thread
 
 		return setmetatable({
 			ID = ID,
 			Thread = Thread,
-			Start = function() coroutine.resume(Thread); self.Threads[ID] = Thread end,
-			Stop = function() coroutine.close(Thread); self.Threads[ID] = nil end,
+			Start = function() coroutine.resume(Thread); end,
+			Stop = function() coroutine.close(Thread); end,
 			Wait = function(time) coroutine.yield(Thread); task.wait(time); coroutine.resume(Thread) end,
 			Status = function() return coroutine.status(Thread) end,
 		}, {})
@@ -67,7 +68,7 @@ do
 			if coroutine.status(v) == "running" then
 				coroutine.close(v)
 			end
-			self.Threads[i] = nil
+			self.Threads = {}
 		end
 	end
 end
