@@ -1,6 +1,21 @@
-local Utility = {}
 local Threads = {}
 
+local ThreadMethods = {}
+do
+	function ThreadMethods.new(ID, Callback)
+		local Thread = coroutine.create(Callback)
+
+		return setmetatable({
+			ID = ID,
+			Thread = Thread,
+		}, ThreadMethods)
+	end
+	function ThreadMethods:Start() coroutine.resume(self.Thread); Threads[self.ID] = self.Thread end
+	function ThreadMethods:Stop() coroutine.close(self.Thread); Threads[self.ID] = nil end
+	function ThreadMethods:Status() return coroutine.status(self.Thread) end
+end
+
+local Utility = {}
 do
 	
 	function Utility:Comma_Value(Text:string)
@@ -49,20 +64,7 @@ do
 		else return Utility:SaveConfig(Config, Directory, File) end
 	end
 	
-	function Utility:Thread(ID, Callback)
-		local Thread = coroutine.create(Callback)
-
-		local MetaTable = {}
-		do
-			function MetaTable:Start() coroutine.resume(Thread); Threads[ID] = Thread end
-			function MetaTable:Stop() coroutine.close(Thread); Threads[ID] = nil end
-			function MetaTable:Status() return coroutine.status(Thread) end
-		end
-
-		return setmetatable({
-			Thread = Thread
-		}, MetaTable)
-	end
+	function Utility:Thread(...) return ThreadMethods.new(...) end
 
 	function Utility:StopAllThreads()
 		for _, v in pairs(Threads) do
