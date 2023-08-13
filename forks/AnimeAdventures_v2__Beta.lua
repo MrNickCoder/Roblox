@@ -4595,6 +4595,7 @@ function autoabilityerwin()
                     end
                 end
                 
+                print("Erwin Buffing")
                 if #erwin1 == 4 then
                     game:GetService("ReplicatedStorage"):WaitForChild("endpoints"):WaitForChild("client_to_server"):WaitForChild("use_active_attack"):InvokeServer(erwin1[1])
                     warn("Use Skill " ..erwin1[1].Name .." 1 " )
@@ -4648,6 +4649,7 @@ function autoabilitywendy()
                     end
                 end
                 
+                print("Wendy Buffing")
                 if #wendy1 == 4 then
                     game:GetService("ReplicatedStorage"):WaitForChild("endpoints"):WaitForChild("client_to_server"):WaitForChild("use_active_attack"):InvokeServer(wendy1[1])
                     warn("Use Skill " ..wendy1[1].Name .." 1 " )
@@ -4701,6 +4703,7 @@ function autoabilityleafa()
                     end
                 end
                 
+                print("Leafa Buffing")
                 if #leafa1 == 4 then
                     game:GetService("ReplicatedStorage"):WaitForChild("endpoints"):WaitForChild("client_to_server"):WaitForChild("use_active_attack"):InvokeServer(leafa1[1])
                     warn("Use Skill " ..leafa1[1].Name .." 1 " )
