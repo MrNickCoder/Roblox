@@ -34,7 +34,7 @@ do
 		if not isfolder(Directory) then makefolder(Directory) end
 
 		writefile(Directory .. "/" .. File, HttpService:JSONEncode(Config))
-		return Utility:LoadConfig(Config, Directory, File)
+		return self:LoadConfig(Config, Directory, File)
 	end
 
 	function Utility:LoadConfig(Config:{any}, Directory:string, File:string)
@@ -46,7 +46,7 @@ do
 		end)
 
 		if Success then return Response
-		else return Utility:SaveConfig(Config, Directory, File) end
+		else return self:SaveConfig(Config, Directory, File) end
 	end
 	
 	function Utility:Thread(ID:string, Callback)
@@ -55,14 +55,15 @@ do
 		return setmetatable({
 			ID = ID,
 			Thread = Thread,
-			Start = function() coroutine.resume(Thread); Utility.Threads[ID] = Thread end,
-			Stop = function() coroutine.close(Thread); Utility.Threads[ID] = nil end,
+			Start = function() coroutine.resume(Thread); self.Threads[ID] = Thread end,
+			Stop = function() coroutine.close(Thread); self.Threads[ID] = nil end,
+			Status = function() return coroutine.status(Thread) end,
 		}, {})
 	end
 
 	function Utility:StopAllThreads()
-		for i, v in pairs(Utility.Threads) do
-			Utility.Threads[i]:Stop()
+		for _, v in pairs(self.Threads) do
+			if v:Status() == "running" then v:Stop() end
 		end
 	end
 end
