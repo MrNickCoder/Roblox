@@ -998,11 +998,11 @@ do
 
 		table.insert(self.Modules, MetaTable.Toggle)
 
-		self:UpdateToggle(MetaTable, nil, {Value = MetaTable.Data.Active})
+		self:UpdateToggle(MetaTable, nil, {Active = MetaTable.Data.Active})
 		
 		function Functions:Toggle()
 			MetaTable.Data.Active = not MetaTable.Data.Active
-			MetaTable.Section:UpdateToggle(MetaTable, nil, {Value = MetaTable.Data.Active})
+			MetaTable.Section:UpdateToggle(MetaTable, nil, {Active = MetaTable.Data.Active})
 
 			if MetaTable.Callback then
 				MetaTable.Callback(MetaTable.Data.Active, function(...)
@@ -2105,7 +2105,7 @@ do
 	function Section:UpdateToggle(MetaTable, Title, Data)
 		local Toggle = self:GetModule(MetaTable.Toggle)
 
-		Data.Value = Data.Value or MetaTable.Data.Value
+		Data.Active = Data.Active or MetaTable.Data.Active
 
 		local Position = {
 			In = UDim2.new(0, 2, 0.5, -6),
@@ -2113,7 +2113,7 @@ do
 		}
 
 		local Frame = Toggle.Button.Frame
-		local Value = Data.Value and "Out" or "In"
+		local Value = Data.Active and "Out" or "In"
 
 		if Title then Toggle.Title.Text = Title end
 
