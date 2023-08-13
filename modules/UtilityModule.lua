@@ -1,8 +1,11 @@
 local Utility = {
-	Threads = {}
+	Threads = {},
+	AllIDs = {},
+	FoundAnything = "",
+	ActualHour = os.date("!*t").hour,
 }
 do
-	
+
 	function Utility:Comma_Value(Text:string)
 		local Value = Text;
 		while true do
@@ -70,6 +73,66 @@ do
 			self.Threads = {}
 		end
 	end
+
+	function Utility:Teleporter(PlaceID)
+		local Deleted = false
+    	local Last
+		local ServerFile = pcall(function() Utility.AllIDs = game:GetService('HttpService'):JSONDecode(readfile("NotSameServers.json")) end)
+		if not ServerFile then
+			table.insert(Utility.AllIDs, Utility.ActualHour)
+			writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(Utility.AllIDs))
+		end
+
+		local Site;
+		if Utility.FoundAnything == "" then
+			Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
+        else
+			Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. Utility.FoundAnything))
+		end
+
+		local ID = ""
+        if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
+			Utility.FoundAnything = Site.nextPageCursor
+		end
+
+		local Num = 0;
+        local ExtraNum = 0
+		for Index, Server in pairs(Site.data) do
+            ExtraNum += 1
+            local Possible = true
+            ID = tostring(Server.id)
+            if tonumber(Server.maxPlayers) > tonumber(Server.playing) then
+                if ExtraNum ~= 1 and tonumber(Server.playing) < Last or ExtraNum == 1 then Last = tonumber(Server.playing)
+                elseif ExtraNum ~= 1 then continue end
+
+                for _, Existing in pairs(Utility.AllIDs) do
+                    if Num ~= 0 then
+                        if ID == tostring(Existing) then Possible = false end
+                    else
+                        if tonumber(Utility.ActualHour) ~= tonumber(Existing) then
+                            local delFile = pcall(function()
+                                delfile("NotSameServers.json")
+                                AllIDs = {}
+                                table.insert(Utility.AllIDs, Utility.ActualHour)
+                            end)
+                        end
+                    end
+                    Num = Num + 1
+                end
+                if Possible == true then
+                    table.insert(Utility.AllIDs, ID)
+                    task.wait()
+                    pcall(function()
+                        writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(Utility.AllIDs))
+                        task.wait()
+                        game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
+                    end)
+                    task.wait(4)
+                end
+            end
+        end
+	end
+
 end
 
 return Utility
