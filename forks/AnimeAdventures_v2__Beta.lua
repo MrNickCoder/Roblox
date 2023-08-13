@@ -2,7 +2,7 @@
 local version = "v2.0.0b31"
 
 ---// Loading Section \\---
-repeat  task.wait() until game:IsLoaded()
+repeat task.wait() until game:IsLoaded()
 if game.PlaceId == 8304191830 then
     repeat task.wait() until game.Workspace:FindFirstChild(game.Players.LocalPlayer.Name)
     repeat task.wait() until game.Players.LocalPlayer.PlayerGui:FindFirstChild("collection"):FindFirstChild("grid"):FindFirstChild("List"):FindFirstChild("Outer"):FindFirstChild("UnitFrames")
@@ -4712,7 +4712,7 @@ function autoabilityleafa()
                     task.wait(Delay[leafa1[1].Name])
                 end
             end
-        end)
+        end))
     end
 end
 
