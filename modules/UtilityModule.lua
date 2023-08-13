@@ -62,8 +62,11 @@ do
 	end
 
 	function Utility:StopAllThreads()
-		for _, v in pairs(self.Threads) do
-			if v:Status() == "running" then v:Stop() end
+		for i, v in pairs(self.Threads) do
+			if coroutine.status(v) == "running" then
+				coroutine.close(v)
+			end
+			self.Threads[i] = nil
 		end
 	end
 end
