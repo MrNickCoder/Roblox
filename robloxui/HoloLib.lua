@@ -625,7 +625,7 @@ do
 
 	function Library:Toggle()
 		if self.Toggling then return end
-		if self.Container and self.Container.Main then
+		if self.Container.Parent then
 			self.Toggling = true
 		
 			local Container = self.Container.Main
