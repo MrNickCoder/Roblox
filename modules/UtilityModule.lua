@@ -62,7 +62,9 @@ do
 	end
 
 	function Utility:StopAllThreads()
-		for i, _ in pairs(Utility.Threads) do
+		for i, v in pairs(Utility.Threads) do
+			print(i)
+			print(v)
 			if Utility.Threads[i]:Status() == "running" then Utility.Threads[i]:Stop() end
 		end
 	end
