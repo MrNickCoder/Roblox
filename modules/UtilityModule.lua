@@ -57,7 +57,7 @@ do
 			ID = ID,
 			Thread = Thread,
 			Start = function() coroutine.resume(Thread); end,
-			Stop = function() coroutine.close(Thread); end,
+			Stop = function() coroutine.yield(Thread); end,
 			Wait = function(time) coroutine.yield(Thread); task.wait(time); coroutine.resume(Thread) end,
 			Status = function() return coroutine.status(Thread) end,
 		}, {})
