@@ -4564,7 +4564,7 @@ end
 -- Start  Auto Buff 100 Function
 --Erwin
 function autoabilityerwin()
-    if Settings.EnableBufferwinLoop then
+    if Settings.EnableBufferwinLoop and game.PlaceId ~= 8304191830 then
         coroutine.resume(coroutine.create(function()
             print("Erwin Auto Buff Running")
 
@@ -4618,7 +4618,7 @@ end
 
 --Wendy
 function autoabilitywendy()
-    if Settings.EnableBuffwendyLoop then
+    if Settings.EnableBuffwendyLoop and game.PlaceId ~= 8304191830 then
         coroutine.resume(coroutine.create(function()
             print("Wendy Auto Buff Running")
 
@@ -4670,7 +4670,7 @@ end
 
 --Leafa
 function autoabilityleafa()
-    if Settings.EnableBuffleafaLoop then
+    if Settings.EnableBuffleafaLoop and game.PlaceId ~= 8304191830 then
         coroutine.resume(coroutine.create(function()
             print("Leafa Auto Buff Running")
 
