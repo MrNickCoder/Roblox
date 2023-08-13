@@ -844,9 +844,7 @@ do
 			Label = Label,
 			Text = Text,
 			Functions = Functions,
-			Update = Update,
 		}, {})
-		function Update(...) self:UpdateLabel(MetaTable, ...) end
 		
 		table.insert(self.Modules, MetaTable.Label)
 		
@@ -888,9 +886,7 @@ do
 			Title = Title,
 			Callback = Callback,
 			Functions = Functions,
-			Update = Update
 		}, {})
-		function Update(...) self:UpdateButton(MetaTable, ...) end
 
 		table.insert(self.Modules, MetaTable.Button)
 
@@ -992,9 +988,7 @@ do
 			Data = Data,
 			Callback = Callback,
 			Functions = Functions,
-			Update = Update
 		}, {})
-		function Update(...) self:UpdateToggle(MetaTable, ...) end
 
 		table.insert(self.Modules, MetaTable.Toggle)
 
@@ -1125,9 +1119,7 @@ do
 			Data = Data,
 			Callback = Callback,
 			Functions = Functions,
-			Update = Update
 		}, {})
-		function Update(...) self:UpdateTextbox(MetaTable, ...) end
 
 		table.insert(self.Modules, MetaTable.Textbox)
 
@@ -1291,9 +1283,7 @@ do
 			Callback = Callback,
 			ChangedCallback = ChangedCallback,
 			Functions = Functions,
-			Update = Update
 		}, {})
-		function Update(...) self:UpdateKeybind(MetaTable, ...) end
 
 		table.insert(self.Modules, MetaTable.Keybind)
 
@@ -1449,9 +1439,7 @@ do
 			Data = Data,
 			Callback = Callback,
 			Functions = Functions,
-			Update = Update
 		}, {})
-		function Update(...) self:UpdateSlider(MetaTable, ...) end
 
 		table.insert(self.Modules, MetaTable.Slider)
 
@@ -1655,9 +1643,7 @@ do
 			Data = Data,
 			Callback = Callback,
 			Functions = Functions,
-			Update = Update
 		}, {})
-		function Update(...) self:UpdateDropdown(MetaTable, ...) end
 		
 		table.insert(self.Modules, MetaTable.Dropdown)
 
@@ -1795,9 +1781,7 @@ do
 			Data = Data,
 			Callback = Callback,
 			Functions = Functions,
-			Update = Update
 		}, {})
-		function Update(...) self:UpdateRadio(MetaTable, ...) end
 		
 		table.insert(self.Modules, MetaTable.Radio)
 		
@@ -1879,9 +1863,7 @@ do
 			Data = Data,
 			Callback = Callback,
 			Functions = Functions,
-			Update = Update
 		}, {})
-		function Update(...) self:UpdateCheckbox(MetaTable,...) end
 
 		table.insert(self.Modules, MetaTable.Checkbox)
 		
