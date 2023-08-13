@@ -628,6 +628,7 @@ do
 
 		self.Toggling = true
 
+		if not self.Container.Main then return end
 		local Container = self.Container.Main
 		local Topbar = Container.TopBar
 		local Frame = Topbar.Button.Frame
