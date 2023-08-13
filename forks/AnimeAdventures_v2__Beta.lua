@@ -4569,7 +4569,7 @@ function autoabilityerwin()
         coroutine.resume(coroutine.create(function()
             print("Erwin Auto Buff Running")
 
-            --local GameFinished = game:GetService("Workspace"):WaitForChild("_DATA"):WaitForChild("GameFinished")
+            local GameFinished = game:GetService("Workspace"):WaitForChild("_DATA"):WaitForChild("GameFinished")
             --repeat task.wait() until  GameFinished.Value == true
             repeat task.wait() until game:IsLoaded()
             --repeat task.wait() until  game:GetService("Players").LocalPlayer.PlayerGui.ResultsUI.Enabled == true
@@ -4584,7 +4584,8 @@ function autoabilityerwin()
             }
             _G.Stop = false
             local erwin1 = {}
-            while task.wait() do
+            repeat
+                task.wait()
                 if _G.Stop then
                     break
                 end
@@ -4608,7 +4609,7 @@ function autoabilityerwin()
                     warn("Use Skill " ..erwin1[1].Name .." 4 " )
                     task.wait(Delay[erwin1[1].Name])
                 end
-            end
+            until GameFinished.Value == true or Settings.EnableBufferwinLoop == false
         end))
     end
 end
@@ -4636,7 +4637,8 @@ function autoabilitywendy()
             }
             _G.Stop = false
             local wendy1 = {}
-            while task.wait() do
+            repeat
+                task.wait()
                 if _G.Stop then
                     break
                 end
@@ -4660,7 +4662,7 @@ function autoabilitywendy()
                     warn("Use Skill " ..wendy1[1].Name .." 4 " )
                     task.wait(Delay[wendy1[1].Name])
                 end
-            end
+            until GameFinished.Value == true or Settings.EnableBuffwendyLoop == false
         end))
     end
 end
@@ -4688,7 +4690,8 @@ function autoabilityleafa()
             }
             _G.Stop = false
             local leafa1 = {}
-            while task.wait() do
+            repeat
+                task.wait()
                 if _G.Stop then
                     break
                 end
@@ -4712,7 +4715,7 @@ function autoabilityleafa()
                     warn("Use Skill " ..leafa1[1].Name .." 4 " )
                     task.wait(Delay[leafa1[1].Name])
                 end
-            end
+            until GameFinished.Value == true or Settings.EnableBuffleafaLoop == false
         end))
     end
 end
