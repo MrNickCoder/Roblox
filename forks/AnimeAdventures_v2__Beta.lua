@@ -3658,7 +3658,7 @@ if Settings.AutoLoadScript then
 end
 
 function autoload2()
-    loadstring(game:HttpGet('https://raw.githubusercontent.com/MrNickCoder/Roblox/main/forks/AnimeAdventures_v2__Beta.lua'))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/forks/AnimeAdventures_v2__Beta.lua"))()
 end
 
 if Settings.refarmc then
