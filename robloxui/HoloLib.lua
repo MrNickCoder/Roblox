@@ -1881,7 +1881,7 @@ do
 			Functions = Functions,
 			Update = Update
 		}, {})
-		function Update(...) self:UpdateCheckbox(MetaTable, ...) end
+		function Update(...) self:UpdateCheckbox(MetaTable,...) end
 
 		table.insert(self.Modules, MetaTable.Checkbox)
 		
@@ -2105,6 +2105,8 @@ do
 	function Section:UpdateToggle(MetaTable, Title, Data)
 		local Toggle = self:GetModule(MetaTable.Toggle)
 
+		Data.Value = Data.Value or MetaTable.Data.Value
+
 		local Position = {
 			In = UDim2.new(0, 2, 0.5, -6),
 			Out = UDim2.new(0, 20, 0.5, -6)
@@ -2150,6 +2152,9 @@ do
 	function Section:UpdateSlider(MetaTable, Title, Data)
 		local Slider = self:GetModule(MetaTable.Slider)
 
+		Data.Min = Data.Min or MetaTable.Data.Min
+		Data.Max = Data.Max or MetaTable.Data.Max
+
 		if Title then Slider.Title.Text = Title end
 
 		local Bar = Slider.Slider.Bar
@@ -2164,7 +2169,7 @@ do
 		Slider.TextBox.Text = Value
 		Utility:Tween(Bar.Fill, {Size = UDim2.new(Percent, 0, 1, 0)}, 0.1)
 
-		if Value ~= Data.LValue and Slider.ImageTransparency == 0 then Utility:Pop(Slider, 10) end
+		if Data and Data.LValue and Value ~= Data.LValue and Slider.ImageTransparency == 0 then Utility:Pop(Slider, 10) end
 
 		return Value
 	end
