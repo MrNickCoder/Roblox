@@ -57,6 +57,7 @@ do
 			Thread = Thread,
 			Start = function() coroutine.resume(Thread); self.Threads[ID] = Thread end,
 			Stop = function() coroutine.close(Thread); self.Threads[ID] = nil end,
+			Wait = function(time) coroutine.yield(Thread); task.wait(time); coroutine.resume(Thread) end,
 			Status = function() return coroutine.status(Thread) end,
 		}, {})
 	end
