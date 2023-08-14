@@ -251,16 +251,60 @@ return {
 		};
 	};
 	["Maps"] = {
+		----- [ Main ] -----
 		"Planet Namak","Shiganshinu District","Snowy Town","Hidden Sand Village",
 		"Marine's Ford","Ghoul City","Hollow World","Ant Kingdom","Magic Town",
 		"Cursed Academy","Clover Kingdom","Cape Canaveral","Alien Spaceship",
 		"Fabled Kingdom","Hero City","Puppet Island","Virtual Dungeon","Windhym",
 		
+		----- [ Raids ] -----
 		"Infinity Train","West City","Storm Hideout","Entertainment District",
 		
+		----- [ Legend Stages ] -----
 		"Karakora Town",
 		
+		----- [ Portal ] -----
 		"The Eclipse",
+	};
+	["Map Identifier"] = {
+		["_map"] = {
+			----- [ Main ] -----
+			["namek mushroom model"] = "Planet Namak";
+			["houses_new"] = "Shiganshinu District";
+			["Snow Particles"] = "Snowy Town";
+			["sand_gate"] = "Hidden Sand Village";
+			["icebergs"] = "Marine's Ford";
+			["new buildings"] = "Ghoul City";
+			["Bones/dust"] = "Hollow World";
+			["Ant Nest"] = "Ant Kingdom";
+			["light poles"] = "Magic Town";
+			["LanternsGround"] = "Cursed Academy";
+			["misc deco"] = {
+				["bushes"] = "Clover Kingdom";
+			};
+			["SpaceCenter"] = "Cape Canaveral";
+			["secret"] = "Alien Spaceship";
+			["misc nonocollide obstacles"] = "Fabled Kingdom";
+			["bridge nocollide"] = "Hero City";
+			["linings"] = "Puppet Island";
+			["water beams"] = "Virtual Dungeon";
+			["swords"] = "Windhym";
+
+			----- [ Raids ] -----
+			["snow grass"] = "Infinity Train";
+			["s"] = "West City";
+			["bushes and flowers"] = "Storm Hideout";
+			["benches and barrels"] = "Entertainment District";
+
+			----- [ Legend Stages ] -----
+			["sand_bags"] = "Karakora Town";
+
+			----- [ Portal ] -----
+			["Storm"] = "The Eclipse";
+
+			----- [ Duplicates ] -----
+			["summer_props"] = "Cursed Academy";
+		};
 	};
 	["Game Setting"] = {
 		["Buffers"] = {
