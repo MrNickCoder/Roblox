@@ -8,49 +8,22 @@ local Version = "v1.0.0b01"
 -------------------------------
 repeat task.wait() until game:IsLoaded()
 if game.PlaceId == 8304191830 then
-	repeat task.wait() until game.Workspace:FindFirstChild(game.Players.LocalPlayer.Name)
-	repeat task.wait() until game.Players.LocalPlayer.PlayerGui:FindFirstChild("collection"):FindFirstChild("grid"):FindFirstChild("List"):FindFirstChild("Outer"):FindFirstChild("UnitFrames")
-	repeat task.wait() until game.ReplicatedStorage.packages:FindFirstChild("assets")
-	repeat task.wait() until game.ReplicatedStorage.packages:FindFirstChild("StarterGui")
+	repeat task.wait() until game:GetService("Workspace"):FindFirstChild(game.Players.LocalPlayer.Name)
+	repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("collection"):FindFirstChild("grid"):FindFirstChild("List"):FindFirstChild("Outer"):FindFirstChild("UnitFrames")
+	repeat task.wait() until game:GetService("ReplicatedStorage").packages:FindFirstChild("assets")
+	repeat task.wait() until game:GetService("ReplicatedStorage").packages:FindFirstChild("StarterGui")
 else
-	repeat task.wait() until game.Workspace:FindFirstChild(game.Players.LocalPlayer.Name)
+	repeat task.wait() until game:GetService("Workspace"):FindFirstChild(game:GetService("Players").LocalPlayer.Name)
 	game:GetService("ReplicatedStorage").endpoints.client_to_server.vote_start:InvokeServer()
 	repeat task.wait() until game:GetService("Workspace")["_waves_started"].Value == true
 end
-
------------------------
------ [ UTILITY ] -----
------------------------
-local Utility = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/modules/UtilityModule.lua"))()
-function InLobby() return (game.PlaceId == 8304191830) end
-
-------------------------
------ [ SETTINGS ] -----
-------------------------
-local Folder = "Astral_V1_Anime_Adventures" --
-local File = game:GetService("Players").LocalPlayer.Name .. "_AnimeAdventures.json"
-
-Settings = {}
-function SaveSettings() Settings = Utility:SaveConfig(Settings, Folder, File); warn("Settings Saved!") end
-function LoadSettings() return Utility:LoadConfig(Settings, Folder, File) end
-Settings = LoadSettings()
-
------ [ Start of Get Level Data of Map [Added by HOLYSHz] ] -----
-function GetLevelData()
-	local List = {}
-	for Index, Value in pairs(game.Workspace._MAP_CONFIG:WaitForChild("GetLevelData"):InvokeServer()) do List[Index] = Value end
-
-	return List
-end
-
-if not InLobby() then GetLevelData() end
------------------------------------------------------------------
 
 ------------------------
 ----- [ SERVICES ] -----
 ------------------------
 local HttpService			= game:GetService("HttpService")
 local Workspace				= game:GetService("Workspace")
+local ReplicatedStorage		= game:GetService("ReplicatedStorage")
 local Players				= game:GetService("Players")
 local RunService			= game:GetService("RunService")
 local UserInputService		= game:GetService("UserInputService")
@@ -61,265 +34,148 @@ local UserInputService		= game:GetService("UserInputService")
 local Player				= Players.LocalPlayer
 local Mouse					= Player:GetMouse()
 
+local UILibrary				= loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/robloxui/HoloLib.lua"))()
+local AAData				= loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/data/AnimeAdventures.lua"))()
+local Utility				= loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/modules/UtilityModule.lua"))()
+local Executor				= tostring(identifyexecutor())
+
+local BufferContainer		= {}
+local Getter				= {}
+local UISetup				= {}
+local Functions				= {}
+
+local Loader				= require(ReplicatedStorage.src.Loader)
+local UnitsData				= require(ReplicatedStorage.src.Data.Units)
+local ItemsFolder			= ReplicatedStorage.src.Data.Items
+local ItemInventoryService	= Loader.load_client_service(script, "ItemInventoryServiceClient")
+
+local Count_Portal_List			= 0
+local Table_All_Items_Old_data	= {}
+local Table_All_Items_New_data	= {}
+local CurrentMap				= ""
+
+-------------------------
+----- [ PRE-SETUP ] -----
+-------------------------
+do
+	----- [ Common ] -----
+	function InLobby() return (game.PlaceId == 8304191830) end
+
+	----- [ Map Getter ] -----
+	function Getter:GetLevelData()
+		local List = {}
+		for Index, Value in pairs(Workspace._MAP_CONFIG:WaitForChild("GetLevelData"):InvokeServer()) do List[Index] = Value end
+		return List
+	end
+	function Getter:GetCurrentLevelId() if Workspace._MAP_CONFIG then return Getter:GetLevelData()["id"] end end
+	function Getter:GetCurrentLevelName() if Workspace._MAP_CONFIG then return Getter:GetLevelData()["name"] end end
+	function Getter:GetCurrentLevelTier() if Workspace._MAP_CONFIG then end end
+	function Getter:GetCurrentMap()
+		for Map, Identifiers in pairs(AAData["Map Identifier"]) do
+			if Getter:GetLevelData()["map"] then
+				if table.find(Identifiers, Getter:GetLevelData()["map"]) then
+					return Map
+				end
+			end
+		end
+	end
+	--------------------------
+
+	----- [ Item Getter ] -----
+	function Getter:Get_Inventory_Items_Unique_Items() return ItemInventoryService["session"]["inventory"]["inventory_profile_data"]["unique_items"] end
+	function Getter:Get_Inventory_Items() return ItemInventoryService["session"]["inventory"]["inventory_profile_data"]["normal_items"] end
+	function Getter:Get_Units_Owner() return ItemInventoryService["session"]["collection"]["collection_profile_data"]["owned_units"] end
+	---------------------------
+end
+if not InLobby() then Getter:GetLevelData() end
+if not InLobby() then CurrentMap = Getter:GetCurrentMap(); print(CurrentMap) end
+
+---------------------------------
+----- [ SETTINGS / CONFIG ] -----
+---------------------------------
+local Directory = "Astral_V1_Anime_Adventures/"..Players.LocalPlayer.Name -- Config Directory
+local File = "Settings.json"
+
+Settings = {}
+function SaveSettings() Settings = Utility:SaveConfig(Settings, Directory, File); warn("Settings Saved!") end
+function LoadSettings() return Utility:LoadConfig(Settings, Directory, File) end
+function SaveUnitPosition(UnitSlot, Positions:{any}, Reset:boolean)
+	if not Settings["World Positions"] then Settings["World Positions"] = {} end
+	if not Settings["World Positions"][CurrentMap] then Settings["World Positions"][CurrentMap] = {} end
+	if not Settings["World Positions"][CurrentMap][UnitSlot] then Settings["World Positions"][CurrentMap][UnitSlot] = {} end
+	if Reset then Settings["World Positions"][CurrentMap][UnitSlot] = {} end
+	
+	for Index, Values in pairs(Positions) do
+		if not Settings["World Positions"][CurrentMap][UnitSlot][Index] then Settings["World Positions"][CurrentMap][UnitSlot][Index] = {} end
+		Settings["World Positions"][CurrentMap][UnitSlot][Index]["x"] = Values.Position.X
+		Settings["World Positions"][CurrentMap][UnitSlot][Index]["y"] = Values.Position.Y
+		Settings["World Positions"][CurrentMap][UnitSlot][Index]["z"] = Values.Position.Z
+	end
+	SaveSettings()
+end
+Settings = LoadSettings()
+
 ---------------------------------
 ----- [ ITEM DROP RESULTS ] -----
 ---------------------------------
-local ItemLoader = require(game.ReplicatedStorage.src.Loader)
-local ItemInventoryService = ItemLoader.load_client_service(script, "ItemInventoryServiceClient")
-function Get_Inventory_Items_Unique_Items() return ItemInventoryService["session"]['inventory']['inventory_profile_data']['unique_items'] end
-function Get_Inventory_Items() return ItemInventoryService["session"]["inventory"]['inventory_profile_data']['normal_items'] end
-function Get_Units_Owner() return ItemInventoryService["session"]["collection"]["collection_profile_data"]['owned_units'] end
-local Count_Portal_List = 0
-local Table_All_Items_Old_data = {}
-local Table_All_Items_New_data = {}
-for _, Items in pairs(game:GetService("ReplicatedStorage").src.Data.Items:GetDescendants()) do
-	if Items:IsA("ModuleScript") then
-		for Index, Item in pairs(require(Items)) do
+do
+	for _, Items in pairs(ItemsFolder:GetDescendants()) do
+		if Items:IsA("ModuleScript") then
+			for Index, Item in pairs(require(Items)) do
+				Table_All_Items_Old_data[Index] = {}
+				Table_All_Items_Old_data[Index]["Name"] = Item["name"]
+				Table_All_Items_Old_data[Index]["Count"] = 0
+				Table_All_Items_New_data[Index] = {}
+				Table_All_Items_New_data[Index]["Name"] = Item["name"]
+				Table_All_Items_New_data[Index]["Count"] = 0
+			end
+		end
+	end
+	for Index, Unit in pairs(UnitsData) do
+		if Unit.rarity then
 			Table_All_Items_Old_data[Index] = {}
-			Table_All_Items_Old_data[Index]['Name'] = Item['name']
-			Table_All_Items_Old_data[Index]['Count'] = 0
+			Table_All_Items_Old_data[Index]["Name"] = Unit["name"]
+			Table_All_Items_Old_data[Index]["Count"] = 0
+			Table_All_Items_Old_data[Index]["Count Shiny"] = 0
 			Table_All_Items_New_data[Index] = {}
-			Table_All_Items_New_data[Index]['Name'] = Item['name']
-			Table_All_Items_New_data[Index]['Count'] = 0
+			Table_All_Items_New_data[Index]["Name"] = Unit["name"]
+			Table_All_Items_New_data[Index]["Count"] = 0
+			Table_All_Items_New_data[Index]["Count Shiny"] = 0
+		end
+	end
+	for Index, Item in pairs(Getter:Get_Inventory_Items()) do Table_All_Items_Old_data[Index]["Count"] = Item end
+	for _, Item in pairs(Getter:Get_Inventory_Items_Unique_Items()) do
+		if string.find(Item["item_id"], "portal") or string.find(Item["item_id"], "disc") then
+			Count_Portal_list = Count_Portal_List + 1
+			Table_All_Items_Old_data[Item["item_id"]]["Count"] = Table_All_Items_Old_data[Item["item_id"]]["Count"] + 1
+		end
+	end
+	for _, Unit in pairs(Getter:Get_Units_Owner()) do
+		Table_All_Items_Old_data[Unit["unit_id"]]["Count"] = Table_All_Items_Old_data[Unit["unit_id"]]["Count"] + 1
+		if Unit.shiny then
+			Table_All_Items_Old_data[Unit["unit_id"]]["Count"] = Table_All_Items_Old_data[Unit["unit_id"]]["Count"] - 1
+			Table_All_Items_Old_data[Unit["unit_id"]]["Count Shiny"] = Table_All_Items_Old_data[Unit["unit_id"]]["Count Shiny"] + 1
 		end
 	end
 end
-local Data_Units_All_Games = require(game:GetService("ReplicatedStorage").src.Data.Units)
-for Index, Unit in pairs(Data_Units_All_Games) do
-	if Unit.rarity then
-		Table_All_Items_Old_data[Index] = {}
-		Table_All_Items_Old_data[Index]['Name'] = Unit['name']
-		Table_All_Items_Old_data[Index]['Count'] = 0
-		Table_All_Items_Old_data[Index]['Count Shiny'] = 0
-		Table_All_Items_New_data[Index] = {}
-		Table_All_Items_New_data[Index]['Name'] = Unit['name']
-		Table_All_Items_New_data[Index]['Count'] = 0
-		Table_All_Items_New_data[Index]['Count Shiny'] = 0
-	end
-end
-for Index, Item in pairs(Get_Inventory_Items()) do Table_All_Items_Old_data[Index]['Count'] = Item end
-for Index, Item in pairs(Get_Inventory_Items_Unique_Items()) do
-	if string.find(Item['item_id'],"portal") or string.find(Item['item_id'],"disc") then
-		Count_Portal_list = Count_Portal_List + 1
-		Table_All_Items_Old_data[Item['item_id']]['Count'] = Table_All_Items_Old_data[Item['item_id']]['Count'] + 1
-	end
-end
-for Index, Unit in pairs(Get_Units_Owner()) do
-	Table_All_Items_Old_data[Unit["unit_id"]]['Count'] = Table_All_Items_Old_data[Unit["unit_id"]]['Count'] + 1
-	if Unit.shiny then
-		Table_All_Items_Old_data[Unit["unit_id"]]['Count'] = Table_All_Items_Old_data[Unit["unit_id"]]['Count'] - 1
-		Table_All_Items_Old_data[Unit["unit_id"]]['Count Shiny'] = Table_All_Items_Old_data[Unit["unit_id"]]['Count Shiny'] + 1
-	end
-end
------ [ Map & ID Map ] -----
-local function GetCurrentLevelId() if game.Workspace._MAP_CONFIG then return game:GetService("Workspace")._MAP_CONFIG.GetLevelData:InvokeServer()["id"] end end
-local function GetCurrentLevelName() if game.Workspace._MAP_CONFIG then return game:GetService("Workspace")._MAP_CONFIG.GetLevelData:InvokeServer()["name"] end end
-----------------------------
-
------ [ Webhook ] -----
-getgenv().item = "-"
-Player.PlayerGui:FindFirstChild("HatchInfo"):FindFirstChild("holder"):FindFirstChild("info1"):FindFirstChild("UnitName").Text = getgenv().item
-function ResultWebhook()
-	if Settings.ResultWebhook then
-		local URL = Settings.WebhookURL; print("Webhook?")
-		if URL == "" then warn("Webhook URL is empty!"); return end
-
-		local Time = os.date('!*t', OSTime);
-		local Thumbnails_Avatar = HttpService:JSONDecode(game:HttpGet("https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. game:GetService("Players").LocalPlayer.UserId .. "&size=150x150&format=Png&isCircular=true", true))
-		local Executor = tostring(identifyexecutor())
-		UserLevel = Player.PlayerGui:FindFirstChild("spawn_units"):FindFirstChild("Lives"):FindFirstChild("Main"):FindFirstChild("Desc"):FindFirstChild("Level").Text
-		TotalGems = Player.PlayerGui:FindFirstChild("spawn_units"):FindFirstChild("Lives"):FindFirstChild("Frame"):FindFirstChild("Resource"):FindFirstChild("Gem"):FindFirstChild("Level").Text
-
-		ResultHolder = Player.PlayerGui:FindFirstChild("ResultsUI"):FindFirstChild("Holder")
-		if game.PlaceId ~= 8304191830 then
-			LevelName = game:GetService("Workspace"):FindFirstChild("_MAP_CONFIG"):FindFirstChild("GetLevelData"):InvokeServer()["name"]
-			Result = ResultHolder.Title.Text
-		else LevelName, Result = "nil","nil" end
-		if Result == "VICTORY" then Result = "VICTORY" end
-		if Result == "DEFEAT" then Result = "DEFEAT" end
-
-		_Map = game:GetService("Workspace")["_BASES"].player.base["fake_unit"]:WaitForChild("HumanoidRootPart")
-		GetLevelData = game.workspace._MAP_CONFIG:WaitForChild("GetLevelData"):InvokeServer()
-		World = GetLevelData.id or GetLevelData.world or GetLevelData.name
-		MapName = game:GetService("Workspace")._MAP_CONFIG.GetLevelData:InvokeServer()["name"]
-		CWaves = game:GetService("Players").LocalPlayer.PlayerGui.ResultsUI.Holder.Middle.WavesCompleted.Text
-		CTime = game:GetService("Players").LocalPlayer.PlayerGui.ResultsUI.Holder.Middle.Timer.Text
-		BattlePass = Player.PlayerGui:FindFirstChild("BattlePass"):FindFirstChild("Main"):FindFirstChild("Level"):FindFirstChild("V").Text
-		BattlePass2 = game:GetService("Players").LocalPlayer.PlayerGui.BattlePass.Main.Level.Title.Text
-		BattlePassAllLV = game:GetService("Players").LocalPlayer.PlayerGui.BattlePass.Main.Main.Rewards.Frame.Pages.Home.Amount.Text
-		BattlePassLV = game:GetService("Players").LocalPlayer.PlayerGui.BattlePass.Main.Level.V.Text
-		Waves = CWaves:split(": ")
-
-		if Waves ~= nil and Waves[2] == "999" then Waves[2] = "Use [Auto Leave at Wave] or [Test Webhook]" end
-		TTime = CTime:split(": ")
-		if Waves ~= nil and TTime[2] == "22:55" then TTime[2] = "Use [Auto Leave at Wave] or [Test Webhook]" end
-		Gold = ResultHolder:FindFirstChild("LevelRewards"):FindFirstChild("ScrollingFrame"):FindFirstChild("GoldReward"):FindFirstChild("Main"):FindFirstChild("Amount").Text
-		if Gold == "+99999" then Gold = "+0" end	 
-		Gems = ResultHolder:FindFirstChild("LevelRewards"):FindFirstChild("ScrollingFrame"):FindFirstChild("GemReward"):FindFirstChild("Main"):FindFirstChild("Amount").Text
-		if Gems == "+99999" then Gems = "+0" end	 
-		ExpReward = ResultHolder:FindFirstChild("LevelRewards"):FindFirstChild("ScrollingFrame"):FindFirstChild("XPReward"):FindFirstChild("Main"):FindFirstChild("Amount").Text
-		Exp = ExpReward:split(" ")
-		if Exp[1] == "+99999" then Exp[1] = "+0" end
-		Trophy = ResultHolder:FindFirstChild("LevelRewards"):FindFirstChild("ScrollingFrame"):FindFirstChild("TrophyReward"):FindFirstChild("Main"):FindFirstChild("Amount").Text
-		if Trophy == "+99999" then Trophy = "+0" end
-
-		TotalTime =  ResultHolder:FindFirstChild("Middle"):FindFirstChild("Timer").Text
-		TotalWaves = ResultHolder:FindFirstChild("Middle"):FindFirstChild("WavesCompleted").Text
-
-		local TextDropLabel = ""
-		local CountAmount = 1
-		for Index, Item in pairs(Get_Inventory_Items()) do Table_All_Items_New_data[Index]['Count'] = Item end
-		for Index, Item in pairs(Get_Inventory_Items_Unique_Items()) do
-			if string.find(Item['item_id'],"portal") or string.find(Item['item_id'],"disc") then
-				Table_All_Items_New_data[Item['item_id']]['Count'] = Table_All_Items_New_data[Item['item_id']]['Count'] + 1
-			end
-		end
-		for Index, Unit in pairs(Get_Units_Owner()) do
-			Table_All_Items_New_data[Unit["unit_id"]]['Count'] = Table_All_Items_New_data[Unit["unit_id"]]['Count'] + 1
-			if Unit.shiny then
-				Table_All_Items_New_data[Unit["unit_id"]]['Count'] = Table_All_Items_New_data[Unit["unit_id"]]['Count'] - 1
-				Table_All_Items_New_data[Unit["unit_id"]]['Count Shiny'] = Table_All_Items_New_data[Unit["unit_id"]]['Count Shiny'] + 1
-			end
-		end
-		for Index, Item in pairs(Table_All_Items_New_data) do
-			if Item['Count'] > 0 and (Item['Count'] - Table_All_Items_Old_data[Index]['Count']) > 0 then
-				if Item['Count Shiny'] and Item['Count'] then
-					if Item['Count'] > 0 or Item['Count Shiny'] > 0 then
-						if Item['Count'] > 0 and (Item['Count'] - Table_All_Items_Old_data[Index]['Count']) > 0 then
-							TextDropLabel = TextDropLabel .. tostring(CountAmount) .. ". " .. tostring(Item['Name']) .. " : x" .. tostring(Item['Count'] - Table_All_Items_Old_data[Index]['Count'])
-							if Item['Count Shiny'] > 0 and (Item['Count Shiny'] - Table_All_Items_Old_data[Index]['Count Shiny']) > 0 then
-								TextDropLabel = TextDropLabel .. " | " .. tostring(Item['Name']) .. " (Shiny) : x" .. tostring(Item['Count Shiny'] - Table_All_Items_Old_data[Index]['Count Shiny']) .. "\n"
-								CountAmount = CountAmount + 1
-							else
-								TextDropLabel = TextDropLabel .. "\n"
-								CountAmount = CountAmount + 1
-							end
-						end
-					end
-				end
-			elseif Item['Count Shiny'] and Item['Count Shiny'] > 0 and (Item['Count Shiny'] - Table_All_Items_Old_data[Index]['Count Shiny']) > 0 then
-				TextDropLabel = TextDropLabel .. tostring(CountAmount) .. ". " .. tostring(Item['Name']) .. " (Shiny) : x" .. tostring(Item['Count Shiny'] - Table_All_Items_Old_data[Index]['Count Shiny']) .. "\n"
-				CountAmount = CountAmount + 1
-			end
-		end
-		for Index, Item in pairs(Table_All_Items_New_data) do
-			if Item['Count'] > 0 and (Item['Count'] - Table_All_Items_Old_data[Index]['Count']) > 0 then
-				if Item['Count Shiny'] and Item['Count'] then
-				elseif string.find(Index,"portal") or string.find(Index,"disc") then
-					Count_Portal_list = Count_Portal_list + 1
-					if string.gsub(Index, "%D", "") == "" then TextDropLabel = TextDropLabel .. tostring(CountAmount) .. ". " .. tostring(Item['Name']) .. " : x" .. tostring(Item['Count'] - Table_All_Items_Old_data[Index]['Count']) .. "\n"
-					else TextDropLabel = TextDropLabel .. tostring(CountAmount) .. ". " .. tostring(Item['Name']) .. " Tier " .. tostring(string.gsub(Index, "%D", "")) .. " : x" .. tostring(Item['Count'] - Table_All_Items_Old_data[Index]['Count']) .. "\n" end
-				end
-				CountAmount = CountAmount + 1
-			else
-				TextDropLabel = TextDropLabel .. tostring(CountAmount) .. ". " .. tostring(Item['Name']) .. " : x" .. tostring(Item['Count'] - Table_All_Items_Old_data[Index]['Count']) .. "\n"
-				CountAmount = CountAmount + 1
-			end
-		end
-		if TextDropLabel == "" then TextDropLabel = "No Items Drops" end
-
-		local Data = {
-			["content"] = "",
-			["username"] = "Astral V1 Anime Adventures",
-			["avatar_url"] = "https://tr.rbxcdn.com/5c9e29b3953ec061286e76f08f1718b3/150/150/Image/Png",
-			["embeds"] = {
-				{
-					["author"] = {
-						["name"] = "Anime Adventures |  Results ✔️",
-						["icon_url"] = "https://cdn.discordapp.com/emojis/997123585476927558.webp?size=96&quality=lossless"
-					},
-					["thumbnail"] = {
-						['url'] = Thumbnails_Avatar.data[1].imageUrl,
-					},
-					["description"] = " Player Name : 🐱 ||**"..game:GetService("Players").LocalPlayer.Name.."**|| 🐱\nExecutors : 🎮 "..Executor.." 🎮 ",
-					["color"] = 110335,
-					["timestamp"] = string.format('%d-%d-%dT%02d:%02d:%02dZ', Time.year, Time.month, Time.day, Time.hour, Time.min, Time.sec),
-					['footer'] = {
-						['text'] = "// Made by NickCoder", 
-						['icon_url'] = "https://yt3.ggpht.com/mApbVVD8mT92f50OJuTObnBbc3j7nDCXMJFBk2SCDpSPcaoH9DB9rxVpJhsB5SxAQo1UN2GzyA=s48-c-k-c0x00ffffff-no-rj"
-					},
-					["fields"] = {
-						{
-							["name"] ="Current Level ✨ & Gems 💎 & Gold 💰 & Portals 🌀",
-							["value"] = "```ini\n"..tostring(game.Players.LocalPlayer.PlayerGui.spawn_units.Lives.Main.Desc.Level.Text).." ✨\n"..
-								"Current Gold : "..tostring(Utility:Comma_Value(game.Players.LocalPlayer._stats.gold_amount.Value)).." 💰\n"..
-								"Current Gems : "..tostring(Utility:Comma_Value(game.Players.LocalPlayer._stats.gem_amount.Value)).." 💎\n"..
-								"Current Trophies : "..tostring(Utility:Comma_Value(game.Players.LocalPlayer._stats.trophies.Value)).." 🏆\n"..
-								"Current Pearl : "..tostring(Utility:Comma_Value(game.Players.LocalPlayer._stats._resourceSummerPearls.Value)).." 🦪\n"..
-								"Current Portal : ".. tostring(Count_Portal_list).." 🌀```",
-						},
-						{
-							["name"] ="Results :",
-							["value"] = " ```ini\nWorld : "..MapName.." 🌏\n"..
-								"Map : "..World.." 🗺️\n"..
-								"Results : "..Result.." ⚔️\n"..
-								"Wave End : "..tostring(Waves[2]).." 🌊\n"..
-								"Time : " ..tostring(TTime[2]).." ⌛\n"..
-								"All Kill Count : "..tostring(Utility:Comma_Value(game.Players.LocalPlayer._stats.kills.Value)).." ⚔️\n"..
-								"DMG Deal : "..tostring(Utility:Comma_Value(game.Players.LocalPlayer._stats.damage_dealt.Value)).." 🩸```",
-							["inline"] = true
-						},
-						{
-							["name"] ="Rewards :",
-							["value"] = "```ini\n" ..Comma_Value(Gold).." Gold 💰\n"..
-								Utility:Comma_Value(Gems).." Gems 💎\n"..
-								Utility:Comma_Value(Exp[1]).." XP 🧪\n"..
-								Trophy.." Trophy 🏆```",
-						},
-						{
-							["name"] ="Items Drop :",
-							["value"] = "```ini\n"..TextDropLabel.."```",
-							["inline"] = false 
-						}
-					}
-				}
-			}
-		}
-
-		local WBody = game:GetService("HttpService"):JSONEncode(Data)
-		local WHeaders = {["content-type"] = "application/json"}
-		local WRequest = http_request or request or HttpPost or syn.request or http.request
-		local WHook = {Url = URL, Body = WBody, Method = "POST", Headers = WHeaders}
-		warn("Sending webhook notification...")
-		WRequest(WHook)
-	end
-end
-function BabyWebhook()
-
-end
-function SnipeWebhook()
-
-end
-function SpecialSummonSniperWebhook()
-
-end
-function StandardSummonSniperWebhook()
-
-end
-function ShopSniperWebhook()
-
-end
------------------------
 
 ------------------------------
 ----- [ USER INTERFACE ] -----
 ------------------------------
-if game.CoreGui:FindFirstChild("HoloLibUI") then getgenv().SHUTDOWN(); game.CoreGui["HoloLibUI"]:Destroy() end
-
-local Directory = "Anime_Adventures/"..game.Players.LocalPlayer.Name
-local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/robloxui/HoloLib.lua"))()
-local AAData = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/main/data/AnimeAdventures.lua"))()
-local Executor = tostring(identifyexecutor())
-local Window = UILibrary.new("[Astral V1] Anime Adventures "..Version.." - "..Executor, {
-	Size = UDim2.new(0, 700, 0, 400),
-	ToggleKey = Enum.KeyCode.P,
-	Enabled = false,
-})
-
-local UISetup = {}
+local Window; -- Window
+local PHome, PFarm, PUnit, PMacro, PShopNItems, PMisc, PDebug; -- Pages
 do
+	if game.CoreGui:FindFirstChild("HoloLibUI") then
+		if getgenv().SHUTDOWN then getgenv().SHUTDOWN() end
+		game.CoreGui["HoloLibUI"]:Destroy()
+	end
+	Window = UILibrary.new("[Astral V1] Anime Adventures "..Version.." - "..Executor, {
+		Size = UDim2.new(0, 700, 0, 400),
+		ToggleKey = Enum.KeyCode.P,
+	})
+	Window:Enabled(false)
+
 	----- [ Home Page ] -----
-	local PHome;
 	function UISetup:Home()
 		PHome = Window:AddPage("Home", "🏠")
 		local SDevelopers = PHome:AddSection("Anime Adventures")
@@ -342,13 +198,11 @@ do
 		SHelp:AddLabel("godspeed_enemies = 'Godspeed Enemies'")
 		SHelp:AddLabel("flying_enemies = 'Flying Enemies'")
 		SHelp:AddLabel("mini_range = 'Mini-Range'")
-
-		Window:SelectPage(PHome, true)
 	end
 	-----------------------
 
 	----- [ Auto Farm Config ] -----
-	local PFarm, SFarmSplits;
+	local SFarmSplits;
 	local FarmCategory;
 	local AutoStart, AutoReplay, AutoPortalReplay, AutoNextStory, AutoLeave;
 	function UISetup:AutoFarm()
@@ -677,15 +531,16 @@ do
 	----------------------------
 
 	----- [ Unit Config ] -----
-	local PUnit;
-	local LoadUnitConfig, TeamSelect;
+	local LoadUnitConfig, CreateUnitConfig, TeamSelect;
 	local UnitSettings = {};
 	function UISetup:UnitConfig()
 		PUnit = Window:AddPage("Unit Config", "🧙")
 		if Settings and not Settings["Unit Config"] then Settings["Unit Config"] = {} end
+		if Settings and not Settings["Unit Config"].Config then Settings["Unit Config"].Config = {} end
+		if Settings and not Settings["Unit Config"].Configs then Settings["Unit Config"].Configs = {} end
 		if Settings and not Settings["Unit Config"].Auto then Settings["Unit Config"].Auto = {} end
 		local STeamConfig = PUnit:AddSection("🧙 Team Configuration 🧙")
-		if InLobby() then STeamConfig:Enabled(false) end
+		if not InLobby() then STeamConfig:Enabled(false) end
 		local SUnitConfig = PUnit:AddSection("⚙️ Unit Configuration ⚙️")
 		local SUnitSplits = PUnit:AddSplit()
 
@@ -693,65 +548,210 @@ do
 
 		end, {Options = {"Team 1","Team 2","Team 3","Team 4","Team 5"}})
 
+		if not Settings["Unit Config"].Config.Value then Settings["Unit Config"].Config.Value = "Default" end
 		LoadUnitConfig = SUnitConfig:AddDropdown("🧙 Load Unit Config: ", function(value)
+			Settings["Unit Config"].Config.Options = LoadUnitConfig.Data.Options
+			Settings["Unit Config"].Config.Value = value;
+			SaveSettings()
 
-		end, {Options = {"Default"}, Value = "Default"})
-		SUnitConfig:AddButton("💾 Save Unit Config", function(value)
+			getgenv().UpdateUnitConfig()
+		end, {Options = Settings["Unit Config"].Config.Options or {"Default"}, Value = Settings["Unit Config"].Config.Value or "Default"})
+		CreateUnitConfig = SUnitConfig:AddTextbox("💾 Create Unit Config", function(value)
+			table.insert(LoadUnitConfig.Data.Options, value)
+			Settings["Unit Config"].Config.Options = LoadUnitConfig.Data.Options
+			SaveSettings()
 
+			CreateUnitConfig.Data.Text = ""
+			CreateUnitConfig.Section:UpdateTextbox(CreateUnitConfig, nil, {Text = CreateUnitConfig.Data.Text})
+		end, {Placeholder = "Config Name", RequireEntered = true})
+		SUnitConfig:AddButton("🔥 Delete Unit Config", function()
+			Settings["Unit Config"].Config.Options = table.remove(Settings["Unit Config"].Config.Options, table.find(Settings["Unit Config"].Config.Options, LoadUnitConfig.Data.Value))
+
+			SaveSettings()
 		end)
-		SUnitConfig:AddButton("🔥 Delete Unit Config", function(value)
-
-		end)
+		SUnitConfig:AddButton("💽 Reset Unit Config", function() getgenv().ResetUnitConfig() end)
 		SUnitConfig:AddLabel()
-		if not InLobby() then SUnitConfig:AddToggle("🚩 Modify Units Positions", function(value) getgenv().ModifyPosition(value) end, {Active = false}) end
+		if not InLobby() then SUnitConfig:AddToggle("🚩 Modify Units Positions", function(value) getgenv().PositionChange(value) end, {Active = false}) end
 		SUnitConfig:AddToggle("👨‍🌾 Auto Place Unit", function(value) Settings["Unit Config"].Auto["Place"] = value; SaveSettings() end, {Active = Settings["Unit Config"].Auto["Place"] or false})
 		SUnitConfig:AddToggle("⭐️ Auto Upgrade Units", function(value) Settings["Unit Config"].Auto["Upgrade"] = value; SaveSettings() end, {Active = Settings["Unit Config"].Auto["Upgrade"] or false})
-		SUnitConfig:AddToggle("🔥 Auto Abilities", function(value) Settings["Unit Config"].Auto["Abilities"] = value; SaveSettings() end, {Active = Settings["Unit Config"].Auto["Abilities"] or false})
-		SUnitConfig:AddDropdown("🧙 Auto Buff 100%", function(value) Settings["Unit Config"].Auto["Buff"] = value; SaveSettings() end, {MultiValue = true, Options = {"Orwin/Erwin", "Wenda/Wendy", "Leafy/Leafa"}, Value = Settings["Unit Config"].Auto["Buff"] or {}})
+		SUnitConfig:AddDropdown("🧙 Auto Buff 100%", function(value)
+			Settings["Unit Config"].Auto["Buff"] = value; SaveSettings()
 
-		
-		for UnitSlot = 1, 6 do
-			UnitSettings[UnitSlot] = {}
-			local USettings = UnitSettings[UnitSlot]
-			if UnitSlot % 2 ~= 0 then USettings["Section"] = PUnit:AddSection("🧙⚙️ Unit "..UnitSlot..": ", {Split = SUnitSplits, Side = "Left"})
-			else USettings["Section"] = PUnit:AddSection("🧙⚙️ Unit "..UnitSlot..": ", {Split = SUnitSplits, Side = "Right"}) end
-
-			USettings["Enable"] = USettings["Section"]:AddToggle("⚙️ Use Unit Settings", function(value) end, {Active = false})
-
-			if not InLobby() then
-				USettings["Section"]:AddToggle("📍 Show Position", function(value) end)
-				USettings["Single"] = USettings["Section"]:AddButton("🚩 Set Position [Single]", function() end)
-				USettings["Group"] = USettings["Section"]:AddButton("🚩 Set Position [Group]", function() end)
-				USettings["Spread"] = USettings["Section"]:AddButton("🚩 Get Positions [Spread]", function() end)
+			for i, _ in pairs(AAData["Game Setting"]["Buffers"]) do
+				if table.find(Settings["Unit Config"].Auto["Buff"], i) then
+					if not BufferContainer[i] then
+						BufferContainer[i] = Functions:AutoBuff(i)
+						BufferContainer[i]:Start();
+					end
+				else
+					if BufferContainer[i] then
+						BufferContainer[i]:Stop();
+						BufferContainer[i] = nil
+					end
+				end
 			end
 
-			USettings["Target"] = USettings["Section"]:AddDropdown("🎯 Target Priority: ", function(value) end, {Options = AAData["Unit Setting"]["Target Priority"], Value = "First"})
-			USettings["Place"] = USettings["Section"]:AddTextbox("Place from wave: ", function(value) end, {Placeholder = "Wave", Text = "1", Pattern = "[%d-]+"})
-			USettings["Upgrade"] = USettings["Section"]:AddTextbox("Upgrade from wave: ", function(value) end, {Placeholder = "Wave", Text = "1", Pattern = "[%d-]+"})
-			USettings["Sell"] = USettings["Section"]:AddTextbox("Auto Sell at wave: ", function(value) end, {Placeholder = "Wave", Text = "99", Pattern = "[%d-]+"})
-			USettings["Total"] = USettings["Section"]:AddSlider("Total Units: ", function(value) end, {Value = "6", Min = "0", Max = "6"})
-			USettings["Upgrade Cap"] = USettings["Section"]:AddSlider("Upgrade Cap: ", function(value) end, {Value = "0", Min = "0", Max = "15"})
+		end, {MultiValue = true, Options = {"Orwin/Erwin", "Wenda/Wendy", "Leafy/Leafa"}, Value = Settings["Unit Config"].Auto["Buff"] or {}})
+		
+		if not Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value] then Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value] = {} end
+		if not Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units then Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units = {} end
+		for UnitSlot = 1, 6 do
+			--coroutine.resume(coroutine.create(function()
+				if not Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)] then Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)] = {} end
+				if not UnitSettings[UnitSlot] then UnitSettings[UnitSlot] = {} end
+				local USettings = UnitSettings[UnitSlot]
+				if UnitSlot % 2 ~= 0 then USettings["Section"] = PUnit:AddSection("🧙⚙️ Unit "..UnitSlot..": ", {Split = SUnitSplits, Side = "Left"})
+				else USettings["Section"] = PUnit:AddSection("🧙⚙️ Unit "..UnitSlot..": ", {Split = SUnitSplits, Side = "Right"}) end
+
+				USettings["Active"] = USettings["Section"]:AddToggle("⚙️ Use Unit Settings", function(value)
+					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Active"] = value; SaveSettings()
+				end, {Active = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Active"] or false})
+
+				if not InLobby() then
+					USettings["Section"]:AddToggle("📍 Show Position", function(value) getgenv().VisualizePosition("Unit "..tostring(UnitSlot), value) end)
+					USettings["Selected Position"] = USettings["Section"]:AddDropdown("📍 Select [Single]: ", function() end, {Options = {"Position 1","Position 2","Position 3","Position 4","Position 5","Position 6"}, Value = "Position 1"})
+					USettings["Single"] = USettings["Section"]:AddButton("🚩 Set Position [Single]", function() Functions:PositionUnit("Unit "..tostring(UnitSlot), "Single", USettings["Selected Position"].Data.Value) end)
+					USettings["Delete"] = USettings["Section"]:AddButton("📀 Delete Positions [Single]", function() end)
+					USettings["Single Group Separator"] = USettings["Section"]:AddLabel()
+					USettings["Group"] = USettings["Section"]:AddButton("🚩 Set Positions [Group]", function() Functions:PositionUnit("Unit "..tostring(UnitSlot), "Group") end)
+					USettings["Spread"] = USettings["Section"]:AddButton("🚩 Get Positions [Spread]", function() Functions:PositionUnit("Unit "..tostring(UnitSlot), "Spread") end)
+					USettings["Clear"] = USettings["Section"]:AddButton("📀 Clear Positions 📀", function() SaveUnitPosition("Unit "..tostring(UnitSlot), {}, true) end)
+				end
+
+				USettings["Target Priority"] = USettings["Section"]:AddDropdown("🎯 Target Priority: ", function(value)
+					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Target Priority"] = value; SaveSettings()
+				end, {Options = AAData["Unit Setting"]["Target Priority"], Value = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Target Priority"] or "First"})
+				USettings["Place Start"] = USettings["Section"]:AddTextbox("Place from wave: ", function(value)
+					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Place Start"] = value; SaveSettings()
+				end, {Placeholder = "Wave", Text = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Place Start"] or 1, Pattern = "[%d-]+"})
+				USettings["Upgrade Start"] = USettings["Section"]:AddTextbox("Upgrade from wave: ", function(value)
+					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Upgrade Start"] = value; SaveSettings()
+				end, {Placeholder = "Wave", Text = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Upgrade Start"] or 1, Pattern = "[%d-]+"})
+				USettings["Sell Start"] = USettings["Section"]:AddTextbox("Auto Sell at wave: ", function(value)
+					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Sell Start"] = value; SaveSettings()
+				end, {Placeholder = "Wave", Text = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Sell Start"] or 99, Pattern = "[%d-]+"})
+				USettings["Unit Limit"] = USettings["Section"]:AddSlider("Total Units: ", function(value)
+					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Unit Limit"] = value; SaveSettings()
+				end, {Value = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Unit Limit"] or 6, Min = 0, Max = 6})
+				USettings["Upgrade Limit"] = USettings["Section"]:AddSlider("Upgrade Cap: ", function(value)
+					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Upgrade Limit"] = value; SaveSettings()
+				end, {Value = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Upgrade Limit"] or 15, Min = 0, Max = 15})
+				USettings["Auto Ability"] = USettings["Section"]:AddDropdown("🔥 Auto Ability", function(value)
+					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Auto Ability"] = value; SaveSettings()
+				end, {Options = {"Disable","Cooldown","On Attack [All]","On Attack [Ground]","On Attack [Air]"}, Value = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Auto Ability"] or "Disable"})
+			--end))
 		end
 
 		-------------------------------------------
 
-		if not InLobby() then
-			getgenv().ModifyPosition = function(value)
-				for UnitSlot = 1, 6 do
+		getgenv().UpdateUnitConfig = function()
+			if not Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value] then Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value] = {} end
+			if not Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units then Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units = {} end
+			for UnitSlot = 1, 6 do
+				--coroutine.resume(coroutine.create(function()
+					if not Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)] then Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)] = {} end
+					if not UnitSettings[UnitSlot] then UnitSettings[UnitSlot] = {} end
 					local USettings = UnitSettings[UnitSlot]
-					USettings["Single"].Button.Visible = value
-					USettings["Group"].Button.Visible = value
-					USettings["Spread"].Button.Visible = value
+					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Active"] = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Active"] or false
+					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Target Priority"] = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Target Priority"] or "First"
+					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Place Start"] = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Place Start"] or 1
+					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Upgrade Start"] = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Upgrade Start"] or 1
+					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Sell Start"] = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Sell Start"] or 99
+					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Unit Limit"] = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Unit Limit"] or 6
+					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Upgrade Limit"] = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Upgrade Limit"] or 15
+					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Auto Ability"] = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Auto Ability"] or "Disable"
+
+					if USettings["Selected Position"] then
+						USettings["Selected Position"].Section:UpdateDropdown(USettings["Selected Position"], nil, {Value = "Position 1"})
+					end
+
+					USettings["Active"].Data.Active = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Active"]
+					USettings["Active"].Section:UpdateToggle(USettings["Active"], nil, {Active = USettings["Active"].Data.Active})
+					USettings["Target Priority"].Data.Value = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Target Priority"]
+					USettings["Target Priority"].Section:UpdateDropdown(USettings["Target Priority"], nil, {Value = USettings["Target Priority"].Data.Value})
+					USettings["Place Start"].Data.Text = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Place Start"]
+					USettings["Upgrade Start"].Data.Text = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Upgrade Start"]
+					USettings["Sell Start"].Data.Text = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Sell Start"]
+					USettings["Unit Limit"].Data.Value = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Unit Limit"]
+					USettings["Unit Limit"].Section:UpdateSlider(USettings["Unit Limit"], nil, {Value = USettings["Unit Limit"].Data.Value, Min = USettings["Unit Limit"].Data.Min, Max = USettings["Unit Limit"].Data.Max})
+					USettings["Upgrade Limit"].Data.Value = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Upgrade Limit"]
+					USettings["Upgrade Limit"].Section:UpdateSlider(USettings["Upgrade Limit"], nil, {Value = USettings["Upgrade Limit"].Data.Value, Min = USettings["Upgrade Limit"].Data.Min, Max = USettings["Upgrade Limit"].Data.Max})
+					USettings["Auto Ability"].Data.Value = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Auto Ability"]
+					USettings["Auto Ability"].Section:UpdateDropdown(USettings["Auto Ability"], nil, {Value = USettings["Auto Ability"].Data.Value})
+				--end))
+			end
+		end
+		getgenv().ResetUnitConfig = function()
+			Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units = {};
+			SaveSettings()
+
+			getgenv().UpdateUnitConfig()
+		end
+
+		getgenv().VisualizePosition = function(UnitSlot, Enabled)
+			if not Settings["World Positions"][CurrentMap] then return end
+			if not Settings["World Positions"][CurrentMap][UnitSlot] then return end
+			local Render;
+			if Enabled then
+				if _G[UnitSlot.." Visualizer"] then _G[UnitSlot.." Visualizer"]:Destroy() end
+				_G[UnitSlot.." Visualizer"] = Instance.new("Model", Workspace)
+				local Blocks = {}
+				for Pos = 1, 6 do
+					if not Settings["World Positions"][CurrentMap][UnitSlot]["Position "..Pos] then continue end
+					
+					Blocks[Pos] = Instance.new("Part", _G[UnitSlot.." Visualizer"])
+					Blocks[Pos].Size = Vector3.new(1, 1, 1)
+					Blocks[Pos].Material = Enum.Material.Neon
+					Blocks[Pos].Anchored = true
+					Blocks[Pos].CanCollide = false
+				end
+
+				Render = RunService.RenderStepped:Connect(function()
+					pcall(function()
+						if Enabled then
+							for Pos = 1, 6 do
+								if not Settings["World Positions"][CurrentMap][UnitSlot]["Position "..Pos] then continue end
+
+								local Position = Settings["World Positions"][CurrentMap][UnitSlot]["Position "..Pos]
+								Blocks[Pos].CFrame = CFrame.new(Vector3.new(Position["x"], Position["y"], Position["z"]))
+							end
+						end
+					end)
+				end)
+			else
+				if _G[UnitSlot.." Visualizer"] then _G[UnitSlot.." Visualizer"]:Destroy() end
+				_G[UnitSlot.." Visualizer"] = nil
+				Render:Disconnect()
+			end
+		end
+
+		if not InLobby() then
+			getgenv().PositionChange = function(value)
+				for UnitSlot = 1, 6 do
+					--coroutine.resume(coroutine.create(function()
+						if not UnitSettings[UnitSlot] then UnitSettings[UnitSlot] = {} end
+						local USettings = UnitSettings[UnitSlot]
+						Utility:Show({
+							USettings["Selected Position"].Dropdown,
+							USettings["Single"].Button,
+							USettings["Delete"].Button,
+							USettings[""].Label,
+							USettings["Group"].Button,
+							USettings["Spread"].Button,
+							USettings["Clear"].Button,
+						}, value)
+					--end))
 				end
 			end
 
-			getgenv().ModifyPosition(false)
+			getgenv().PositionChange(false)
 		end
+
+		getgenv().UpdateUnitConfig()
 	end
 	---------------------------
 
 	----- [ Macro Config ] -----
-	local PMacro;
 	local MacroConfig, CreateMacro;
 	function UISetup:Macro()
 		PMacro = Window:AddPage("Macro", "🕹️")
@@ -793,7 +793,6 @@ do
 	----------------------------
 
 	----- [ Shoop and Item Page ] -----
-	local PShopNItems;
 	function UISetup:ShopNItem()
 		PShopNItems = Window:AddPage("Shop & Items", "💰")
 		local SShopSplit = PShopNItems:AddSplit()
@@ -807,7 +806,6 @@ do
 	-----------------------------------
 
 	----- [ Misc Page ] -----
-	local PMisc;
 	function UISetup:Misc()
 		PMisc = Window:AddPage("Misc [BETA]", "🛠️")
 		if Settings and not Settings["Misc"] then Settings["Misc"] = {} end
@@ -852,21 +850,286 @@ do
 		SPlayersModification:AddToggle("🐱 Hide Name Player", function(value) Settings["Misc"].Players["Hide Name"] = value; SaveSettings() end, {Active = Settings["Misc"].Players["Hide Name"] or false})
 		
 		--- [ Other Config ] ---
-		SOtherConfig:AddButton("Redeem All Codes", function()
-			for _, code in pairs(AAData["Codes"]) do
-				pcall(function() game:GetService("ReplicatedStorage").endpoints["client_to_server"]["redeem_code"]:InvokeServer(code)() end)
-			end
-			Window:Notify("Info", "Done Collecting Codes")
-		end)
+		if InLobby() then
+			SOtherConfig:AddButton("Redeem All Codes", function()
+				for _, code in pairs(AAData["Codes"]) do
+					pcall(function() ReplicatedStorage.endpoints["client_to_server"]["redeem_code"]:InvokeServer(code)() end)
+				end
+				Window:Notify("Info", "Done Collecting Codes")
+			end)
+		end
 		SOtherConfig:AddButton("Return To Lobby", function() end)
 		
 		--- [ Reset ] ---
 		
 	end
 	-------------------------
+
+	----- [ Debug Page ] -----
+	function UISetup:Debug()
+		PDebug = Window:AddPage("Debug", "🎚️")
+		local SDebugSplits = PDebug:AddSplit()
+
+		if not InLobby() then
+			local SWorldData = PDebug:AddSection("World Data", {Split = SDebugSplits, Side = "Left"})
+			SWorldData:AddLabel("Current Map : "..CurrentMap)
+			for i, v in pairs(Getter:GetLevelData()) do
+				if typeof(v) == "string" then
+					SWorldData:AddLabel(i.." : "..v)
+				end
+			end
+		end
+
+		local SEquippedUnit = PDebug:AddSection("Equipped Unit", {Split = SDebugSplits, Side = "Right"})
+		local UnitSlots = {}
+		for slot = 1, 6 do UnitSlots[tostring(slot)] = SEquippedUnit:AddLabel(slot.." - ") end
+		RunService.RenderStepped:Connect(function()
+			pcall(function()
+				for slot = 1, 6 do
+					local name;
+					if ItemInventoryService["session"]["collection"]["collection_profile_data"]["equipped_units"][tostring(slot)] then
+						local uuid = ItemInventoryService["session"]["collection"]["collection_profile_data"]["equipped_units"][tostring(slot)]
+						local unit_id = ItemInventoryService["session"]["collection"]["collection_profile_data"]["owned_units"][uuid]["unit_id"]
+						name = UnitsData[unit_id]["name"]
+					end
+
+					UnitSlots[tostring(slot)].Section:UpdateLabel(UnitSlots[tostring(slot)], slot.." - "..(name or ""))
+				end
+			end)
+		end)
+		-------------------------------------------
+	end
+	--------------------------
 end
 
------ [ Setup ] -----
+-------------------------
+----- [ FUNCTIONS ] -----
+-------------------------
+do
+	----- [ Place ] -----
+	function Functions:PlaceUnit()
+
+	end
+	---------------------
+
+	----- [ Upgrade ] -----
+	function Functions:UpgradeUnit()
+		repeat task.wait() until Workspace:WaitForChild("_UNITS")
+		for _, unit in ipairs(Workspace["_UNITS"]:GetChildren()) do
+
+		end
+	end
+	-----------------------
+
+	----- [ Target Priority ] -----
+	function Functions:TargetPriority()
+
+	end
+	-------------------------------
+
+	----- [ Position Unit ] -----
+	function Functions:PositionUnit(UnitSlot, Type:string, Specific:string)
+		if Type == "Group" then
+			print("[Setting Position] Type: Group")
+			local RaycastParameters = RaycastParams.new()
+			RaycastParameters.FilterType = Enum.RaycastFilterType.Whitelist
+			RaycastParameters.FilterDescendantsInstances = {Workspace["_terrain"]}
+			_G.ModifyingPosition = true
+			task.wait(0.5)
+			local Visualize = Instance.new("Model", Workspace)
+			local Blocks = {}
+			for Pos = 1, 6 do
+				Blocks[Pos] = Instance.new("Part", Visualize)
+				Blocks[Pos].Size = Vector3.new(1, 1, 1)
+				Blocks[Pos].Material = Enum.Material.Neon
+				Blocks[Pos].Anchored = true
+				Blocks[Pos].CanCollide = false
+			end
+
+			RunService.RenderStepped:Connect(function()
+				pcall(function()
+					if _G.ModifyingPosition then
+						Mouse.TargetFilter = Visualize
+						local x = Mouse.Hit.Position.X
+						local z = Mouse.Hit.Position.Z
+						local distance = {
+							{0.75, 0}, {0.75, 1.5}, {0.75, -1.5},
+							{-0.75, -0}, {-0.75, 1.5}, {-0.75, -1.5},
+						}
+						for Pos = 1, 6 do
+							local RayOrigin = CFrame.new(x + distance[Pos][1], 1000, z + distance[Pos][2]).p
+							local RayDestination = CFrame.new(x + distance[Pos][1], -500, z + distance[Pos][2]).p
+							local RayDirection = (RayDestination - RayOrigin)
+							local RaycastResult = Workspace:Raycast(RayOrigin, RayDirection, RaycastParameters)
+							Blocks[Pos].CFrame = CFrame.new(RaycastResult.Position) * CFrame.Angles(0, -0, -0)
+						end
+					end
+				end)
+			end)
+
+			ClickDetection = Mouse.Button1Down:Connect(function()
+				ClickDetection:Disconnect()
+				print("[Saving Position] Type: Group")
+				SaveUnitPosition(UnitSlot, {
+					["Position 1"] = Blocks[1],
+					["Position 2"] = Blocks[2],
+					["Position 3"] = Blocks[3],
+					["Position 4"] = Blocks[4],
+					["Position 5"] = Blocks[5],
+					["Position 6"] = Blocks[6],
+				}, true)
+				_G.ModifyingPosition = false
+				for transparency = 0, 1, 0.1 do -- Fade Animation
+					for Pos = 1, 6 do Blocks[Pos].Transparency = transparency end
+					task.wait()
+				end
+				Visualize:Destroy()
+			end)
+		elseif Type == "Single" then
+			print("[Setting Position] Type: Single")
+			local RaycastParameters = RaycastParams.new()
+			RaycastParameters.FilterType = Enum.RaycastFilterType.Whitelist
+			RaycastParameters.FilterDescendantsInstances = {Workspace["_terrain"]}
+			_G.ModifyingPosition = true
+			task.wait(0.5)
+			local Block = Instance.new("Part", Workspace)
+			Block.Size = Vector3.new(1, 1, 1)
+			Block.Material = Enum.Material.Neon
+			Block.Anchored = true
+			Block.CanCollide = false
+
+			RunService.RenderStepped:Connect(function()
+				pcall(function()
+					if _G.ModifyingPosition then
+						Mouse.TargetFilter = Block
+						local x = Mouse.Hit.Position.X
+						local z = Mouse.Hit.Position.Z
+
+						local RayOrigin = CFrame.new(x, 1000, z).p
+						local RayDestination = CFrame.new(x, -500, z).p
+						local RayDirection = (RayDestination - RayOrigin)
+						local RaycastResult = Workspace:Raycast(RayOrigin, RayDirection, RaycastParameters)
+						Block.CFrame = CFrame.new(RaycastResult.Position) * CFrame.Angles(0, -0, -0)
+					end
+				end)
+			end)
+
+			ClickDetection = Mouse.Button1Down:Connect(function()
+				ClickDetection:Disconnect()
+				print("[Saving Position] Type: Single")
+				SaveUnitPosition(UnitSlot, {
+					[Specific] = Block
+				})
+				_G.ModifyingPosition = false
+				for transparency = 0, 1, 0.1 do -- Fade Animation
+					Block.Transparency = transparency
+					task.wait()
+				end
+				Block:Destroy()
+			end)
+		elseif Type == "Spread" then
+			print("[Setting Position] Type: Spread")
+
+		end
+	end
+	-----------------------------
+
+    ----- [ Auto Buff ] -----
+    function Functions:AutoBuff(Buffer)
+        return Utility:Thread(Buffer, function()
+			print(Buffer.." Auto Buff Started")
+            local LocalPlayer = Players.LocalPlayer
+            local Data = AAData["Game Setting"]["Buffers"][Buffer]
+
+            local Container = {}
+            local function RemoveBuffer()
+				if #Container <= 0 then return end
+                local Temp = {}
+                for _, unit in pairs(Workspace._UNITS:GetChildren()) do
+                    if table.find(Data["Name"], unit.Name) then
+						if unit:FindFirstChild("_stats") and unit:FindFirstChild("_stats"):FindFirstChild("player").Value == LocalPlayer then
+							if not table.find(Temp, unit) then
+                        		table.insert(Temp, unit)
+							end
+						end
+                    end
+                end
+                for pos, unit in pairs(Container) do -- Removing Deleted Buffer
+                    if not table.find(Temp, unit) then
+                        --table.remove(Container, table.find(Container, unit))
+						table.remove(Container, pos)
+                        --print(""..Buffer.." Left: "..#Container)
+                    end
+                end
+            end
+            local function AddBuffer() -- Adding Newer Buffer
+				if #Container >= 4 then return end
+                for _, unit in pairs(Workspace._UNITS:GetChildren()) do
+					if table.find(Data["Name"], unit.Name) then
+						if unit:FindFirstChild("_stats") and unit:FindFirstChild("_stats"):FindFirstChild("player").Value == LocalPlayer then
+							if not table.find(Container, unit) then
+								table.insert(Container, unit)
+								--print(""..Buffer.." Left: "..#Container)
+							end
+						end
+					end
+                end
+            end
+
+            repeat
+                task.wait()
+                if not table.find(Settings["Unit Config"].Auto["Buff"], Buffer) then break end
+                
+                RemoveBuffer()
+                AddBuffer()
+
+                for count = 1, 4 do
+                    if #Container < 4 then break end
+                    RemoveBuffer()
+                    if Container[count] ~= nil and Container[count].Parent == Workspace._UNITS then
+                        ReplicatedStorage:WaitForChild("endpoints"):WaitForChild("client_to_server"):WaitForChild("use_active_attack"):InvokeServer(Container[count])
+                        --print(Buffer..": Buffing")
+                        task.wait(Data["Delay"])
+                    end
+                end
+            until not table.find(Settings["Unit Config"].Auto["Buff"], Buffer)
+			print(Buffer.." Auto Buff Ended")
+        end)
+    end
+	-------------------------
+
+    ----- [ Teleport ] -----
+    function Functions:Teleport()
+        while task.wait() do
+            pcall(function()
+                Utility:Teleporter(8304191830)
+                if Utility.FoundAnything ~= "" then
+                    Utility:Teleporter(8304191830)
+                end
+            end)
+        end
+    end
+    --------------------------
+
+    ----- [ Connection ] -----
+    function Functions:CheckInternet()
+        warn("Auto Reconnect Loaded")
+        while task.wait(5) do
+            game.CoreGui.RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(a)
+                if a.Name == 'ErrorPrompt' then
+                    task.wait(10)
+                    warn("Trying to Reconnect")
+                    Utility:Teleporter(8304191830)
+                end
+            end)
+        end
+    end
+    --------------------------
+end
+
+---------------------
+----- [ SETUP ] -----
+---------------------
 if InLobby() then
 	UISetup:Home()
 	UISetup:AutoFarm()
@@ -883,179 +1146,40 @@ else
 	UISetup:Misc()
 	warn("Loaded Game UI")
 end
+if Players.LocalPlayer.UserId == 82468271 then UISetup:Debug() end
+Window:SelectPage(PHome, true)
 Window:Enabled(true)
----------------------
 
--------------------------
------ [ FUNCTIONS ] -----
--------------------------
-local Functions = {}
-do
-    ----- [ Auto Buff ] -----
-    function Functions:AutoBuff(Buffer)
-        local Thread = coroutine.create(function()
-            local LocalPlayer = Players.LocalPlayer
-            local Data = AAData["Game Setting"]["Buffers"][Buffer]
-
-            local Container = {}
-            local function RemoveBuffer()
-                local Temp = {}
-                for _, v in pairs(game:GetService("Workspace")._UNITS:GetChildren()) do
-                    if table.find(Data["Name"], v.Name) and v:FindFirstChild("_stats"):FindFirstChild("player").Value == LocalPlayer and not table.find(Temp, v) then
-                        table.insert(Temp, v)
-                    end
-                end
-                for _, v in pairs(Container) do -- Removing Deleted Buffer
-                    if not table.find(Temp, v) then
-                        table.remove(Container, table.find(Container, v))
-                        print(""..Buffer.." Left: "..#Container)
-                    end
-                end
-            end
-            local function AddBuffer() -- Adding Newer Buffer
-                for _, v in pairs(game:GetService("Workspace")._UNITS:GetChildren()) do
-                    if table.find(Data["Name"], v.Name) and v:FindFirstChild("_stats"):FindFirstChild("player").Value == LocalPlayer and not table.find(Container, v) then
-                        table.insert(Container, v)
-                        print(""..Buffer.." Left: "..#Container)
-                    end
-                end
-            end
-
-            repeat
-                wait()
-                if not table.find(Settings["Unit Config"].Auto["Buff"], Buffer) then break end
-                
-                RemoveBuffer()
-                AddBuffer()
-
-                for count = 1, 4 do
-                    if #Container < 4 then break end
-                    RemoveBuffer()
-                    if Container[count] ~= nil and Container[count].Parent == game:GetService("Workspace")._UNITS then
-                        game:GetService("ReplicatedStorage"):WaitForChild("endpoints"):WaitForChild("client_to_server"):WaitForChild("use_active_attack"):InvokeServer(Container[count])
-                        print(Buffer..": Buffing")
-                        wait(Data["Delay"])
-                    end
-                end
-            until not table.find(Settings["Unit Config"].Auto["Buff"], Buffer)
-        end)
-        coroutine.resume(Thread)
-        return Thread
-    end
-    coroutine.resume(coroutine.create(function()
-        local Container = {}
-        while task.wait() do
-            for i, _ in pairs(AAData["Game Setting"]["Buffers"]) do
-                if table.find(Settings["Unit Config"].Auto["Buff"], i) and Container[i] == nil then
-                    Container[i] = Functions:AutoBuff(i)
-                    print("Enabled "..i.." Auto Buff")
-                elseif not table.find(Settings["Unit Config"].Auto["Buff"], i) and Container[i] ~= nil then
-                    coroutine.close(Container[i])
-                    Container[i] = nil
-                    print("Disabled "..i.." Auto Buff")
-                end
-            end
-        end
-    end))
-
-    ----- [ Auto Leave ] -----
-    local PlaceID = 8304191830
-    local AllIDs = {}
-    local FoundAnything = ""
-    local ActualHour = os.date("!*t").hour
-    local Deleted = false
-    local Last
-    local ServerFile = pcall(function() AllIDs = game:GetService('HttpService'):JSONDecode(readfile("NotSameServers.json")) end)
-    if not ServerFile then
-        table.insert(AllIDs, ActualHour)
-        writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
-    end
-    function TPReturner()
-        local Site;
-        if FoundAnything == "" then Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
-        else Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. FoundAnything)) end
-
-        local ID = ""
-        if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then FoundAnything = Site.nextPageCursor end
-
-        local Num = 0;
-        local ExtraNum = 0
-        for Index, Server in pairs(Site.data) do
-            ExtraNum += 1
-            local Possible = true
-            ID = tostring(Server.id)
-            if tonumber(Server.maxPlayers) > tonumber(Server.playing) then
-                if ExtraNum ~= 1 and tonumber(Server.playing) < Last or ExtraNum == 1 then Last = tonumber(Server.playing)
-                elseif ExtraNum ~= 1 then continue end
-
-                for _,Existing in pairs(AllIDs) do
-                    if Num ~= 0 then
-                        if ID == tostring(Existing) then Possible = false end
-                    else
-                        if tonumber(ActualHour) ~= tonumber(Existing) then
-                            local delFile = pcall(function()
-                                delfile("NotSameServers.json")
-                                AllIDs = {}
-                                table.insert(AllIDs, ActualHour)
-                            end)
-                        end
-                    end
-                    Num = Num + 1
-                end
-                if Possible == true then
-                    table.insert(AllIDs, ID)
-                    wait()
-                    pcall(function()
-                        writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
-                        wait()
-                        game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
-                    end)
-                    wait(4)
-                end
-            end
-        end
-    end
-    function Teleport()
-        while wait() do
-            pcall(function()
-                TPReturner()
-                if FoundAnything ~= "" then
-                    TPReturner()
-                end
-            end)
-        end
-    end
-    --------------------------
-
-    ----- [ Start of Check Connection ] -----
-    function CheckInternet()
-        warn("Auto Reconnect Loaded")
-        while task.wait(5) do
-            game.CoreGui.RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(a)
-                if a.Name == 'ErrorPrompt' then
-                    task.wait(10)
-                    warn("Trying to Reconnect")
-                    TPReturner()
-                end
-            end)
-        end
-    end
-    -----------------------------------------
-end
+coroutine.resume(coroutine.create(function()
+	task.spawn(function()
+		if not InLobby() and Settings["Unit Config"].Auto["Buff"] then
+			for i, _ in pairs(AAData["Game Setting"]["Buffers"]) do
+				if table.find(Settings["Unit Config"].Auto["Buff"], i) then
+					BufferContainer[i] = Functions:AutoBuff(i)
+					BufferContainer[i]:Start()
+				end
+			end
+		end
+	end)
+end))
+SaveSettings()
 
 --------------------------
 ----- [ POST-SETUP ] -----
 --------------------------
-getgenv().SHUTDOWN = function() script:Destroy() end
+getgenv().SHUTDOWN = function()
+	Utility:StopAllThreads();
+	script:Destroy();
+end
 warn("Astral Anti-AFK Loaded!!!")
 warn("Astral Hider Name Loaded!!!")
 warn("Astral AA v1 Loaded!!!")
 warn("All Loaded !!!")
 
 if InLobby() then
-	repeat task.wait(0.5) until Workspace:WaitForChild(game.Players.LocalPlayer.Name)
-	CheckInternet()
+	repeat task.wait(0.5) until Workspace:WaitForChild(Players.LocalPlayer.Name)
+	Functions:CheckInternet()
 elseif not InLobby() then
 	repeat task.wait(0.5) until Workspace:WaitForChild("_terrain")
-	CheckInternet()
+	Functions:CheckInternet()
 end
