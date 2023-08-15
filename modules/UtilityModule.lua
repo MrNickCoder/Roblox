@@ -26,6 +26,12 @@ do
 		return newTable
 	end
 	
+	function Utility:Length(Table:{any})
+		local Counter = 0
+		for _, v in pairs(Table) do Counter += 1; end
+		return Counter
+	end
+
 	function Utility:Show(UIObjects:{GuiObject}, Visible:boolean)
 		for Index, Value in pairs(UIObjects) do
 			Value.Visible = Visible
