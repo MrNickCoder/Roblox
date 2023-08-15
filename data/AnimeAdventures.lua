@@ -327,7 +327,7 @@ return {
 		["Rarity"] = {"Common","Rare","Epic","Legendary","Mythic","Secret"};
 	};
 	["Codes"] = {
-		"SUMMER2023","ANNIVERSARY","TOURNAMENTUIFIX","AINCRAD",
+		"SuperTierMagicSoon","SUMMER2023","ANNIVERSARY","TOURNAMENTUIFIX","AINCRAD",
 		"BILLION",
 		"SubToKelvingts","SubToKelvingts","TOADBOIGAMING","KingLuffy","noclypso","subtosnowrbx","Cxrsed","FictioNTheFirst","subtomaokuma",
 	};
