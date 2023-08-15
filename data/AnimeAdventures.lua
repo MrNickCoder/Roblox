@@ -281,7 +281,7 @@ return {
 		["Clover Kingdom"] = {"hage","hage_elf","hage_elf_night"};
 		["Cape Canaveral"] = {"space_center"};
 		["Alien Spaceship"] = {"boros_ship","boros_ship_summer"};
-		["Fabled Kingdom"] = {"7ds_map","7ds_map_night","7ds_map_cube","7ds_map_summer"};
+		["Fabled Kingdom"] = {"7ds_map","7ds_map_night","7ds_map_cube","7ds_summer"};
 		["Hero City"] = {"mha_city","mha_city_night"};
 		["Puppet Island"] = {"dressrosa","dressrosa_summer"};
 		["Virtual Dungeon"] = {"sao","sao_legend"};
