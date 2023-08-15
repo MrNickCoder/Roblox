@@ -51,6 +51,11 @@ do
 		if Success then return Response
 		else return self:SaveConfig(Config, Directory, File) end
 	end
+
+	function Utility:GetFiles(Directory:string)
+		if not isfolder(Directory) then makefolder(Directory) end
+		return listfiles(Directory)
+	end
 	
 	function Utility:Thread(ID:string, Callback)
 		local Thread = coroutine.create(Callback)
