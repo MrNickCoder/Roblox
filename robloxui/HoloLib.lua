@@ -813,7 +813,7 @@ do
 	end
 	
 	function Library:Enabled(Enabled)
-		self.Container.Enabled = Enabled
+		self.Container.Parent.Enabled = Enabled
 	end
 	
 	---------------------------

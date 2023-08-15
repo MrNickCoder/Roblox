@@ -267,44 +267,37 @@ return {
 		"The Eclipse",
 	};
 	["Map Identifier"] = {
-		["_map"] = {
-			----- [ Main ] -----
-			["namek mushroom model"] = "Planet Namak";
-			["houses_new"] = "Shiganshinu District";
-			["Snow Particles"] = "Snowy Town";
-			["sand_gate"] = "Hidden Sand Village";
-			["icebergs"] = "Marine's Ford";
-			["new buildings"] = "Ghoul City";
-			["Bones/dust"] = "Hollow World";
-			["Ant Nest"] = "Ant Kingdom";
-			["light poles"] = "Magic Town";
-			["LanternsGround"] = "Cursed Academy";
-			["misc deco"] = {
-				["bushes"] = "Clover Kingdom";
-			};
-			["SpaceCenter"] = "Cape Canaveral";
-			["secret"] = "Alien Spaceship";
-			["misc nonocollide obstacles"] = "Fabled Kingdom";
-			["bridge nocollide"] = "Hero City";
-			["linings"] = "Puppet Island";
-			["water beams"] = "Virtual Dungeon";
-			["swords"] = "Windhym";
+		----- [ Common Maps ] -----
+		["Planet Namak"] = {"namek_cartoon","namek_summer"};
+		["Shiganshinu District"] = {"aot","aot_raid","aot_summer"};
+		["Snowy Town"] = {"demonslayer"};
+		["Hidden Sand Village"] = {"naruto","naruto_raid"};
+		["Marine's Ford"] = {"marineford"};
+		["Ghoul City"] = {"tokyo_ghoul"};
+		["Hollow World"] = {"hueco"};
+		["Ant Kingdom"] = {"hxhant","hxhant_summer"};
+		["Magic Town"] = {"magnolia"};
+		["Cursed Academy"] = {"jjk","jjk_summer"};
+		["Clover Kingdom"] = {"hage","hage_elf","hage_elf_night"};
+		["Cape Canaveral"] = {"space_center"};
+		["Alien Spaceship"] = {"boros_ship","boros_ship_summer"};
+		["Fabled Kingdom"] = {"7ds_map","7ds_map_night","7ds_map_cube","7ds_map_summer"};
+		["Hero City"] = {"mha_city","mha_city_night"};
+		["Puppet Island"] = {"dressrosa","dressrosa_summer"};
+		["Virtual Dungeon"] = {"sao","sao_legend"};
+		["Windhym"] = {"berserk"};
 
-			----- [ Raids ] -----
-			["snow grass"] = "Infinity Train";
-			["s"] = "West City";
-			["bushes and flowers"] = "Storm Hideout";
-			["benches and barrels"] = "Entertainment District";
+		----- [ Raid Maps ] -----
+		["Infinity Train"] = {"demonslayer_raid"};
+		["West City"] = {"west_city"};
+		["Storm Hideout"] = {"uchiha_hideout","uchiha_hideout_final"};
+		["Entertainment District"] = {"entertainment_district"};
 
-			----- [ Legend Stages ] -----
-			["sand_bags"] = "Karakora Town";
+		----- [ Legend Maps ] -----
+		["Karakora Town"] = {"karakura","karakura2"};
 
-			----- [ Portal ] -----
-			["Storm"] = "The Eclipse";
-
-			----- [ Duplicates ] -----
-			["summer_props"] = "Cursed Academy";
-		};
+		----- [ Portal Maps ] -----
+		["The Eclipse"] = {"eclipse"};
 	};
 	["Game Setting"] = {
 		["Buffers"] = {
