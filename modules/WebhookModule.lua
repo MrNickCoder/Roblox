@@ -46,15 +46,15 @@ do
 		end
 		self["content"] = temp
 	end
-	
+
 	function Webhook:AppendLine(text)
 		self:Append(text .. "\n")
 	end
-	
+
 	function Webhook:SetUsername(username)
 		self["username"] = username
 	end
-	
+
 	function Webhook:SetAvatarUrl(url)
 		self["avatar_url"] = url
 	end
