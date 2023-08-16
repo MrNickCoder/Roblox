@@ -195,7 +195,7 @@ do
 			.. string.format("%02d", temp["sec"]) .. 'Z'
 	end
 
-	function Embed:SetColor3(color)
+	function Embed:SetColor(color)
 		if typeof(color) == "Color3" then
 			local value = bit32.lshift(math.floor(color["r"] * 255 + 0.5), 8)
 			value = bit32.lshift(math.floor(color["g"] * 255 + 0.5) + value, 8)
