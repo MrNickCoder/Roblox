@@ -70,13 +70,13 @@ do
 		elseif typeof(url) == "table" then
 			for _, uri in pairs(url) do
 				local request = http_request or request or HttpPost or syn.request or http.request
-				local hook = {Url = uri, Body = tostring(self), Method = "POST", Headers = headers}
+				local hook = {Url = uri; Body = tostring(self); Method = "POST"; Headers = headers}
 				warn("Sending webhook notification...")
 				request(hook)
 			end
 		else
 			local request = http_request or request or HttpPost or syn.request or http.request
-			local hook = {Url = url, Body = tostring(self), Method = "POST", Headers = headers}
+			local hook = {Url = url; Body = tostring(self); Method = "POST"; Headers = headers}
 			warn("Sending webhook notification...")
 			request(hook)
 		end
