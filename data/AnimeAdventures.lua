@@ -301,7 +301,7 @@ return {
 	["Identifiers"] = {
 		["Map"] = {
 			----- [ Common Maps ] -----
-			["Planet Namak"] = {"namek_cartoon","namek_summer"};
+			["Planet Namak"] = {"namek_cartoon","namek_anniversary","namek_summer"};
 			["Shiganshinu District"] = {"aot","aot_raid","aot_summer"};
 			["Snowy Town"] = {"demonslayer"};
 			["Hidden Sand Village"] = {"naruto","naruto_raid"};
@@ -359,7 +359,7 @@ return {
 		};
 		["Level"] = {
 			["portal_summer"] = {
-				["namak_infinite"] = "Planet Namak (Summer)";
+				["namek_infinite"] = "Planet Namak (Summer)";
 				["out_infinite"] = "Shiganshinu District (Summer)";
 				["hxhant_infinite"] = "Ant Kingdom (Summer)";
 				["jjk_infinite"] = "Cursed Academy (Summer)";
