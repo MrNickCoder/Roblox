@@ -192,7 +192,7 @@ return {
 						["Levels"] = {"portal_summer"};
 						["Level"] = {
 							["portal_summer"] = {
-								["Maps"] = {"Planet Namak (Summer)","Shiganshinu District","Ant Kingdom (Summer)","Cursed Academy (Summer)","Alien Spaceship (Underwater)","Fabled Kingdom (Summer)","Puppet Island (Summer)"};
+								["Maps"] = {"Planet Namak (Summer)","Shiganshinu District (Summer)","Ant Kingdom (Summer)","Cursed Academy (Summer)","Alien Spaceship (Underwater)","Fabled Kingdom (Summer)","Puppet Island (Summer)"};
 								["Damage Modifiers"] = {"Fire","Aqua","Storm","Air","Rose","Dark","Light"};
 								["Tiers"] = {"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"};
 								["Challenges"] = {"double_cost","short_range","fast_enemies","regen_enemies","tank_enemies","shield_enemies"};
