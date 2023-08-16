@@ -7,7 +7,7 @@ local Field = {}
 -----------------------
 ----- [ Webhook ] -----
 -----------------------
-do	
+do
 	Webhook.__index = Webhook
 	Webhook.__tostring = function(self)
 		local Data = {}
