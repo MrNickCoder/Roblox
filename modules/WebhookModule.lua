@@ -70,8 +70,8 @@ do
 				request(hook)
 			end
 		else
-			local WRequest = http_request or request or HttpPost or syn.request or http.request
-			local WHook = {Url = url, Body = tostring(self), Method = "POST", Headers = headers}
+			local request = http_request or request or HttpPost or syn.request or http.request
+			local hook = {Url = url, Body = tostring(self), Method = "POST", Headers = headers}
 			warn("Sending webhook notification...")
 			request(hook)
 		end
