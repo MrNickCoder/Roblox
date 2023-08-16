@@ -195,7 +195,7 @@ return {
 								["Maps"] = {"Planet Namak (Summer)","Shiganshinu District (Summer)","Ant Kingdom (Summer)","Cursed Academy (Summer)","Alien Spaceship (Underwater)","Fabled Kingdom (Summer)","Puppet Island (Summer)"};
 								["Damage Modifiers"] = {"Fire","Aqua","Storm","Air","Rose","Dark","Light"};
 								["Tiers"] = {"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"};
-								["Challenges"] = {"double_cost","short_range","fast_enemies","regen_enemies","tank_enemies","shield_enemies"};
+								["Challenges"] = {"High Cost","Short Range","Fast Enemies","Regen Enemies","Tank Enemies","Shield Enemies"};
 							};
 						};
 					};
@@ -256,48 +256,15 @@ return {
 		"Marine's Ford","Ghoul City","Hollow World","Ant Kingdom","Magic Town",
 		"Cursed Academy","Clover Kingdom","Cape Canaveral","Alien Spaceship",
 		"Fabled Kingdom","Hero City","Puppet Island","Virtual Dungeon","Windhym",
-		
+
 		----- [ Raids ] -----
 		"Infinity Train","West City","Storm Hideout","Entertainment District",
-		
+
 		----- [ Legend Stages ] -----
 		"Karakora Town",
-		
+
 		----- [ Portal ] -----
 		"The Eclipse",
-	};
-	["Map Identifier"] = {
-		----- [ Common Maps ] -----
-		["Planet Namak"] = {"namek_cartoon","namek_summer"};
-		["Shiganshinu District"] = {"aot","aot_raid","aot_summer"};
-		["Snowy Town"] = {"demonslayer"};
-		["Hidden Sand Village"] = {"naruto","naruto_raid"};
-		["Marine's Ford"] = {"marineford"};
-		["Ghoul City"] = {"tokyo_ghoul"};
-		["Hollow World"] = {"hueco"};
-		["Ant Kingdom"] = {"hxhant","hxhant_summer"};
-		["Magic Town"] = {"magnolia"};
-		["Cursed Academy"] = {"jjk","jjk_summer"};
-		["Clover Kingdom"] = {"hage","hage_elf","hage_elf_night"};
-		["Cape Canaveral"] = {"space_center"};
-		["Alien Spaceship"] = {"boros_ship","boros_ship_summer"};
-		["Fabled Kingdom"] = {"7ds_map","7ds_map_night","7ds_map_cube","7ds_summer"};
-		["Hero City"] = {"mha_city","mha_city_night"};
-		["Puppet Island"] = {"dressrosa","dressrosa_summer"};
-		["Virtual Dungeon"] = {"sao","sao_legend"};
-		["Windhym"] = {"berserk"};
-
-		----- [ Raid Maps ] -----
-		["Infinity Train"] = {"demonslayer_raid"};
-		["West City"] = {"west_city"};
-		["Storm Hideout"] = {"uchiha_hideout","uchiha_hideout_final"};
-		["Entertainment District"] = {"entertainment_district"};
-
-		----- [ Legend Maps ] -----
-		["Karakora Town"] = {"karakura","karakura2"};
-
-		----- [ Portal Maps ] -----
-		["The Eclipse"] = {"eclipse"};
 	};
 	["Game Setting"] = {
 		["Buffers"] = {
@@ -330,5 +297,76 @@ return {
 		"SuperTierMagicSoon","SUMMER2023","ANNIVERSARY","TOURNAMENTUIFIX","AINCRAD",
 		"BILLION",
 		"SubToKelvingts","SubToKelvingts","TOADBOIGAMING","KingLuffy","noclypso","subtosnowrbx","Cxrsed","FictioNTheFirst","subtomaokuma",
+	};
+	["Identifiers"] = {
+		["Map"] = {
+			----- [ Common Maps ] -----
+			["Planet Namak"] = {"namek_cartoon","namek_summer"};
+			["Shiganshinu District"] = {"aot","aot_raid","aot_summer"};
+			["Snowy Town"] = {"demonslayer"};
+			["Hidden Sand Village"] = {"naruto","naruto_raid"};
+			["Marine's Ford"] = {"marineford"};
+			["Ghoul City"] = {"tokyo_ghoul"};
+			["Hollow World"] = {"hueco"};
+			["Ant Kingdom"] = {"hxhant","hxhant_summer"};
+			["Magic Town"] = {"magnolia"};
+			["Cursed Academy"] = {"jjk","jjk_summer"};
+			["Clover Kingdom"] = {"hage","hage_elf","hage_elf_night"};
+			["Cape Canaveral"] = {"space_center"};
+			["Alien Spaceship"] = {"boros_ship","boros_ship_summer"};
+			["Fabled Kingdom"] = {"7ds_map","7ds_map_night","7ds_map_cube","7ds_summer"};
+			["Hero City"] = {"mha_city","mha_city_night"};
+			["Puppet Island"] = {"dressrosa","dressrosa_summer"};
+			["Virtual Dungeon"] = {"sao","sao_legend"};
+			["Windhym"] = {"berserk"};
+
+			----- [ Raid Maps ] -----
+			["Infinity Train"] = {"demonslayer_raid"};
+			["West City"] = {"west_city"};
+			["Storm Hideout"] = {"uchiha_hideout","uchiha_hideout_final"};
+			["Entertainment District"] = {"entertainment_district"};
+
+			----- [ Legend Maps ] -----
+			["Karakora Town"] = {"karakura","karakura2"};
+
+			----- [ Portal Maps ] -----
+			["The Eclipse"] = {"eclipse"};
+		};
+		["Challenge"] = {
+			["double_cost"] = "High Cost";
+			["short_range"] = "Short Range";
+			["fast_enemies"] = "Fast Enemies";
+			["regen_enemies"] = "Regen Enemies";
+			["tank_enemies"] = "Tank Enemies";
+			["shield_enemies"] = "Shield Enemies";
+			["triple_cost"] = "Triple Cost";
+			["hyper_regen_enemies"] = "Hyper-Regen Enemies";
+			["hyper_shield_enemies"] = "Steel-Plated Enemies";
+			["godspeed_enemies"] = "Godspeed Enemies";
+			["flying_enemies"] = "Flying Enemies";
+			["mini_range"] = "Mini-Range";
+		};
+		["Damage Modifier"] = {
+			["magic"] = "Magic";
+			["physical"] = "Physical";
+			["fire_damage"] = "Fire";
+			["water_damage"] = "Aqua";
+			["lightning_damage"] = "Storm";
+			["air_damage"] = "Air";
+			["ice_damage"] = "Rose";
+			["dark_damage"] = "Dark";
+			["light_damage"] = "Light"
+		};
+		["Level"] = {
+			["portal_summer"] = {
+				["namak_infinite"] = "Planet Namak (Summer)";
+				["out_infinite"] = "Shiganshinu District (Summer)";
+				["hxhant_infinite"] = "Ant Kingdom (Summer)";
+				["jjk_infinite"] = "Cursed Academy (Summer)";
+				["opm_infinite"] = "Alien Spaceship (Underwater)";
+				["7ds_infinite"] = "Fabled Kingdom (Summer)";
+				["dressrosa_infinite"] = "Puppet Island (Summer)";
+			};
+		};
 	};
 }
