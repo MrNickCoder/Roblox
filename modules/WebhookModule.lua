@@ -25,11 +25,11 @@ do
 		return HttpService:JSONEncode(Data)
 	end
 
-	function Webhook.new()
+	function Webhook.new(content, username, avatar_url)
 		local Data = {
-			["avatar_url"] = "",
-			["username"] = "",
-			["content"] = "",
+			["avatar_url"] = avatar_url or "",
+			["username"] = username or "",
+			["content"] = content or "",
 			["embeds"] = {},
 		}
 		return setmetatable(Data, Webhook)
@@ -57,6 +57,16 @@ do
 
 	function Webhook:SetAvatarUrl(url)
 		self["avatar_url"] = url
+	end
+
+	function Webhook:NewEmbed(...)
+		local embed = Embed.new(...)
+		self["embeds"][#self["embeds"]+1] = embed
+		return embed
+	end
+
+	function Webhook:CountEmbeds()
+		return #self["embeds"]
 	end
 
 	function Webhook:Send(url)
@@ -129,10 +139,10 @@ do
 		return HttpService:JSONEncode(Data)
 	end
 
-	function Embed.new()
+	function Embed.new(title, description)
 		local Data = {
-			["title"] = "";
-			["description"] = "";
+			["title"] = title or "";
+			["description"] = description or "";
 			["url"] = "";
 			["timestamp"] = 0;
 			["color"] = 0;
@@ -232,8 +242,8 @@ do
 		self["author"]["icon_url"] = url
 	end
 
-	function Embed:NewField()
-		local field = Field.new()
+	function Embed:NewField(...)
+		local field = Field.new(...)
 		self["fields"][#self["fields"]+1] = field
 		return field
 	end
@@ -257,11 +267,11 @@ do
 		})
 	end
 
-	function Field.new()
+	function Field.new(name, value, inline)
 		local Data = {
-			["name"] = "";
-			["value"] = "";
-			["inline"] = false;
+			["name"] = name or "";
+			["value"] = value or "";
+			["inline"] = inline or false;
 		}
 		return setmetatable(Data, Field)
 	end
