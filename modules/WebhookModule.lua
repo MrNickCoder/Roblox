@@ -196,10 +196,14 @@ do
 	end
 
 	function Embed:SetColor3(color)
-		local value = bit32.lshift(math.floor(color["r"] * 255 + 0.5), 8)
-		value = bit32.lshift(math.floor(color["g"] * 255 + 0.5) + value, 8)
-		value = value + math.floor(color["b"] * 255 + 0.5)
-		self["color"] = value
+		if typeof(color) == "Color3" then
+			local value = bit32.lshift(math.floor(color["r"] * 255 + 0.5), 8)
+			value = bit32.lshift(math.floor(color["g"] * 255 + 0.5) + value, 8)
+			value = value + math.floor(color["b"] * 255 + 0.5)
+			self["color"] = value
+		elseif typeof(color) == "number" then
+			self["color"] = color
+		end
 	end
 
 	function Embed:AppendFooter(text)
