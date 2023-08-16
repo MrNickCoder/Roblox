@@ -43,11 +43,13 @@ local BufferContainer		= {}
 local Getter				= {}
 local UISetup				= {}
 local Functions				= {}
+local MacroData				= {}
 
 local Loader				= require(ReplicatedStorage.src.Loader)
 local UnitsData				= require(ReplicatedStorage.src.Data.Units)
 local ItemsFolder			= ReplicatedStorage.src.Data.Items
 local ItemInventoryService	= Loader.load_client_service(script, "ItemInventoryServiceClient")
+local PlacementService		= Loader.load_client_service(script, "PlacementServiceClient")
 
 local Count_Portal_List			= 0
 local Table_All_Items_Old_data	= {}
@@ -62,30 +64,23 @@ do
 	function InLobby() return (game.PlaceId == 8304191830) end
 
 	----- [ Map Getter ] -----
-	function Getter:GetLevelData()
-		local List = {}
-		for Index, Value in pairs(Workspace._MAP_CONFIG:WaitForChild("GetLevelData"):InvokeServer()) do List[Index] = Value end
-		return List
-	end
+	function Getter:GetLevelData() local List = {}; for Index, Value in pairs(Workspace._MAP_CONFIG:WaitForChild("GetLevelData"):InvokeServer()) do List[Index] = Value end return List end
 	function Getter:GetCurrentLevelId() if Workspace._MAP_CONFIG then return Getter:GetLevelData()["id"] end end
 	function Getter:GetCurrentLevelName() if Workspace._MAP_CONFIG then return Getter:GetLevelData()["name"] end end
 	function Getter:GetCurrentLevelTier() if Workspace._MAP_CONFIG then end end
-	function Getter:GetCurrentMap()
-		for Map, Identifiers in pairs(AAData["Map Identifier"]) do
-			if Getter:GetLevelData()["map"] then
-				if table.find(Identifiers, Getter:GetLevelData()["map"]) then
-					return Map
-				end
-			end
-		end
-	end
+	function Getter:GetCurrentMap() for Map, Identifiers in pairs(AAData["Map Identifier"]) do if Getter:GetLevelData()["map"] then if table.find(Identifiers, Getter:GetLevelData()["map"]) then return Map end end end return nil end
 	--------------------------
 
 	----- [ Item Getter ] -----
-	function Getter:Get_Inventory_Items_Unique_Items() return ItemInventoryService["session"]["inventory"]["inventory_profile_data"]["unique_items"] end
-	function Getter:Get_Inventory_Items() return ItemInventoryService["session"]["inventory"]["inventory_profile_data"]["normal_items"] end
-	function Getter:Get_Units_Owner() return ItemInventoryService["session"]["collection"]["collection_profile_data"]["owned_units"] end
+	function Getter:GetInventoryItemsUniqueItems() return ItemInventoryService["session"]["inventory"]["inventory_profile_data"]["unique_items"] end
+	function Getter:GetInventoryItems() return ItemInventoryService["session"]["inventory"]["inventory_profile_data"]["normal_items"] end
 	---------------------------
+
+	----- [ Unit Getter ] -----
+	function Getter:GetUnitsEquipped() return ItemInventoryService["session"]["collection"]["collection_profile_data"]["equipped_units"] end
+	function Getter:GetUnitsOwned() return ItemInventoryService["session"]["collection"]["collection_profile_data"]["owned_units"] end
+	---------------------------
+
 end
 if not InLobby() then Getter:GetLevelData() end
 if not InLobby() then CurrentMap = Getter:GetCurrentMap(); print(CurrentMap) end
@@ -93,13 +88,15 @@ if not InLobby() then CurrentMap = Getter:GetCurrentMap(); print(CurrentMap) end
 ---------------------------------
 ----- [ SETTINGS / CONFIG ] -----
 ---------------------------------
-local Directory = "Astral_V1_Anime_Adventures/"..Players.LocalPlayer.Name -- Config Directory
-local File = "Settings.json"
+local MainDirectory = "Astral_V1_Anime_Adventures/"..Players.LocalPlayer.Name -- Main Directory
+local MacrosDirectory = MainDirectory.."/Macros"
+local UnitsDirectory = MainDirectory.."/Units"
+local SettingsFile = "Settings.json"
 
 Settings = {}
-function SaveSettings() Settings = Utility:SaveConfig(Settings, Directory, File); warn("Settings Saved!") end
-function LoadSettings() return Utility:LoadConfig(Settings, Directory, File) end
-function SaveUnitPosition(UnitSlot, Positions:{any}, Reset:boolean)
+function SaveSettings() Settings = Utility:SaveConfig(Settings, MainDirectory, SettingsFile); warn("Settings Saved!") end
+function LoadSettings() return Utility:LoadConfig(Settings, MainDirectory, SettingsFile) end
+function SaveUnitPosition(UnitSlot, Positions, Reset)
 	if not Settings["World Positions"] then Settings["World Positions"] = {} end
 	if not Settings["World Positions"][CurrentMap] then Settings["World Positions"][CurrentMap] = {} end
 	if not Settings["World Positions"][CurrentMap][UnitSlot] then Settings["World Positions"][CurrentMap][UnitSlot] = {} end
@@ -132,7 +129,7 @@ do
 		end
 	end
 	for Index, Unit in pairs(UnitsData) do
-		if Unit.rarity then
+		if Unit["rarity"] then
 			Table_All_Items_Old_data[Index] = {}
 			Table_All_Items_Old_data[Index]["Name"] = Unit["name"]
 			Table_All_Items_Old_data[Index]["Count"] = 0
@@ -143,16 +140,16 @@ do
 			Table_All_Items_New_data[Index]["Count Shiny"] = 0
 		end
 	end
-	for Index, Item in pairs(Getter:Get_Inventory_Items()) do Table_All_Items_Old_data[Index]["Count"] = Item end
-	for _, Item in pairs(Getter:Get_Inventory_Items_Unique_Items()) do
+	for Index, Item in pairs(Getter:GetInventoryItems()) do Table_All_Items_Old_data[Index]["Count"] = Item end
+	for _, Item in pairs(Getter:GetInventoryItemsUniqueItems()) do
 		if string.find(Item["item_id"], "portal") or string.find(Item["item_id"], "disc") then
 			Count_Portal_list = Count_Portal_List + 1
 			Table_All_Items_Old_data[Item["item_id"]]["Count"] = Table_All_Items_Old_data[Item["item_id"]]["Count"] + 1
 		end
 	end
-	for _, Unit in pairs(Getter:Get_Units_Owner()) do
+	for _, Unit in pairs(Getter:GetUnitsOwned()) do
 		Table_All_Items_Old_data[Unit["unit_id"]]["Count"] = Table_All_Items_Old_data[Unit["unit_id"]]["Count"] + 1
-		if Unit.shiny then
+		if Unit["shiny"] then
 			Table_All_Items_Old_data[Unit["unit_id"]]["Count"] = Table_All_Items_Old_data[Unit["unit_id"]]["Count"] - 1
 			Table_All_Items_Old_data[Unit["unit_id"]]["Count Shiny"] = Table_All_Items_Old_data[Unit["unit_id"]]["Count Shiny"] + 1
 		end
@@ -173,7 +170,6 @@ do
 		Size = UDim2.new(0, 700, 0, 400),
 		ToggleKey = Enum.KeyCode.P,
 	})
-	Window:Enabled(false)
 
 	----- [ Home Page ] -----
 	function UISetup:Home()
@@ -368,7 +364,7 @@ do
 				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
 			}; Utility:Show(List, visible)
 		end
-		getgenv().UpdateWorldLevel = function(value:string)
+		getgenv().UpdateWorldLevel = function(value)
 			WorldLevel.Functions:Hide()
 			local visible = false
 			if AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] then
@@ -403,7 +399,7 @@ do
 				WorldDifficultyLabel.Label, WorldDifficulty.Dropdown
 			}; Utility:Show(List, visible)
 		end
-		getgenv().UpdateWorldDifficulty = function(value:string)
+		getgenv().UpdateWorldDifficulty = function(value)
 			WorldDifficulty.Functions:Hide()
 			local List = {
 				WorldDifficultySeparator.Label,
@@ -414,18 +410,18 @@ do
 			if AAData["World Type"]["Type"][FarmCategory.Data.Value]["Worlds"] then
 				if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value] then
 					if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Levels"] then
-						if (Settings["World Config"]["World Level"] and string.find(Settings["World Config"]["World Level"], "_infinite")) or
-							(Settings["Farm Config"]["Farm Category"] and table.find({"Legend Stages", "Raid Worlds"}, Settings["Farm Config"]["Farm Category"])) then
+						if (Settings["World Config"]["Level"] and string.find(Settings["World Config"]["Level"], "_infinite")) or
+							(Settings["Farm Config"]["Category"] and table.find({"Legend Stages", "Raid Worlds"}, Settings["Farm Config"]["Category"])) then
 							WorldDifficulty.Data.Options = {"Hard"}
-							Settings["World Config"]["World Difficulty"] = "Hard"
-						elseif (Settings["Farm Config"]["Farm Category"] and table.find({"Portals", "Dungeon", "Secret Portals"}, Settings["Farm Config"]["Farm Category"])) then
+							Settings["World Config"]["Difficulty"] = "Hard"
+						elseif (Settings["Farm Config"]["Category"] and table.find({"Portals", "Dungeon", "Secret Portals"}, Settings["Farm Config"]["Category"])) then
 							WorldDifficulty.Data.Options = {"Default"}
-							Settings["World Config"]["World Difficulty"] = "Default"
+							Settings["World Config"]["Difficulty"] = "Default"
 						else
 							WorldDifficulty.Data.Options = {"Normal", "Hard"}
-							Settings["World Config"]["World Difficulty"] = "Normal"
+							Settings["World Config"]["Difficulty"] = "Normal"
 						end
-						WorldDifficulty.Data.Value = Settings["World Config"]["World Difficulty"]
+						WorldDifficulty.Data.Value = Settings["World Config"]["Difficulty"]
 						WorldDifficulty.Section:UpdateDropdown(WorldDifficulty, nil, {Value = WorldDifficulty.Data.Value})
 						
 						local ignoring = false
@@ -443,7 +439,7 @@ do
 			end
 			Utility:Show(List, visible)
 		end
-		getgenv().UpdateIgnoredMap = function(value:string)
+		getgenv().UpdateIgnoredMap = function(value)
 			local List = {IgnoredMap.Dropdown}
 			local visible = false
 			if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"] then
@@ -462,7 +458,7 @@ do
 			end
 			Utility:Show(List, visible)
 		end
-		getgenv().UpdateIgnoredDamageModifier = function(value:string)
+		getgenv().UpdateIgnoredDamageModifier = function(value)
 			local List = {IgnoredDamageModifier.Dropdown};
 			local visible = false
 			if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"] then
@@ -481,7 +477,7 @@ do
 			end
 			Utility:Show(List, visible)
 		end
-		getgenv().UpdateIgnoredTier = function(value:string)
+		getgenv().UpdateIgnoredTier = function(value)
 			local List = {IgnoredTier.Dropdown};
 			local visible = false
 			if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"] then
@@ -500,7 +496,7 @@ do
 			end
 			Utility:Show(List, visible)
 		end
-		getgenv().UpdateIgnoredChallenge = function(value:string)
+		getgenv().UpdateIgnoredChallenge = function(value)
 			local List = {IgnoredChallenge.Dropdown};
 			local visible = false
 			if AAData["World Type"]["Type"][FarmCategory.Data.Value]["World"][WorldType.Data.Value]["Level"] then
@@ -596,7 +592,7 @@ do
 		if not Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value] then Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value] = {} end
 		if not Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units then Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units = {} end
 		for UnitSlot = 1, 6 do
-			--coroutine.resume(coroutine.create(function()
+			task.spawn(function()
 				if not Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)] then Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)] = {} end
 				if not UnitSettings[UnitSlot] then UnitSettings[UnitSlot] = {} end
 				local USettings = UnitSettings[UnitSlot]
@@ -639,7 +635,7 @@ do
 				USettings["Auto Ability"] = USettings["Section"]:AddDropdown("🔥 Auto Ability", function(value)
 					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Auto Ability"] = value; SaveSettings()
 				end, {Options = {"Disable","Cooldown","On Attack [All]","On Attack [Ground]","On Attack [Air]"}, Value = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Auto Ability"] or "Disable"})
-			--end))
+			end)
 		end
 
 		-------------------------------------------
@@ -648,9 +644,10 @@ do
 			if not Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value] then Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value] = {} end
 			if not Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units then Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units = {} end
 			for UnitSlot = 1, 6 do
-				--coroutine.resume(coroutine.create(function()
+				task.spawn(function()
 					if not Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)] then Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)] = {} end
-					if not UnitSettings[UnitSlot] then UnitSettings[UnitSlot] = {} end
+					repeat task.wait() until Utility:Length(UnitSettings[UnitSlot]) >= 16
+
 					local USettings = UnitSettings[UnitSlot]
 					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Active"] = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Active"] or false
 					Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Target Priority"] = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Target Priority"] or "First"
@@ -678,7 +675,7 @@ do
 					USettings["Upgrade Limit"].Section:UpdateSlider(USettings["Upgrade Limit"], nil, {Value = USettings["Upgrade Limit"].Data.Value, Min = USettings["Upgrade Limit"].Data.Min, Max = USettings["Upgrade Limit"].Data.Max})
 					USettings["Auto Ability"].Data.Value = Settings["Unit Config"].Configs[LoadUnitConfig.Data.Value].Units["Unit "..tostring(UnitSlot)]["Auto Ability"]
 					USettings["Auto Ability"].Section:UpdateDropdown(USettings["Auto Ability"], nil, {Value = USettings["Auto Ability"].Data.Value})
-				--end))
+				end)
 			end
 		end
 		getgenv().ResetUnitConfig = function()
@@ -728,19 +725,19 @@ do
 		if not InLobby() then
 			getgenv().PositionChange = function(value)
 				for UnitSlot = 1, 6 do
-					--coroutine.resume(coroutine.create(function()
-						if not UnitSettings[UnitSlot] then UnitSettings[UnitSlot] = {} end
+					task.spawn(function()
+						repeat task.wait() until Utility:Length(UnitSettings[UnitSlot]) >= 16
 						local USettings = UnitSettings[UnitSlot]
 						Utility:Show({
 							USettings["Selected Position"].Dropdown,
 							USettings["Single"].Button,
 							USettings["Delete"].Button,
-							USettings[""].Label,
+							USettings["Single Group Separator"].Label,
 							USettings["Group"].Button,
 							USettings["Spread"].Button,
 							USettings["Clear"].Button,
 						}, value)
-					--end))
+					end)
 				end
 			end
 
@@ -753,7 +750,10 @@ do
 
 	----- [ Macro Config ] -----
 	local MacroConfig, CreateMacro;
+	local MacroMaps = {};
 	function UISetup:Macro()
+		if Settings and not Settings["Macro"] then Settings["Macro"] = {} end
+		if Settings and not Settings["Macro"].Maps then Settings["Macro"].Maps = {} end
 		PMacro = Window:AddPage("Macro", "🕹️")
 		local SMacroSplits = PMacro:AddSplit()
 		local SMacroStatus = PMacro:AddSection("🕹️ Macro Information 🕹️", {Split = SMacroSplits, Side = "Left"})
@@ -761,34 +761,111 @@ do
 		local SMacroUnits = PMacro:AddSection("🧙 Macro Units 🧙", {Split = SMacroSplits, Side = "Left"})
 		local SMacroMaps = PMacro:AddSection("🌏 Macro Maps 🌏", {Split = SMacroSplits, Side = "Right"})
 		
-		SMacroStatus:AddLabel("Status: N/A")
-		SMacroStatus:AddLabel("Action: N/A")
-		SMacroStatus:AddLabel("Type: N/A")
-		SMacroStatus:AddLabel("Unit: N/A")
-		SMacroStatus:AddLabel("Currently Waiting For Money: N/A")
+		local InfoStatus = SMacroStatus:AddLabel("Status: Stopped")
+		local InfoAction = SMacroStatus:AddLabel("Action: N/A")
+		local InfoType = SMacroStatus:AddLabel("Type: N/A")
+		local InfoUnit = SMacroStatus:AddLabel("Unit: N/A")
+		local InfoWaiting = SMacroStatus:AddLabel("Waiting For (None): N/A")
 		
 		MacroConfig = SMacroOptions:AddDropdown("🕹️ Macro: ", function(value)
-
-		end, {})
+			Settings["Macro"].Selected = value;
+			SaveSettings();
+		end, {Value = Settings["Macro"].Selected or ""})
 		CreateMacro = SMacroOptions:AddTextbox("💾 Create Macro", function(value)
-			table.insert(MacroConfig.Data.Options, value)
-			CreateMacro.Data.Text = ""
-			CreateMacro.Section:UpdateTextbox(CreateMacro, nil, {Text = CreateMacro.Data.Text})
+			CreateMacro.Data.Text = ""; CreateMacro.Section:UpdateTextbox(CreateMacro, nil, {Text = CreateMacro.Data.Text});
+			local Success = pcall(function() writefile(MacrosDirectory.."/"..value..".json", HttpService:JSONEncode({})) end)
+			if Success then Window:Notify("Macro Update", "Successfully created "..value.." Macro!")
+			else Window:Notify("Macro Update", "Error while creating "..value.." Macro!") end
+			
+			getgenv().RefeshMacroList()
 		end, {Placeholder = "Macro Name", RequireEntered = true})
+		SMacroOptions:AddButton("🔄 Refresh Macro List", function() getgenv().RefeshMacroList() end)
+		SMacroOptions:AddButton("🔥 Delete Macro", function()
+			local Success = pcall(function() readfile(MacrosDirectory.."/"..Settings["Macro"].Selected..".json") end)
+			if Success then
+				delfile(MacrosDirectory.."/"..Settings["Macro"].Selected..".json")
+				Window:Notify("Macro Update", "Successfully deleted "..value.." Macro!")
+			end
+			SaveSettings()
+
+			getgenv().RefeshMacroList()
+		end)
+		SMacroOptions:AddToggle("▶️ Play Macro", function(value)
+			Settings["Macro"].Play = value;
+			SaveSettings();
+		end, {Active = Settings["Macro"].Play or false})
 		SMacroOptions:AddToggle("⏺️ Record", function(value) end)
 		SMacroOptions:AddToggle("⚡ Record Abilities", function(value) end)
-		SMacroOptions:AddButton("🔥 Delete Macro", function() end)
-		SMacroOptions:AddToggle("▶️ Play Macro", function(value) end)
 		
 		SMacroUnits:AddButton("🧙 Equip Macro Units", function() end)
 		
 		for _, Map in pairs(AAData["Maps"]) do
-			local MacroMap = SMacroMaps:AddDropdown(Map..": ", function(value) end, {Value = "None", ExpandLimit = 5})
-			MacroMap.Data.Options = Utility:Combine_Table({"None"}, MacroConfig.Data.Options)
+			MacroMaps[Map] = SMacroMaps:AddDropdown(Map..": ", function(value)
+				Settings["Macro"].Maps[Map] = value;
+				SaveSettings();
+			end, {Options = {"None"}, Value = Settings["Macro"].Maps[Map] or "None", ExpandLimit = 5})
 		end
 		
 		-------------------------------------------
 		
+		getgenv().RefeshMacroList = function()
+			local Files = Utility:GetFiles(MacrosDirectory)
+			local Temp = {}
+			for _, File in pairs(Files) do
+				if string.sub(File, #File - 4) ~= ".json" then continue end
+				table.insert(Temp, string.sub(File, #MacrosDirectory + 2, #File - 5))
+			end
+			MacroConfig.Data.Options = Temp
+			if Settings["Macro"].Selected and Settings["Macro"].Selected ~= "" then
+				local Success = pcall(function() readfile(MacrosDirectory.."/"..Settings["Macro"].Selected..".json") end)
+				if not Success then
+					Settings["Macro"].Selected = ""
+					MacroConfig.Data.Value = Settings["Macro"].Selected
+					MacroConfig.Section:UpdateDropdown(MacroConfig, nil, {Value = MacroConfig.Data.Value})
+				else
+					MacroConfig.Section:UpdateDropdown(MacroConfig, nil, {})
+				end
+			end
+			for Map, _ in pairs(MacroMaps) do
+				MacroMaps[Map].Data.Options = Utility:Combine_Table({"None"}, Temp)
+				if Settings["Macro"].Maps[Map] and Settings["Macro"].Maps[Map] ~= "None" then
+					local Success = pcall(function() readfile(MacrosDirectory.."/"..Settings["Macro"].Maps[Map]..".json") end)
+					if not Success then
+						Settings["Macro"].Maps[Map] = "None"
+						MacroMaps[Map].Data.Value = Settings["Macro"].Maps[Map]
+					end
+					MacroMaps[Map].Section:UpdateDropdown(MacroMaps[Map], nil, {Value = MacroMaps[Map].Data.Value})
+					continue;
+				end
+				MacroMaps[Map].Section:UpdateDropdown(MacroMaps[Map], nil, {})
+			end
+
+			SaveSettings()
+		end
+
+		if not InLobby() then
+			RunService.RenderStepped:Connect(function()
+				pcall(function()
+					if MacroData ~= {}  then
+						if MacroData["Macro"] and MacroData["Status"] and MacroData["Status"] ~= "" then InfoStatus.Section:UpdateLabel(InfoStatus, "Status: "..MacroData["Status"]) else InfoStatus.Section:UpdateLabel(InfoStatus, "Status: Stopped") end
+						if MacroData["Macro"] and MacroData["Action"] and MacroData["Action"] ~= 0 then InfoAction.Section:UpdateLabel(InfoAction, "Action: "..MacroData["Action"].." / "..Utility:Length(MacroData["Macro"])) else InfoAction.Section:UpdateLabel(InfoAction, "Action: N/A") end
+						if MacroData["Macro"] and MacroData["Type"] and MacroData["Type"] ~= "" then InfoType.Section:UpdateLabel(InfoType, "Type: "..MacroData["Type"]) else InfoType.Section:UpdateLabel(InfoType, "Type: N/A") end
+						if MacroData["Macro"] and MacroData["Unit"] and MacroData["Unit"] ~= "" then InfoUnit.Section:UpdateLabel(InfoUnit, "Unit: "..MacroData["Unit"]) else InfoUnit.Section:UpdateLabel(InfoUnit, "Unit: N/A") end
+						if MacroData["Macro"] and MacroData["Waiting"] and MacroData["Waiting"] ~= {} then
+							if MacroData["Waiting"]["Type"] and MacroData["Waiting"]["Value"] then
+								if MacroData["Waiting"]["Type"] == "Money" then
+									InfoWaiting.Section:UpdateLabel(InfoWaiting, "Waiting For (Cash): "..tostring(MacroData["Waiting"]["Value"]))
+								elseif MacroData["Waiting"]["Type"] == "Wave" then
+									InfoWaiting.Section:UpdateLabel(InfoWaiting, "Waiting For (Wave): "..tostring(MacroData["Waiting"]["Value"]))
+								else InfoWaiting.Section:UpdateLabel(InfoWaiting, "Waiting For (None): N/A") end
+							else InfoWaiting.Section:UpdateLabel(InfoWaiting, "Waiting For (None): N/A") end
+						else InfoWaiting.Section:UpdateLabel(InfoWaiting, "Waiting For (None): N/A") end
+					end
+				end)
+			end)
+		end
+
+		getgenv().RefeshMacroList()
 	end
 	----------------------------
 
@@ -811,6 +888,8 @@ do
 		if Settings and not Settings["Misc"] then Settings["Misc"] = {} end
 		if Settings and not Settings["Misc"].Discord then Settings["Misc"].Discord = {} end
 		if Settings and not Settings["Misc"].Device then Settings["Misc"].Device = {} end
+		if Settings and not Settings["Misc"].Laggy then Settings["Misc"].Laggy = {} end
+		if Settings and not Settings["Misc"].UI then Settings["Misc"].UI = {} end
 		if Settings and not Settings["Misc"].Map then Settings["Misc"].Map = {} end
 		if Settings and not Settings["Misc"].Script then Settings["Misc"].Script = {} end
 		if Settings and not Settings["Misc"].Players then Settings["Misc"].Players = {} end
@@ -819,6 +898,7 @@ do
 		local SMiscSplit = PMisc:AddSplit()
 		local SDevicePerformance = PMisc:AddSection("🖥️ Device Performance 🖥️", {Split = SMiscSplit, Side = "Left"})
 		local SLaggyBETA = PMisc:AddSection("LAGGY Config (BETA)", {Split = SMiscSplit, Side = "Left"})
+		local SUserInterface = PMisc:AddSection("🖼️ User Interface 🖼️", {Split = SMiscSplit, Side = "Left"})
 		local SMapPerformance = PMisc:AddSection("🌏 Map Performance 🌏", {Split = SMiscSplit, Side = "Right"})
 		local SScriptSettings = PMisc:AddSection("⌛ Script Settings ⌛", {Split = SMiscSplit, Side = "Right"})
 		local SPlayersModification = PMisc:AddSection("🐱 Players Modification 🐱", {Split = SMiscSplit, Side = "Right"})
@@ -835,11 +915,25 @@ do
 		SDevicePerformance:AddToggle("🔫 Boost FPS Mode", function(value) Settings["Misc"].Device["Boost FPS Mode"] = value; SaveSettings() end, {Active = Settings["Misc"].Device["Boost FPS Mode"] or false})
 		
 		--- [ LAGGY ] ---
+
+		--- [ User Interface ] ---
+		SUserInterface:AddToggle("🖼️ Hide Alert Message 🖼️", function(value)
+			Settings["Misc"].UI["Hide Alert Message"] = value;
+			SaveSettings()
+
+			Functions:AlertMessage(not Settings["Misc"].UI["Hide Alert Message"])
+		end, {Active = Settings["Misc"].UI["Hide Alert Message"] or false})
 		
 		--- [ Map Performance ] ---
 		SMapPerformance:AddToggle("🗺️ Delete Map", function(value) Settings["Misc"].Map["Delete Map"] = value; SaveSettings() end, {Active = Settings["Misc"].Map["Delete Map"] or false})
-		SMapPerformance:AddToggle("👇 Place Anywhere", function(value) Settings["Misc"].Map["Place Anywhere"] = value; SaveSettings() end, {Active = Settings["Misc"].Map["Place Anywhere"] or false})
-		SMapPerformance:AddButton("Activate Place Anywhere", function() end)
+		SMapPerformance:AddToggle("👇 Place Anywhere", function(value)
+			Settings["Misc"].Map["Place Anywhere"] = value;
+			SaveSettings()
+
+			Functions:PlaceAnywhere()
+			Functions:RemoveUnitsHitbox()
+		end, {Active = Settings["Misc"].Map["Place Anywhere"] or false})
+		SMapPerformance:AddButton("Activate Place Anywhere", function() Functions:PlaceAnywhere(); Functions:RemoveUnitsHitbox() end)
 		SMapPerformance:AddToggle("⛰️ Delete Hill [Disable hill placing]", function(value) Settings["Misc"].Map["Delete Hill"] = value; SaveSettings() end, {Active = Settings["Misc"].Map["Delete Hill"] or false})
 		SMapPerformance:AddButton("Activate Delete Hill", function() end)
 		
@@ -887,9 +981,9 @@ do
 			pcall(function()
 				for slot = 1, 6 do
 					local name;
-					if ItemInventoryService["session"]["collection"]["collection_profile_data"]["equipped_units"][tostring(slot)] then
-						local uuid = ItemInventoryService["session"]["collection"]["collection_profile_data"]["equipped_units"][tostring(slot)]
-						local unit_id = ItemInventoryService["session"]["collection"]["collection_profile_data"]["owned_units"][uuid]["unit_id"]
+					if Getter:GetUnitsEquipped()[tostring(slot)] then
+						local uuid = Getter:GetUnitsEquipped()[tostring(slot)]
+						local unit_id = Getter:GetUnitsOwned()[uuid]["unit_id"]
 						name = UnitsData[unit_id]["name"]
 					end
 
@@ -906,29 +1000,69 @@ end
 ----- [ FUNCTIONS ] -----
 -------------------------
 do
-	----- [ Place ] -----
-	function Functions:PlaceUnit()
-
-	end
-	---------------------
-
-	----- [ Upgrade ] -----
-	function Functions:UpgradeUnit()
+	----- [ Get Unit ] -----
+	function Functions:GetUnit(Position)
 		repeat task.wait() until Workspace:WaitForChild("_UNITS")
-		for _, unit in ipairs(Workspace["_UNITS"]:GetChildren()) do
-
+		for _, Unit in ipairs(Workspace["_UNITS"]:GetChildren()) do
+			repeat task.wait() until Unit:WaitForChild("_stats")
+			if Unit:FindFirstChild("_stats"):FindFirstChild("player").Value == Players.LocalPlayer then
+				local magnitude = (Unit.PrimaryPart.Position - Position).magnitude
+				if math.floor(magnitude) == 0 then
+					return Unit
+				end
+			end
 		end
+		return nil
 	end
-	-----------------------
+	------------------------
+
+	----- [ Place Unit ] -----
+	function Functions:PlaceUnit(UUID, Position)
+		local args = {
+			[1] = UUID,
+			[2] = CFrame.new(Position),
+		}
+		local Success = pcall(function() ReplicatedStorage.endpoints.client_to_server.spawn_unit:InvokeServer(unpack(args)) end)
+		if Success then return true end
+		return false
+	end
+	--------------------------
+
+	----- [ Upgrade Unit ] -----
+	function Functions:UpgradeUnit(Unit)
+		local args = {
+			[1] = Unit;
+		}
+		local Success = pcall(function() ReplicatedStorage.endpoints.client_to_server.upgrade_unit_ingame:InvokeServer(unpack(args)) end)
+		if Success then return true end
+		return false
+	end
+	----------------------------
+
+	----- [ Sell Unit ] -----
+	function Functions:SellUnit(Unit)
+		local args = {
+			[1] = Unit;
+		}
+		local Success = pcall(function() ReplicatedStorage.endpoints.client_to_server.sell_unit_ingame:InvokeServer(unpack(args)) end)
+		if Success then return true end
+		return false
+	end
+	-------------------------
 
 	----- [ Target Priority ] -----
-	function Functions:TargetPriority()
-
+	function Functions:TargetPriority(Unit)
+		local args = {
+			[1] = Unit;
+		}
+		local Success = pcall(function() ReplicatedStorage.endpoints.client_to_server.cycle_priority:InvokeServer(unpack(args)) end)
+		if Success then return true end
+		return false
 	end
 	-------------------------------
 
 	----- [ Position Unit ] -----
-	function Functions:PositionUnit(UnitSlot, Type:string, Specific:string)
+	function Functions:PositionUnit(UnitSlot, Type, Specific)
 		if Type == "Group" then
 			print("[Setting Position] Type: Group")
 			local RaycastParameters = RaycastParams.new()
@@ -1036,7 +1170,7 @@ do
 
     ----- [ Auto Buff ] -----
     function Functions:AutoBuff(Buffer)
-        return Utility:Thread(Buffer, function()
+        return Utility:Thread(Buffer.." Buffer", function()
 			print(Buffer.." Auto Buff Started")
             local LocalPlayer = Players.LocalPlayer
             local Data = AAData["Game Setting"]["Buffers"][Buffer]
@@ -1046,6 +1180,7 @@ do
 				if #Container <= 0 then return end
                 local Temp = {}
                 for _, unit in pairs(Workspace._UNITS:GetChildren()) do
+					task.wait()
                     if table.find(Data["Name"], unit.Name) then
 						if unit:FindFirstChild("_stats") and unit:FindFirstChild("_stats"):FindFirstChild("player").Value == LocalPlayer then
 							if not table.find(Temp, unit) then
@@ -1055,6 +1190,7 @@ do
                     end
                 end
                 for pos, unit in pairs(Container) do -- Removing Deleted Buffer
+					task.wait()
                     if not table.find(Temp, unit) then
                         --table.remove(Container, table.find(Container, unit))
 						table.remove(Container, pos)
@@ -1065,6 +1201,7 @@ do
             local function AddBuffer() -- Adding Newer Buffer
 				if #Container >= 4 then return end
                 for _, unit in pairs(Workspace._UNITS:GetChildren()) do
+					task.wait()
 					if table.find(Data["Name"], unit.Name) then
 						if unit:FindFirstChild("_stats") and unit:FindFirstChild("_stats"):FindFirstChild("player").Value == LocalPlayer then
 							if not table.find(Container, unit) then
@@ -1084,6 +1221,7 @@ do
                 AddBuffer()
 
                 for count = 1, 4 do
+					task.wait()
                     if #Container < 4 then break end
                     RemoveBuffer()
                     if Container[count] ~= nil and Container[count].Parent == Workspace._UNITS then
@@ -1097,6 +1235,47 @@ do
         end)
     end
 	-------------------------
+
+	----- [ Get Portal ] -----
+	function Functions:GetPortals(ID)
+		local Portals = {}
+		for _, Item in pairs(Getter:GetInventoryItemsUniqueItems()) do
+			if Item["item_id"]:match(ID) then
+				if Settings["World Config"].Ignored then
+					if Item["_unique_item_data"]["_unique_portal_data"]["challenge"] then
+						local Challenge = Item["_unique_item_data"]["_unique_portal_data"]["challenge"]
+						if Settings["World Config"].Ignored["Challenge"] and Settings["World Config"].Ignored["Challenge"] ~= {} then
+							if table.find(Settings["World Config"].Ignored["Challenge"], tostring(Challenge)) then continue end
+						end
+					end
+					if Item["_unique_item_data"]["_unique_portal_data"]["portal_depth"] then
+						local Tier = Item["_unique_item_data"]["_unique_portal_data"]["portal_depth"]
+						if Settings["World Config"].Ignored["Tier"] and Settings["World Config"].Ignored["Tier"] ~= {} then
+							if table.find(Settings["World Config"].Ignored["Tier"], tostring(Tier)) then continue end
+						end
+					end
+				end
+				table.insert(Portals, Item)
+			end
+		end
+		return Portals
+	end
+	-----------------------------
+
+	----- [ Replay Portal ] -----
+	function Functions:AutoReplay(Type, Data)
+		if not Data then return false end
+		if Type == "Portal" then
+			local args = {
+				[1] = "replay";
+				[2] = {["item_uuid"] = Data["uuid"]}
+			}
+			local Success = pcall(function() ReplicatedStorage.endpoints.client_to_server.set_game_finished_vote:InvokeServer(unpack(args)) end)
+			if Success then return true end
+		end
+		return false
+	end
+	-----------------------------
 
     ----- [ Teleport ] -----
     function Functions:Teleport()
@@ -1125,11 +1304,205 @@ do
         end
     end
     --------------------------
+
+	----- [ Place Anywhere ] -----
+	function Functions:PlaceAnywhere()
+		task.spawn(function() while task.wait() do PlacementService.can_place = true end end)
+	end
+	------------------------------
+
+	----- [ Remove Units Hitbox ] -----
+	function Functions:RemoveUnitsHitbox()
+		repeat task.wait() until Workspace:WaitForChild("_UNITS")
+		for _, Unit in ipairs(Workspace:FindFirstChild("_UNITS"):GetChildren()) do
+			repeat task.wait() until Unit:WaitForChild("_stats")
+			if Unit["_stats"]["player"].Value == Players.LocalPlayer and Unit:FindFirstChild("_hitbox") then
+				Unit["_hitbox"]:Destroy()
+			end
+		end
+	end
+	-----------------------------------
+
+	----- [ Alert Message ] -----
+	function Functions:AlertMessage(Enabled)
+		Players.LocalPlayer.PlayerGui:WaitForChild("MessageGui").Enabled = Enabled
+	end
+	----------------------------------
 end
 
 ---------------------
 ----- [ SETUP ] -----
 ---------------------
+local Threads = {}
+Threads["Macro"] = Utility:Thread("Macro", function()
+	task.spawn(function()
+		if not InLobby() then
+			----- [ Get Macro ] -----
+			if Settings["Macro"].Maps then
+				local Success, Result = pcall(function() return HttpService:JSONDecode(readfile(MacrosDirectory.."/"..Settings["Macro"].Maps[CurrentMap]..".json")) end)
+				if Success then MacroData["Macro"] = Result; end
+			end
+
+			----- [ Get Units ] -----
+			local Units = {}
+			for Slot = 1, Utility:Length(Getter:GetUnitsEquipped()) do
+				if Getter:GetUnitsEquipped()[tostring(Slot)] then
+					local uuid = Getter:GetUnitsEquipped()[tostring(Slot)]
+					local unit_id = Getter:GetUnitsOwned()[uuid]["unit_id"]
+					local name = UnitsData[unit_id]["name"]
+
+					Units[unit_id] = {["unit_id"] = unit_id, ["uuid"] = uuid, ["name"] = name}
+				end
+			end
+
+			----- [ Start Macro ] -----
+			if MacroData["Macro"] then
+				warn("Starting Macro")
+				for Index = 1, Utility:Length(MacroData["Macro"]) do
+					if not Settings["Macro"].Play then
+						repeat task.wait(); MacroData["Status"] = "Stopped"
+						until Settings["Macro"].Play
+					end
+					MacroData["Status"] = "Running"
+					MacroData["Action"] = Index
+					local Action = MacroData["Macro"][tostring(Index)]
+
+					if Action["type"] == "spawn_unit" then
+						MacroData["Type"] = "Placing Unit"
+						local split = string.split(Action["cframe"], ",")
+						local pos = Vector3.new(tonumber(split[1]), tonumber(split[2]), tonumber(split[3]))
+						local unit = Units[Action["unit"]]
+
+						if unit ~= nil then
+							MacroData["Unit"] = Units[Action["unit"]]["name"]
+							print("Placing "..Units[Action["unit"]]["name"])
+
+							-- [ Condition Holder ] --
+							if Action["money"] then
+								repeat task.wait(); MacroData["Waiting"] = {["Type"] = "Money", ["Value"] = Action["money"]}
+								until Players.LocalPlayer:WaitForChild("_stats"):WaitForChild("resource").Value >= Action["money"]
+							end
+
+							local Result = false
+							task.spawn(function() Result = Functions:PlaceUnit(unit["uuid"], pos) end)
+							repeat task.wait(0.1); if not Result then task.spawn(function() Result = Functions:PlaceUnit(unit["uuid"], pos) end) end
+							until Result
+						end
+					elseif Action["type"] == "upgrade_unit_ingame" then
+						MacroData["Type"] = "Upgrading Unit"
+						local split = string.split(Action["pos"], ",")
+						local pos = Vector3.new(tonumber(split[1]), tonumber(split[2]), tonumber(split[3]))
+						local unit = Functions:GetUnit(pos)
+
+						if unit ~= nil then
+							MacroData["Unit"] = Units[unit["_stats"]["id"].Value]["name"]
+							print("Upgrading "..Units[unit["_stats"]["id"].Value]["name"])
+
+							-- [ Condition Holder ] --
+							if Action["money"] then
+								repeat task.wait(); MacroData["Waiting"] = {["Type"] = "Money", ["Value"] = Action["money"]}
+								until Players.LocalPlayer:WaitForChild("_stats"):WaitForChild("resource").Value >= Action["money"]
+							end
+							
+							local Result = false
+							task.spawn(function() Result = Functions:UpgradeUnit(unit) end)
+							repeat task.wait(0.1); if not Result then task.spawn(function() Result = Functions:UpgradeUnit(unit) end) end
+							until Result
+						end
+					elseif Action["type"] == "sell_unit_ingame" then
+						MacroData["Type"] = "Selling Unit"
+						local split = string.split(Action["pos"], ",")
+						local pos = Vector3.new(tonumber(split[1]), tonumber(split[2]), tonumber(split[3]))
+						local unit = Functions:GetUnit(pos)
+
+						if unit ~= nil then
+							MacroData["Unit"] = Units[unit["_stats"]["id"].Value]["name"]
+							print("Selling "..Units[unit["_stats"]["id"].Value]["name"])
+							
+							local Result = false
+							task.spawn(function() Result = Functions:SellUnit(unit) end)
+							repeat task.wait(0.1); if not Result then task.spawn(function() Result = Functions:SellUnit(unit) end) end
+							until Result
+						end
+					elseif Action["type"] == "cycle_priority" then
+						MacroData["Type"] = "Change Unit Target Priority"
+						local split = string.split(Action["pos"], ",")
+						local pos = Vector3.new(tonumber(split[1]), tonumber(split[2]), tonumber(split[3]))
+						local unit = Functions:GetUnit(pos)
+
+						if unit ~= nil then
+							MacroData["Unit"] = Units[unit["_stats"]["id"].Value]["name"]
+							print("Change Target "..Units[unit["_stats"]["id"].Value]["name"])
+							
+							-- [ Condition Holder ] --
+							if Action["Wave"] then
+								repeat task.wait(); MacroData["Waiting"] = {["Type"] = "Wave", ["Value"] = Action["Wave"]}
+								until Workspace:WaitForChild("_wave_num").Value >= tonumber(Action["Wave"])
+							end
+							if Action["Wavetime"] then
+								repeat task.wait();
+								until Workspace:WaitForChild("_wave_time").Value <= tonumber(Action["Wavetime"])
+							end
+							
+							local Result = false
+							task.spawn(function() Result = Functions:TargetPriority(unit) end)
+							repeat task.wait(0.1); if not Result then task.spawn(function() Result = Functions:TargetPriority(unit) end) end
+							until Result
+						end
+					end
+					task.wait(0.1)
+				end
+				MacroData["Status"] = "Finished"
+				MacroData["Type"] = ""
+				MacroData["Unit"] = ""
+				MacroData["Waiting"] = {}
+			end
+		end
+	end)
+end); Threads["Macro"]:Start()
+Utility:Thread("Game Detector", function()
+	task.spawn(function()
+		local GameFinished = Workspace:WaitForChild("_DATA"):WaitForChild("GameFinished")
+		GameFinished:GetPropertyChangedSignal("Value"):Connect(function()
+			print("Game Finished: ", GameFinished.Value == true)
+			if GameFinished.Value == true then
+				repeat task.wait() until Players.LocalPlayer.PlayerGui.ResultsUI.Enabled == true
+				-- Webhook Here!
+
+				Threads["Buffer"]:Stop()
+
+				Threads["Macro"]:Stop()
+				MacroData["Status"] = "Game Finished"
+				MacroData["Type"] = ""
+				MacroData["Unit"] = ""
+				MacroData["Waiting"] = {}
+
+				print("Waiting For Next or Leave")
+				task.wait(1.5)
+
+				local Category = Settings["Farm Config"]["Category"];
+				local Level = Settings["World Config"]["Level"];
+				if table.find({"Portals", "Secret Portals"}, Category) then
+					if Settings["Farm Config"].Auto["Replay Portal"] then
+						local Portals = Functions:GetPortals(Level)
+
+						if Portals ~= {} then
+							print("Portal Replay")
+
+							local Result = false
+							task.spawn(function() Result = Functions:AutoReplay("Portal", {["uuid"] = Portals[1]["uuid"]}) end)
+							repeat task.wait(0.1); if not Result then task.spawn(function() Result = Functions:AutoReplay("Portal", {["uuid"] = Portals[1]["uuid"]}) end) end
+							until Result
+						end
+					end
+				else
+
+				end
+			end
+		end)
+	end)
+end):Start()
+
 if InLobby() then
 	UISetup:Home()
 	UISetup:AutoFarm()
@@ -1148,9 +1521,9 @@ else
 end
 if Players.LocalPlayer.UserId == 82468271 then UISetup:Debug() end
 Window:SelectPage(PHome, true)
-Window:Enabled(true)
+if not InLobby() and Settings and Settings["Macro"] and Settings["Macro"].Play then Window:SelectPage(PMacro, true) end
 
-coroutine.resume(coroutine.create(function()
+Threads["Buffer"] = Utility:Thread("Auto Buffer", function()
 	task.spawn(function()
 		if not InLobby() and Settings["Unit Config"].Auto["Buff"] then
 			for i, _ in pairs(AAData["Game Setting"]["Buffers"]) do
@@ -1161,7 +1534,11 @@ coroutine.resume(coroutine.create(function()
 			end
 		end
 	end)
-end))
+end); Threads["Buffer"]:Start()
+
+if Settings["Misc"].Map["Place Anywhere"] then Functions:PlaceAnywhere(); Functions:RemoveUnitsHitbox() end
+if Settings["Misc"].UI["Hide Alert Message"] then Functions:AlertMessage(not Settings["Misc"].UI["Hide Alert Message"]) end
+
 SaveSettings()
 
 --------------------------
