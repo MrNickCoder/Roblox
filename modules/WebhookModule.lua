@@ -139,11 +139,11 @@ do
 		return HttpService:JSONEncode(Data)
 	end
 
-	function Embed.new(title, description)
+	function Embed.new(title, description, url)
 		local Data = {
 			["title"] = title or "";
 			["description"] = description or "";
-			["url"] = "";
+			["url"] = url or "";
 			["timestamp"] = 0;
 			["color"] = 0;
 			["footer"] = { ["text"] = ""; ["icon_url"] = ""; };
