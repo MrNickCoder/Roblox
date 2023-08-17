@@ -186,13 +186,14 @@ do
 	function Embed:SetTimestamp(epoch)
 		if epoch == nil then epoch = tick() end
 		local temp = os.date('!*t', epoch)
-		self["timestamp"] = 
-			temp["year"] .. '-' 
-			.. string.format("%02d", temp["month"]) .. '-'
-			.. string.format("%02d", temp["day"]) .. 'T'
-			.. string.format("%02d", temp["hour"]) .. ':'
-			.. string.format("%02d", temp["min"]) .. ':'
-			.. string.format("%02d", temp["sec"]) .. 'Z'
+		self["timestamp"] = string.format("%d-%02d-%02dT%02d:%02d:%02dZ",
+			temp["year"],
+			temp["month"],
+			temp["day"],
+			temp["hour"],
+			temp["min"],
+			temp["sec"]
+		)
 	end
 
 	function Embed:SetColor(color)
