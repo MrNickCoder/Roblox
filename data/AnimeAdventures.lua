@@ -298,6 +298,12 @@ return {
 		"BILLION",
 		"SubToKelvingts","SubToKelvingts","TOADBOIGAMING","KingLuffy","noclypso","subtosnowrbx","Cxrsed","FictioNTheFirst","subtomaokuma",
 	};
+	["Alternatives"] = {
+		["Units"] = {
+			{"hoshino","hoshino_2"};
+			{"hoshino_evolved","hoshino_2_evolved"}
+		};
+	};
 	["Identifiers"] = {
 		["Map"] = {
 			----- [ Common Maps ] -----
