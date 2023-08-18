@@ -145,10 +145,16 @@ return {
 			};
 			["Portals"] = {
 				["Worlds"] = {
-					"Alien Portals","Zeldris Portals","Demon Portals","Dressrosa Portals","The Eclipse","Summer Hunt"
+					"Alien Portal","Demon Leader's Portals","Puppet Portal","Eclipse Portal","Summer Portal"
 				};
 				["World"] = {
-					["Alien Portals"] = {
+					["Final Disc"] = {
+						["Levels"] = {""};
+						["Level"] = {
+							
+						}
+					};
+					["Alien Portal"] = {
 						["Levels"] = {"portal_boros_g"};
 						["Level"] = {
 							["portal_boros_g"] = {
@@ -156,15 +162,7 @@ return {
 							};
 						};
 					};
-					["Zeldris Portals"] = {
-						["Levels"] = {"april_portal_item"};
-						["Level"] = {
-							["april_portal_item"] = {
-								["Damage Modifiers"] = {"Magic","Physical","Fire","Aqua","Storm","Air","Rose","Dark","Light"};
-							};
-						};
-					};
-					["Demon Portals"] = {
+					["Demon Leader's Portals"] = {
 						["Levels"] = {"portal_zeldris"};
 						["Level"] = {
 							["portal_zeldris"] = {
@@ -172,7 +170,7 @@ return {
 							};
 						};
 					};
-					["Dressrosa Portals"] = {
+					["Puppet Portal"] = {
 						["Levels"] = {"portal_item__dressrosa"};
 						["Level"] = {
 							["portal_item__dressrosa"] = {
@@ -180,7 +178,7 @@ return {
 							};
 						};
 					};
-					["The Eclipse"] = {
+					["Eclipse Portal"] = {
 						["Levels"] = {"portal_item__eclipse"};
 						["Level"] = {
 							["portal_item__eclipse"] = {
@@ -188,7 +186,7 @@ return {
 							};
 						};
 					};
-					["Summer Hunt"] = {
+					["Summer Portal"] = {
 						["Levels"] = {"portal_summer"};
 						["Level"] = {
 							["portal_summer"] = {
@@ -229,16 +227,16 @@ return {
 			};
 			["Secret Portals"] = {
 				["Worlds"] = {
-					"Dressrosa Secret","The Eclipse Secret","Summer Secret"
+					"String Portal","King's Portal","Sea God's Portal"
 				};
 				["World"] = {
-					["Dressrosa Secret"] = {
+					["String Portal"] = {
 						["Levels"] = {"portal_item__doflamingo"};
 					};
-					["The Eclipse Secret"] = {
+					["King's Portal"] = {
 						["Levels"] = {"portal_item__femto"};
 					};
-					["Summer Secret"] = {
+					["Sea God's Portal"] = {
 						["Levels"] = {"portal_poseidon"};
 					};
 				};
