@@ -16,6 +16,7 @@ ProtectGui(ScreenGui);
 
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 if gethui then ScreenGui.Parent = gethui();
+elseif RunService:IsStudio() then ScreenGui.Parent = LocalPlayer:FindFirstChild("PlayerGui")
 elseif CoreGui:FindFirstChild("RobloxGui") then ScreenGui.Parent = CoreGui:FindFirstChild("RobloxGui");
 else ScreenGui.Parent = CoreGui; end
 
