@@ -65,6 +65,9 @@ return {
 					["Windhym"] = {
 						["Levels"] = {"berserk_infinite","berserk_level_1","berserk_level_2","berserk_level_3","berserk_level_4","berserk_level_5","berserk_level_6"};
 					};
+					["Undead Tomb"] = {
+						["Levels"] = {"overlord_infinite","overlord_level_1","overlord_level_2","overlord_level_3","overlord_level_4","overlord_level_5","overlord_level_6"}
+					};
 				};
 				["UI"] = {
 					["Auto Replay"] = true;
@@ -254,6 +257,7 @@ return {
 		"Marine's Ford","Ghoul City","Hollow World","Ant Kingdom","Magic Town",
 		"Cursed Academy","Clover Kingdom","Cape Canaveral","Alien Spaceship",
 		"Fabled Kingdom","Hero City","Puppet Island","Virtual Dungeon","Windhym",
+		"Undead Tomb",
 
 		----- [ Raids ] -----
 		"Infinity Train","West City","Storm Hideout","Entertainment District",
@@ -323,6 +327,7 @@ return {
 			["Puppet Island"] = {"dressrosa","dressrosa_summer"};
 			["Virtual Dungeon"] = {"sao","sao_legend"};
 			["Windhym"] = {"berserk"};
+			["Undead Tomb"] = {"overlord_tomb"};
 
 			----- [ Raid Maps ] -----
 			["Infinity Train"] = {"demonslayer_raid"};
