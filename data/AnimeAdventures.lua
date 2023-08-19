@@ -151,7 +151,7 @@ return {
 					["Final Disc"] = {
 						["Levels"] = {""};
 						["Level"] = {
-							
+
 						}
 					};
 					["Alien Portal"] = {
