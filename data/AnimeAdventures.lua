@@ -8,7 +8,7 @@ return {
 				["Worlds"] = {
 					"Planet Namak","Shiganshinu District","Snowy Town","Hidden Sand Village","Marine's Ford","Ghoul City","Hollow World","Ant Kingdom",
 					"Magic Town","Cursed Academy","Clover Kingdom","Cape Canaveral","Alien Spaceship","Fabled Kingdom","Hero City","Puppet Island",
-					"Virtual Dungeon","Windhym"
+					"Virtual Dungeon","Windhym","Undead Tomb"
 				};
 				["World"] = {
 					["Planet Namak"] = {
@@ -98,6 +98,9 @@ return {
 					};
 					["Virtual Dungeon (Bosses)"] = {
 						["Levels"] = {"sao_legend_1","sao_legend_2","sao_legend_3"};
+					};
+					["Undead Tomb (Legend)"] = {
+						["Levels"] = {"overlord_legend_1","overlord_legend_2","overlord_legend_3"}
 					};
 				};
 				["UI"] = {
@@ -296,7 +299,8 @@ return {
 		["Rarity"] = {"Common","Rare","Epic","Legendary","Mythic","Secret"};
 	};
 	["Codes"] = {
-		"SuperTierMagicSoon","SUMMER2023","ANNIVERSARY","TOURNAMENTUIFIX","AINCRAD",
+		"OVERLORD","SUMMER2023","ANNIVERSARY","TOURNAMENTUIFIX","AINCRAD",
+		"SuperTierMagicSoon",
 		"BILLION",
 		"SubToKelvingts","SubToKelvingts","TOADBOIGAMING","KingLuffy","noclypso","subtosnowrbx","Cxrsed","FictioNTheFirst","subtomaokuma",
 	};
