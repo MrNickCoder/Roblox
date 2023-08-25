@@ -344,6 +344,7 @@ return {
 
 			----- [ Portal Maps ] -----
 			["The Eclipse"] = {"eclipse"};
+			["Thriller Park"] = {"thriller_bark"};
 		};
 		["Challenge"] = {
 			["double_cost"] = "High Cost";
