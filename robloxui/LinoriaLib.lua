@@ -1818,7 +1818,7 @@ do
     end;
 
     function Funcs:AddToggle(Idx, Info)
-        assert(Info.Text, 'AddInput: Missing `Text` string.')
+        assert(Info.Text, 'AddToggle: Missing `Text` string.')
 
         local Toggle = {
             Value = Info.Default or false;
@@ -2760,8 +2760,6 @@ do
     Library.WatermarkText = WatermarkLabel;
     Library:MakeDraggable(Library.Watermark);
 
-
-
     local KeybindOuter = Library:Create('Frame', {
         AnchorPoint = Vector2.new(0, 0.5);
         BorderColor3 = Color3.new(0, 0, 0);
@@ -2933,6 +2931,92 @@ function Library:Notify(Text, Time)
 
         NotifyOuter:Destroy();
     end);
+end;
+
+function Library:CreateFloater(Info)
+    assert(Info.Text, 'CreateFloater: Missing `Text` string.')
+
+    local Floater = {};
+
+    local FloaterOuter = Library:Create('Frame', {
+        BorderColor3 = Color3.new(0, 0, 0);
+        Position = Info.Position or UDim2.new(0, 100, 0, -25);
+        Size = UDim2.new(0, 213, 0, 20);
+        ZIndex = 200;
+        Visible = Info.Visible or false;
+        Parent = ScreenGui;
+    });
+
+    local FloaterInner = Library:Create('Frame', {
+        BackgroundColor3 = Library.MainColor;
+        BorderColor3 = Library.AccentColor;
+        BorderMode = Enum.BorderMode.Inset;
+        Size = UDim2.new(1, 0, 1, 0);
+        ZIndex = 201;
+        Parent = FloaterOuter;
+    });
+
+    Library:AddToRegistry(FloaterInner, {
+        BorderColor3 = 'AccentColor';
+    });
+
+    local InnerFrame = Library:Create('Frame', {
+        BackgroundColor3 = Color3.new(1, 1, 1);
+        BorderSizePixel = 0;
+        Position = UDim2.new(0, 1, 0, 1);
+        Size = UDim2.new(1, -2, 1, -2);
+        ZIndex = 202;
+        Parent = FloaterInner;
+    });
+
+    local Gradient = Library:Create('UIGradient', {
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.MainColor)),
+            ColorSequenceKeypoint.new(1, Library.MainColor),
+        });
+        Rotation = -90;
+        Parent = InnerFrame;
+    });
+
+    Library:AddToRegistry(Gradient, {
+        Color = function()
+            return ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.MainColor)),
+                ColorSequenceKeypoint.new(1, Library.MainColor),
+            });
+        end
+    });
+
+    local FloaterLabel = Library:CreateLabel({
+        Position = UDim2.new(0, 5, 0, 0);
+        Size = UDim2.new(1, -4, 1, 0);
+        Text = Info.Text;
+        TextSize = 14;
+        TextXAlignment = Enum.TextXAlignment.Left;
+        ZIndex = 203;
+        Parent = InnerFrame;
+    });
+
+    Floater.Container = FloaterOuter;
+    Floater.TextLabel = FloaterLabel;
+    Library:MakeDraggable(Floater.Container);
+
+    function Floater:SetVisibility(Bool)
+        Floater.Container.Visible = Bool;
+    end;
+
+    function Floater:SetPosition(Position)
+        Floater.Container.Position = Position;
+    end;
+
+    function Floater:SetText(Text)
+        local X, Y = Library:GetTextBounds(Text, Library.Font, 14);
+        Floater.Container.Size = UDim2.new(0, X + 15, 0, (Y * 1.5) + 3);
+
+        Floater.TextLabel.Text = Text;
+    end;
+
+    return Floater;
 end;
 
 function Library:CreateWindow(...)
