@@ -2375,7 +2375,7 @@ do
                 Str = Dropdown.Value or '';
             end;
 
-            ItemList.Text = (Str == '' and '--' or Str);
+            ItemList.Text = (Str == '' and 'None' or Str);
         end;
 
         function Dropdown:GetActiveValues()
