@@ -2250,12 +2250,37 @@ do
             Position = UDim2.new(0, 5, 0, 0);
             Size = UDim2.new(1, -5, 1, 0);
             TextSize = 14;
-            Text = '--';
+            Text = 'None';
             TextXAlignment = Enum.TextXAlignment.Left;
             TextWrapped = true;
             ZIndex = 7;
             Parent = DropdownInner;
         });
+
+        local ContainerText = Library:Create('Frame', {
+			BackgroundTransparency = 1;
+			ClipsDescendants = true;
+			Size = UDim2.new(1, 0, 1, 0);
+			ZIndex = 6;
+			Parent = DropdownInner;
+			Visible = false;
+		});
+
+		local SearchTextbox = Library:Create('TextBox', {
+			BackgroundTransparency = 1;
+			Position = UDim2.new(0, 5, 0, 0);
+			Size = UDim2.new(1, -42, 1, 0);
+			Parent = ContainerText;
+			Font = Enum.Font.Code;
+			PlaceholderColor3 = Color3.fromRGB(190, 190, 190);
+			PlaceholderText = 'Search Here...';
+			Text = '';
+			TextColor3 = Library.FontColor;
+			TextSize = 14;
+			TextStrokeTransparency = 0;
+			TextXAlignment = Enum.TextXAlignment.Left;
+			ZIndex = 7;
+		});
 
         Library:OnHighlight(DropdownOuter, DropdownOuter,
             { BorderColor3 = 'AccentColor' },
@@ -2363,7 +2388,8 @@ do
             end;
         end;
 
-        function Dropdown:BuildDropdownList()
+        function Dropdown:BuildDropdownList(Filter)
+            local Filter = Filter or '';
             local Values = Dropdown.Values;
             local Buttons = {};
 
@@ -2376,103 +2402,105 @@ do
             local Count = 0;
 
             for Idx, Value in next, Values do
-                local Table = {};
+                if Filter == '' or string.find(string.upper(Value), string.upper(Filter)) then
+                    local Table = {};
 
-                Count = Count + 1;
+                    Count = Count + 1;
 
-                local Button = Library:Create('Frame', {
-                    BackgroundColor3 = Library.MainColor;
-                    BorderColor3 = Library.OutlineColor;
-                    BorderMode = Enum.BorderMode.Middle;
-                    Size = UDim2.new(1, -1, 0, 20);
-                    ZIndex = 23;
-                    Active = true,
-                    Parent = Scrolling;
-                });
+                    local Button = Library:Create('Frame', {
+                        BackgroundColor3 = Library.MainColor;
+                        BorderColor3 = Library.OutlineColor;
+                        BorderMode = Enum.BorderMode.Middle;
+                        Size = UDim2.new(1, -1, 0, 20);
+                        ZIndex = 23;
+                        Active = true,
+                        Parent = Scrolling;
+                    });
 
-                Library:AddToRegistry(Button, {
-                    BackgroundColor3 = 'MainColor';
-                    BorderColor3 = 'OutlineColor';
-                });
+                    Library:AddToRegistry(Button, {
+                        BackgroundColor3 = 'MainColor';
+                        BorderColor3 = 'OutlineColor';
+                    });
 
-                local ButtonLabel = Library:CreateLabel({
-                    Active = false;
-                    Size = UDim2.new(1, -6, 1, 0);
-                    Position = UDim2.new(0, 6, 0, 0);
-                    TextSize = 14;
-                    Text = Value;
-                    TextXAlignment = Enum.TextXAlignment.Left;
-                    ZIndex = 25;
-                    Parent = Button;
-                });
+                    local ButtonLabel = Library:CreateLabel({
+                        Active = false;
+                        Size = UDim2.new(1, -6, 1, 0);
+                        Position = UDim2.new(0, 6, 0, 0);
+                        TextSize = 14;
+                        Text = Value;
+                        TextXAlignment = Enum.TextXAlignment.Left;
+                        ZIndex = 25;
+                        Parent = Button;
+                    });
 
-                Library:OnHighlight(Button, Button,
-                    { BorderColor3 = 'AccentColor', ZIndex = 24 },
-                    { BorderColor3 = 'OutlineColor', ZIndex = 23 }
-                );
+                    Library:OnHighlight(Button, Button,
+                        { BorderColor3 = 'AccentColor', ZIndex = 24 },
+                        { BorderColor3 = 'OutlineColor', ZIndex = 23 }
+                    );
 
-                local Selected;
+                    local Selected;
 
-                if Info.Multi then
-                    Selected = Dropdown.Value[Value];
-                else
-                    Selected = Dropdown.Value == Value;
-                end;
-
-                function Table:UpdateButton()
                     if Info.Multi then
                         Selected = Dropdown.Value[Value];
                     else
                         Selected = Dropdown.Value == Value;
                     end;
 
-                    ButtonLabel.TextColor3 = Selected and Library.AccentColor or Library.FontColor;
-                    Library.RegistryMap[ButtonLabel].Properties.TextColor3 = Selected and 'AccentColor' or 'FontColor';
-                end;
-
-                ButtonLabel.InputBegan:Connect(function(Input)
-                    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        local Try = not Selected;
-
-                        if Dropdown:GetActiveValues() == 1 and (not Try) and (not Info.AllowNull) then
+                    function Table:UpdateButton()
+                        if Info.Multi then
+                            Selected = Dropdown.Value[Value];
                         else
-                            if Info.Multi then
-                                Selected = Try;
-
-                                if Selected then
-                                    Dropdown.Value[Value] = true;
-                                else
-                                    Dropdown.Value[Value] = nil;
-                                end;
-                            else
-                                Selected = Try;
-
-                                if Selected then
-                                    Dropdown.Value = Value;
-                                else
-                                    Dropdown.Value = nil;
-                                end;
-
-                                for _, OtherButton in next, Buttons do
-                                    OtherButton:UpdateButton();
-                                end;
-                            end;
-
-                            Table:UpdateButton();
-                            Dropdown:Display();
-
-                            Library:SafeCallback(Dropdown.Callback, Dropdown.Value);
-                            Library:SafeCallback(Dropdown.Changed, Dropdown.Value);
-
-                            Library:AttemptSave();
+                            Selected = Dropdown.Value == Value;
                         end;
+
+                        ButtonLabel.TextColor3 = Selected and Library.AccentColor or Library.FontColor;
+                        Library.RegistryMap[ButtonLabel].Properties.TextColor3 = Selected and 'AccentColor' or 'FontColor';
                     end;
-                end);
 
-                Table:UpdateButton();
-                Dropdown:Display();
+                    ButtonLabel.InputBegan:Connect(function(Input)
+                        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+                            local Try = not Selected;
 
-                Buttons[Button] = Table;
+                            if Dropdown:GetActiveValues() == 1 and (not Try) and (not Info.AllowNull) then
+                            else
+                                if Info.Multi then
+                                    Selected = Try;
+
+                                    if Selected then
+                                        Dropdown.Value[Value] = true;
+                                    else
+                                        Dropdown.Value[Value] = nil;
+                                    end;
+                                else
+                                    Selected = Try;
+
+                                    if Selected then
+                                        Dropdown.Value = Value;
+                                    else
+                                        Dropdown.Value = nil;
+                                    end;
+
+                                    for _, OtherButton in next, Buttons do
+                                        OtherButton:UpdateButton();
+                                    end;
+                                end;
+
+                                Table:UpdateButton();
+                                Dropdown:Display();
+
+                                Library:SafeCallback(Dropdown.Callback, Dropdown.Value);
+                                Library:SafeCallback(Dropdown.Changed, Dropdown.Value);
+
+                                Library:AttemptSave();
+                            end;
+                        end;
+                    end);
+
+                    Table:UpdateButton();
+                    Dropdown:Display();
+
+                    Buttons[Button] = Table;
+                end;
             end;
 
             Scrolling.CanvasSize = UDim2.fromOffset(0, (Count * 20) + 1);
@@ -2552,6 +2580,15 @@ do
                 end;
             end;
         end);
+
+        SearchTextbox:GetPropertyChangedSignal('Text'):Connect(function()
+			local Text = SearchTextbox.Text;
+			if #Text >= 29 then
+				Text = Text:sub(1, #Text - 2);
+				SearchTextbox.Text = (Text == '' and '' or Text);
+			end;
+			Dropdown:BuildDropdownList(SearchTextbox.Text);
+		end);
 
         Dropdown:BuildDropdownList();
         Dropdown:Display();
