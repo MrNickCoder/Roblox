@@ -2535,6 +2535,7 @@ do
         end;
 
         function Dropdown:CloseDropdown()
+            ContainerText.Visible = false;
             ListOuter.Visible = false;
             Library.OpenedFrames[ListOuter] = nil;
             DropdownArrow.Rotation = 0;
