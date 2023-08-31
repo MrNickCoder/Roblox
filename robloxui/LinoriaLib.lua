@@ -2523,7 +2523,12 @@ do
             Dropdown:BuildDropdownList();
         end;
 
+        function Dropdown:Refresh(Tab)
+			Dropdown:SetValues(Tab or {})
+		end
+
         function Dropdown:OpenDropdown()
+            ContainerText.Visible = true;
             ListOuter.Visible = true;
             Library.OpenedFrames[ListOuter] = true;
             DropdownArrow.Rotation = 180;
