@@ -2528,6 +2528,7 @@ do
 		end
 
         function Dropdown:OpenDropdown()
+            ItemList.Visible = false;
             ContainerText.Visible = true;
             ListOuter.Visible = true;
             Library.OpenedFrames[ListOuter] = true;
@@ -2535,6 +2536,7 @@ do
         end;
 
         function Dropdown:CloseDropdown()
+            ItemList.Visible = true;
             ContainerText.Visible = false;
             ListOuter.Visible = false;
             Library.OpenedFrames[ListOuter] = nil;
