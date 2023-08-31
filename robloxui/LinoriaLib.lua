@@ -2160,6 +2160,10 @@ do
             Info.AllowNull = true;
         end;
 
+        if (not Info.Default) then
+            Info.AllowNull = true;
+        end
+
         assert(Info.Values, 'AddDropdown: Missing dropdown value list.');
         assert(Info.AllowNull or Info.Default, 'AddDropdown: Missing default value. Pass `AllowNull` as true if this was intentional.')
 
@@ -2462,6 +2466,8 @@ do
                             local Try = not Selected;
 
                             if Dropdown:GetActiveValues() == 1 and (not Try) and (not Info.AllowNull) then
+                                Library:SafeCallback(Dropdown.Callback, Dropdown.Value);
+                                Library:SafeCallback(Dropdown.Changed, Dropdown.Value);
                             else
                                 if Info.Multi then
                                     Selected = Try;
