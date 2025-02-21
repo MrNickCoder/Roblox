@@ -171,6 +171,9 @@ do
 		Data.UI = Create("BillboardGui", {
 			AlwaysOnTop = true;
 			Size = UDim2.new(5, 0, 2, 0);
+			StudsOffset = Vector3.new(0, 2, 0
+		}, {
+			
 		});
 		
 		return Data
@@ -248,7 +251,7 @@ task.spawn(function()
 			task.spawn(function()
 				if workspace:WaitForChild("Ghost") then
 					GhostLocation.Text = workspace:WaitForChild("Ghost"):WaitForChild("Zone").Value.Name;
-					GhostSpeed.Text = "Walk Speed: ".. string.format("%.f2", tonumber(workspace:WaitForChild("Ghost").Humanoid.WalkSpeed));
+					GhostSpeed.Text = "Walk Speed: ".. (math.floor(workspace:WaitForChild("Ghost").Humanoid.WalkSpeed*100)/100);
 					GhostDuration.Text = "Duration: ".. RStorage["HuntDuration"].Value + 1;
 				end
 			end)
