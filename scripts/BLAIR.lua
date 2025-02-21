@@ -248,28 +248,6 @@ task.spawn(function()
 end)
 task.spawn(function()
 	while task.wait() do
-		Player.PlayerGui["Statusifier"].Enabled = SideStatus.Enabled.Value;
-		Light.Brightness = tonumber(CustomLightBrightness.Text) or 0;
-		Light.Range = tonumber(CustomLightsRange.Text) or 0;
-		Light.Enabled = CustomLights.Enabled.Value;
-		
-		if Fullbright.Enabled.Value then
-			Lighting.Ambient = Color3.fromRGB(138, 138, 138);
-			Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128);
-			Lighting.Brightness = 2;
-		else
-			Lighting.Ambient = Color3.fromRGB(11, 11, 11);
-			Lighting.OutdoorAmbient = Color3.fromRGB(16, 16, 16);
-			Lighting.Brightness = 0;
-		end
-		
-		if CustomSprint.Enabled.Value and Sprinting then
-			Player.Character:FindFirstChild("Humanoid").WalkSpeed = tonumber(CustomSprintSpeed.Text);
-		end
-	end
-end)
-task.spawn(function()
-	while task.wait() do
 		if workspace:FindFirstChild("Ghost") then
 			for _, v in pairs({GhostLocation, GhostSpeed, GhostDuration}) do v.Visible = true; end
 
@@ -285,11 +263,35 @@ task.spawn(function()
 		end
 	end
 end)
+task.spawn(function()
+	while task.wait() do
+		Player.PlayerGui["Statusifier"].Enabled = SideStatus.Enabled.Value;
+		Light.Brightness = tonumber(CustomLightBrightness.Text) or 0;
+		Light.Range = tonumber(CustomLightsRange.Text) or 0;
+		Light.Enabled = CustomLights.Enabled.Value;
+		
+		if CustomSprint.Enabled.Value and Sprinting then
+			Player.Character:FindFirstChild("Humanoid").WalkSpeed = tonumber(CustomSprintSpeed.Text);
+		end
+	end
+end)
+
 for _, v in pairs({CustomLightsRange, CustomLightBrightness, CustomSprintSpeed}) do
 	v:GetPropertyChangedSignal("Text"):Connect(function() v.Text = v.Text:gsub('%D+', ''); end)
 end
 NoClipDoor.Enabled:GetPropertyChangedSignal("Value"):Connect(function()
 	for _, v in pairs(AllCollidable) do v.CanCollide = not NoClipDoor.Enabled.Value; end
+end)
+Fullbright.Enabled:GetPropertyChangedSignal("Value"):Connect(function()
+	if Fullbright.Enabled.Value then
+		Lighting.Ambient = Color3.fromRGB(138, 138, 138);
+		Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128);
+		Lighting.Brightness = 2;
+	else
+		Lighting.Ambient = Color3.fromRGB(11, 11, 11);
+		Lighting.OutdoorAmbient = Color3.fromRGB(16, 16, 16);
+		Lighting.Brightness = 0;
+	end
 end)
 UserIS.InputBegan:Connect(function(input, gameProcessed)
 	if gameProcessed then return end
