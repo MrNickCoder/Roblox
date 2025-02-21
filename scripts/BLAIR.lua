@@ -165,17 +165,6 @@ do
 		
 		return Data;
 	end
-	function CreateESP(Name, Text)
-		local Data = {}
-		
-		Data.UI = Create("BillboardGui", {
-			AlwaysOnTop = true;
-			Size = UDim2.new(5, 0, 2, 0);
-			StudsOffset = Vector3.new(0, 2, 0);
-		});
-		
-		return Data
-	end
 end
 
 -- [[ VARIABLES ]] --
