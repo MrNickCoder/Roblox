@@ -172,8 +172,6 @@ do
 			AlwaysOnTop = true;
 			Size = UDim2.new(5, 0, 2, 0);
 			StudsOffset = Vector3.new(0, 2, 0);
-		}, {
-			
 		});
 		
 		return Data
@@ -251,7 +249,7 @@ task.spawn(function()
 			task.spawn(function()
 				if workspace:WaitForChild("Ghost") then
 					GhostLocation.Text = workspace:WaitForChild("Ghost"):WaitForChild("Zone").Value.Name;
-					GhostSpeed.Text = "Walk Speed: ".. tonumber(workspace:WaitForChild("Ghost").Humanoid.WalkSpeed);
+					GhostSpeed.Text = "Walk Speed: ".. workspace:WaitForChild("Ghost").Humanoid.WalkSpeed;
 					GhostDuration.Text = "Duration: ".. RStorage["HuntDuration"].Value + 1;
 				end
 			end)
