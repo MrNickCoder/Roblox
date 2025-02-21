@@ -72,6 +72,22 @@ do
 		});
 		Data.Enabled = Data.Button["Enable"];
 		Data.Toggle = Data.Button["Frame"];
+		Data.AddConfig = function(Properties)
+			local Config = Create("", {
+				Parent = Data.Button;
+				AnchorPoint = Vector2.new(0.5, 1);
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+				BackgroundTransparency = 0.25;
+				Position = UDim2.new(0.5, 0, 0, -2);
+				Size = UDim2.new(0.8, 0, 0.8, 0);
+				Font = Enum.Font.SourceSansBold;
+				Text = "13";
+				TextColor3 = Color3.fromRGB(255, 255, 255);
+				TextScaled = true;
+			}, { Create("UICorner"); });
+			for Index, Value in pairs(Properties or {}) do Config[Index] = Value; end;
+			return Config
+		end;
 		
 		task.spawn(function()
 			while task.wait() do
@@ -148,48 +164,13 @@ do
 	end
 end
 
--- [[ INTERFACE ]] --
-local CustomLightsRange = Create("TextBox", {
-	AnchorPoint = Vector2.new(0.5, 1);
-	BackgroundColor3 = Color3.fromRGB(0, 0, 0);
-	BackgroundTransparency = 0.25;
-	Position = UDim2.new(0.25, 0, 0, -2);
-	Size = UDim2.new(0.4, 0, 0.8, 0);
-	Font = Enum.Font.SourceSansBold;
-	Text = "60";
-	TextColor3 = Color3.fromRGB(255, 255, 255);
-	TextScaled = true;
-}, { Create("UICorner"); });
-local CustomLightBrightness = Create("TextBox", {
-	AnchorPoint = Vector2.new(0.5, 1);
-	BackgroundColor3 = Color3.fromRGB(0, 0, 0);
-	BackgroundTransparency = 0.25;
-	Position = UDim2.new(0.75, 0, 0, -2);
-	Size = UDim2.new(0.4, 0, 0.8, 0);
-	Font = Enum.Font.SourceSansBold;
-	Text = "10";
-	TextColor3 = Color3.fromRGB(255, 255, 255);
-	TextScaled = true;
-}, { Create("UICorner"); });
-local CustomSprintSpeed = Create("TextBox", {
-	AnchorPoint = Vector2.new(0.5, 1);
-	BackgroundColor3 = Color3.fromRGB(0, 0, 0);
-	BackgroundTransparency = 0.25;
-	Position = UDim2.new(0.5, 0, 0, -2);
-	Size = UDim2.new(0.8, 0, 0.8, 0);
-	Font = Enum.Font.SourceSansBold;
-	Text = "13";
-	TextColor3 = Color3.fromRGB(255, 255, 255);
-	TextScaled = true;
-}, { Create("UICorner"); });
-
 -- [[ VARIABLES ]] --
 local Fullbright = CreateSettings("Fullbright");
 local CustomLights = CreateSettings("Custom Lights");
-CustomLightsRange.Parent = CustomLights.Button;
-CustomLightBrightness.Parent = CustomLights.Button;
+local CustomLightsRange = CustomLights.AddConfig({ Position = UDim2.new(0.25, 0, 0, -2); Size = UDim2.new(0.4, 0, 0.8, 0); Text = "60"; });
+local CustomLightBrightness = CustomLights.AddConfig({ Position = UDim2.new(0.75, 0, 0, -2); Size = UDim2.new(0.4, 0, 0.8, 0); Text = "10"; });
 local CustomSprint = CreateSettings("Custom Sprint", true);
-CustomSprintSpeed.Parent = CustomSprint.Button;
+local CustomSprintSpeed = CustomSprint.AddConfig({ Text = "13"; });
 local NoClipDoor = CreateSettings("No Clip Door");
 --local ESP = CreateSettings("ESP");
 local SideStatus = CreateSettings("Side Status", true);
