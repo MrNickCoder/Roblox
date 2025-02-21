@@ -73,7 +73,7 @@ do
 		Data.Enabled = Data.Button["Enable"];
 		Data.Toggle = Data.Button["Frame"];
 		Data.AddConfig = function(Properties)
-			local Config = Create("", {
+			local Config = Create("TextBox", {
 				Parent = Data.Button;
 				AnchorPoint = Vector2.new(0.5, 1);
 				BackgroundColor3 = Color3.fromRGB(0, 0, 0);
