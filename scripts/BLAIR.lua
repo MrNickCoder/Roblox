@@ -53,10 +53,7 @@ do
 			Size = UDim2.new(0.10, 0, 1, 0);
 			Text = "";
 		}, {
-			Create("BoolValue", {
-				Name = "Enable";
-				Value = Enabled or false;
-			});
+			Create("BoolValue", { Name = "Enable"; Value = Enabled or false; });
 			Create("TextLabel", {
 				AnchorPoint = Vector2.new(0.5, 0.5);
 				BackgroundTransparency = 1;
