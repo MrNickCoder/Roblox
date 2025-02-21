@@ -299,3 +299,5 @@ end)
 UserIS.InputEnded:Connect(function(input)
 	if input.KeyCode == Enum.KeyCode.LeftShift then Sprinting = false; end
 end)
+
+print("BLAIR Script!");
