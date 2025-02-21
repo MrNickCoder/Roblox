@@ -165,6 +165,16 @@ do
 		
 		return Data;
 	end
+	function CreateESP(Name, Text)
+		local Data = {}
+		
+		Data.UI = Create("BillboardGui", {
+			AlwaysOnTop = true;
+			Size = UDim2.new(5, 0, 2, 0);
+		});
+		
+		return Data
+	end
 end
 
 -- [[ VARIABLES ]] --
@@ -238,7 +248,7 @@ task.spawn(function()
 			task.spawn(function()
 				if workspace:WaitForChild("Ghost") then
 					GhostLocation.Text = workspace:WaitForChild("Ghost"):WaitForChild("Zone").Value.Name;
-					GhostSpeed.Text = "Walk Speed: ".. string.format("%.f2", tonumber(math.floor(workspace:WaitForChild("Ghost"))));
+					GhostSpeed.Text = "Walk Speed: ".. string.format("%.f2", tonumber(workspace:WaitForChild("Ghost").Humanoid.WalkSpeed));
 					GhostDuration.Text = "Duration: ".. RStorage["HuntDuration"].Value + 1;
 				end
 			end)
