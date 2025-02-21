@@ -15,6 +15,9 @@ repeat task.wait() until game.Workspace:FindFirstChild(Player.Name):FindFirstChi
 repeat task.wait() until game.Workspace:FindFirstChild("Map")
 task.wait(5)
 
+if Player.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then Player.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings"):Destroy() end;
+if Player.PlayerGui:FindFirstChild("Statusifier") then Player.PlayerGui:FindFirstChild("Statusifier"):Destroy() end;
+
 -- [[ UTILITIES ]] --
 do
 	function Create(Name, Properties, Childrens)
