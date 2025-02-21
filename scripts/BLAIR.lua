@@ -251,7 +251,7 @@ task.spawn(function()
 			task.spawn(function()
 				if workspace:WaitForChild("Ghost") then
 					GhostLocation.Text = workspace:WaitForChild("Ghost"):WaitForChild("Zone").Value.Name;
-					GhostSpeed.Text = "Walk Speed: ".. (math.floor(workspace:WaitForChild("Ghost").Humanoid.WalkSpeed*100)/100);
+					GhostSpeed.Text = "Walk Speed: ".. workspace:WaitForChild("Ghost").Humanoid.WalkSpeed;
 					GhostDuration.Text = "Duration: ".. RStorage["HuntDuration"].Value + 1;
 				end
 			end)
