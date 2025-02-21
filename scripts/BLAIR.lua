@@ -233,7 +233,7 @@ task.spawn(function()
 			if v.ClassName ~= "Part" and v.ClassName ~= "UnionOperation" then continue; end
 			if v:FindFirstChild("Exclude") then continue; end
 			if LowestTempRoom == nil then LowestTempRoom = v; continue; end
-			if v["_____Temperature"].Value < LowestTempRoom["_____Temperature"].Value then LowestTempRoom = v; end
+			if v["_____Temperature"]["_____LocalBaseTemp"].Value < LowestTempRoom["_____Temperature"]["_____LocalBaseTemp"].Value then LowestTempRoom = v; end
 		end
 		if LowestTempRoom then
 			RoomName.Text = LowestTempRoom.Name;
