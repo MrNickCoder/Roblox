@@ -306,7 +306,7 @@ local NoClipDoor = CreateSettings("No Clip Door", { Config = "NoClipDoor"; Keybi
 });
 
 local VoodooESP = nil;
-if workspace.VoodooDoll then VoodooESP = CreateESP("[Voodoo]", { Parent = workspace.VoodooDoll; Color = Color3.fromRGB(0, 255, 0) }); end
+if workspace:FindFirstChild("VoodooDoll") then VoodooESP = CreateESP("[Voodoo]", { Parent = workspace.VoodooDoll; Color = Color3.fromRGB(0, 255, 0) }); end
 local GhostESP = nil;
 local ESP = CreateSettings("ESP", { Config = "ESP"; }, {
 	On = function()
