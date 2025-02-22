@@ -17,9 +17,9 @@ if not RService:IsStudio() then
 	if game.PlaceId == 6137321701 then return end
 	if HttpService:JSONDecode(game:HttpGet("https://apis.roblox.com/universes/v1/places/".. game.PlaceId .."/universe")).universeId ~= 2239430935 then return end
 
-	repeat task.wait() until game.Workspace:FindFirstChild(Player.Name)
-	repeat task.wait() until game.Workspace:FindFirstChild(Player.Name):FindFirstChild("HumanoidRootPart")
-	repeat task.wait() until game.Workspace:FindFirstChild("Map")
+	repeat task.wait(1) until game.Workspace:FindFirstChild(Player.Name)
+	repeat task.wait(1) until game.Workspace:FindFirstChild(Player.Name):FindFirstChild("HumanoidRootPart")
+	repeat task.wait(1) until game.Workspace:FindFirstChild("Map")
 	task.wait(5)
 
 	if Player.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then Player.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings"):Destroy() end;
