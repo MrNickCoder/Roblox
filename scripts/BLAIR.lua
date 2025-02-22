@@ -20,6 +20,7 @@ if not RService:IsStudio() then
 	repeat task.wait(.1) until game.Workspace:FindFirstChild(Player.Name);
 	repeat task.wait(.1) until game.Workspace:FindFirstChild(Player.Name):FindFirstChild("HumanoidRootPart");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map");
+	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map"):FindFirstChild("Van");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map"):FindFirstChild("Doors");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map"):FindFirstChild("Items");
 	repeat task.wait(.1) until Player.PlayerGui:FindFirstChild("Journal");
@@ -324,8 +325,16 @@ local Fullbright = CreateSettings("Fullbright", { Config = "Fullbright"; Keybind
 	end;
 });
 local NoClipDoor = CreateSettings("No Clip Door", { Config = "NoClipDoor"; Keybind = Enum.KeyCode.X; }, {
-	On = function() for _, v in pairs(Doors) do v.CanCollide = false end end;
-	Off = function() for _, v in pairs(Doors) do v.CanCollide = true end end;
+	On = function()
+		for _, v in pairs(Doors) do v.CanCollide = false end
+		game.Workspace["Map"]["Van"]["Van"]["Door"]["Lines"]["Part"].CanCollide = false;
+		game.Workspace["Map"]["Van"]["Van"]["Door"]["Main"].CanCollide = false;
+	end;
+	Off = function()
+		for _, v in pairs(Doors) do v.CanCollide = true end
+		game.Workspace["Map"]["Van"]["Van"]["Door"]["Lines"]["Part"].CanCollide = true;
+		game.Workspace["Map"]["Van"]["Van"]["Door"]["Main"].CanCollide = true;
+	end;
 });
 
 local VoodooESP = nil;
