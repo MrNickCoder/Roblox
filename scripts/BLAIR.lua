@@ -53,7 +53,8 @@ do
 		return Object;
 	end
 	function CreateSettings(Name, Options, Callback)
-		local Enabled = Options and Config[Options.Config] or (Options.Default or false);
+		local Enabled = Options and Options.Default or false;
+		if Options and Config[Options.Config] then Enabled = Config[Options.Config] end
 		local Keybind = Options and Options.Keybind or nil;
 		local On = Callback and Callback.On or function() end;
 		local Off = Callback and Callback.Off or function() end;
