@@ -379,11 +379,9 @@ task.spawn(function()
 			if v.ClassName ~= "Part" and v.ClassName ~= "UnionOperation" then continue; end
 			if v:FindFirstChild("Exclude") then continue; end
 			if LowestTempRoom == nil then LowestTempRoom = v; continue; end
-			if v:FindFirstChild("_____Temperature") then
-				if v:FindFirstChild("_____Temperature")["_____LocalBaseTemp"].Value < LowestTempRoom:FindFirstChild("_____Temperature")["_____LocalBaseTemp"].Value then
-					LowestTempRoom = v;
-				end
-			end
+			if not v:FindFirstChild("_____Temperature") then continue; end
+			if v:FindFirstChild("_____Temperature")["_____LocalBaseTemp"].Value > LowestTempRoom:FindFirstChild("_____Temperature")["_____LocalBaseTemp"].Value then continue; end
+			LowestTempRoom = v;
 		end
 		if LowestTempRoom then
 			RoomName.Text = LowestTempRoom.Name;
