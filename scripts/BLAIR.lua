@@ -380,7 +380,9 @@ task.spawn(function()
 			if v:FindFirstChild("Exclude") then continue; end
 			if LowestTempRoom == nil then LowestTempRoom = v; continue; end
 			if v:FindFirstChild("_____Temperature") then
-				if v:FindFirstChild("_____Temperature")["_____LocalBaseTemp"].Value < LowestTempRoom:FindFirstChild("_____Temperature")["_____LocalBaseTemp"].Value then LowestTempRoom = v; end
+				if v:FindFirstChild("_____Temperature")["_____LocalBaseTemp"].Value < LowestTempRoom:FindFirstChild("_____Temperature")["_____LocalBaseTemp"].Value then
+					LowestTempRoom = v;
+				end
 			end
 		end
 		if LowestTempRoom then
