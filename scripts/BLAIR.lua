@@ -17,10 +17,13 @@ if not RService:IsStudio() then
 	if game.PlaceId == 6137321701 then return end
 	if HttpService:JSONDecode(game:HttpGet("https://apis.roblox.com/universes/v1/places/".. game.PlaceId .."/universe")).universeId ~= 2239430935 then return end
 
-	repeat task.wait(1) until game.Workspace:FindFirstChild(Player.Name)
-	repeat task.wait(1) until game.Workspace:FindFirstChild(Player.Name):FindFirstChild("HumanoidRootPart")
-	repeat task.wait(1) until game.Workspace:FindFirstChild("Map")
-	task.wait(5)
+	repeat task.wait() until game.Workspace:FindFirstChild(Player.Name)
+	repeat task.wait() until game.Workspace:FindFirstChild(Player.Name):FindFirstChild("HumanoidRootPart")
+	repeat task.wait() until game.Workspace:FindFirstChild("Map")
+	repeat task.wait() until game.Workspace:FindFirstChild("Map"):FindFirstChild("Doors")
+	repeat task.wait() until game.Workspace:FindFirstChild("Map"):FindFirstChild("Items")
+	repeat task.wait() until Player.PlayerGui:FindFirstChild("Journal")
+	repeat task.wait() until RStorage:FindFirstChild("ActiveChallenges")
 
 	if Player.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then Player.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings"):Destroy() end;
 	if Player.PlayerGui:FindFirstChild("Statusifier") then Player.PlayerGui:FindFirstChild("Statusifier"):Destroy() end;
@@ -53,8 +56,8 @@ do
 		return Object;
 	end
 	function CreateSettings(Name, Options, Callback)
-		local Enabled = Options and Options.Default or false;
-		if Options and Config[Options.Config] then Enabled = Config[Options.Config] end
+		local Enabled = Options.Default or false;
+		if Config[Options.Config] then Enabled = Config[Options.Config] end
 		local Keybind = Options and Options.Keybind or nil;
 		local On = Callback and Callback.On or function() end;
 		local Off = Callback and Callback.Off or function() end;
@@ -275,7 +278,7 @@ function PopulateDoors(Model)
 		if (v.ClassName == "Part" or v.ClassName == "MeshPart") and v.CanCollide then table.insert(Doors, v); end
 	end
 end
-PopulateDoors(workspace["Map"]["Doors"]);
+PopulateDoors(game.Workspace["Map"]["Doors"]);
 
 -- [[ USER INTERFACE ]] --
 local CustomLights = CreateSettings("Custom Lights", { Config = "CustomLight"; Keybind = Enum.KeyCode.R; }, {
@@ -306,7 +309,7 @@ local NoClipDoor = CreateSettings("No Clip Door", { Config = "NoClipDoor"; Keybi
 });
 
 local VoodooESP = nil;
-if workspace:FindFirstChild("VoodooDoll") then VoodooESP = CreateESP("[Voodoo]", { Parent = workspace:WaitForChild("VoodooDoll"); Color = Color3.fromRGB(0, 255, 0) }); end
+if game.Workspace:FindFirstChild("VoodooDoll") then VoodooESP = CreateESP("[Voodoo]", { Parent = game.Workspace:WaitForChild("VoodooDoll"); Color = Color3.fromRGB(0, 255, 0) }); end
 local GhostESP = nil;
 local ESP = CreateSettings("ESP", { Config = "ESP"; }, {
 	On = function()
@@ -318,7 +321,7 @@ local ESP = CreateSettings("ESP", { Config = "ESP"; }, {
 		if GhostESP then GhostESP.UI.Enabled = false; end
 	end;
 });
-workspace.ChildAdded:Connect(function(instance)
+game.Workspace.ChildAdded:Connect(function(instance)
 	if instance.Name ~= "Ghost" then return; end
 	GhostESP = CreateESP("[Ghost]", { Parent = instance:WaitForChild("Head"); Color = Color3.fromRGB(255, 0, 0); Enabled = ESP.Enabled; });
 end)
@@ -330,9 +333,9 @@ local SideStatus = CreateSettings("Side Status", { Config = "SideStatus"; Defaul
 
 -- [[ CURSED OBJECT ]] --
 local Objects = CreateInfo("Cursed Object");
-if workspace:FindFirstChild("SummoningCircle") then Objects.AddInfo("Summoning Circle"); end
-if workspace:FindFirstChild("Ouija Board") then Objects.AddInfo("Ouija Board"); end
-if workspace["Map"]["Items"]:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); end
+if game.Workspace:FindFirstChild("SummoningCircle") then Objects.AddInfo("Summoning Circle"); end
+if game.Workspace:FindFirstChild("Ouija Board") then Objects.AddInfo("Ouija Board"); end
+if game.Workspace["Map"]["Items"]:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); end
 
 -- [[[ ROOM ]]] --
 local Room = CreateInfo("Possible Room");
@@ -341,7 +344,7 @@ local RoomTemp = Room.AddInfo("Room Temp");
 task.spawn(function()
 	while task.wait() do
 		local LowestTempRoom = nil;
-		for _, v in pairs(workspace.Map["Zones"]:GetChildren()) do
+		for _, v in pairs(game.Workspace.Map["Zones"]:GetChildren()) do
 			if v.ClassName ~= "Part" and v.ClassName ~= "UnionOperation" then continue; end
 			if v:FindFirstChild("Exclude") then continue; end
 			if LowestTempRoom == nil then LowestTempRoom = v; continue; end
@@ -363,14 +366,14 @@ local GhostDuration = Ghost.AddInfo("Duration");
 task.spawn(function()
 	while task.wait() do
 		GhostActivity.Text = "Activity: ".. RStorage["Activity"].Value;
-		if workspace:FindFirstChild("Ghost") then
+		if game.Workspace:FindFirstChild("Ghost") then
 			for _, v in pairs({GhostLocation, GhostSpeed, GhostDuration}) do v.Visible = true; end
 
 			pcall(function()
-				if workspace:WaitForChild("Ghost") then
-					GhostLocation.Text = workspace:WaitForChild("Ghost", 5):WaitForChild("Zone", 5).Value.Name or "";
-					GhostSpeed.Text = "Walk Speed: ".. (math.floor(workspace:WaitForChild("Ghost", 5).Humanoid.WalkSpeed * 1000) / 1000);
-					GhostDuration.Text = "Duration: ".. RStorage["HuntDuration"].Value + 1;
+				if game.Workspace:WaitForChild("Ghost") then
+					GhostLocation.Text = game.Workspace:WaitForChild("Ghost", 5):WaitForChild("Zone", 5).Value.Name or "";
+					GhostSpeed.Text = "Walk Speed: ".. (math.floor(game.Workspace:WaitForChild("Ghost", 5).Humanoid.WalkSpeed * 1000) / 1000);
+					GhostDuration.Text = "Duration: ".. RStorage["HuntDuration"].Value;
 				end
 			end)
 		else
@@ -380,6 +383,7 @@ task.spawn(function()
 end)
 
 -- [[[ EVIDENCE ]]] --
+if 
 
 -- [[[ PLAYER ]]] --
 task.spawn(function()
