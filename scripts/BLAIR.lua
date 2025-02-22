@@ -24,6 +24,7 @@ if not RService:IsStudio() then
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map"):FindFirstChild("Items");
 	repeat task.wait(.1) until Player.PlayerGui:FindFirstChild("Journal");
 	repeat task.wait(.1) until RStorage:FindFirstChild("ActiveChallenges");
+	task.wait(5);
 
 	if Player.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then Player.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings"):Destroy() end;
 	if Player.PlayerGui:FindFirstChild("Statusifier") then Player.PlayerGui:FindFirstChild("Statusifier"):Destroy() end;
