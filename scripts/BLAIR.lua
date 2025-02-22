@@ -380,12 +380,12 @@ task.spawn(function()
 			if v:FindFirstChild("Exclude") then continue; end
 			if LowestTempRoom == nil then LowestTempRoom = v; continue; end
 			if v:FindFirstChild("_____Temperature") then
-				if v["_____Temperature"]["_____LocalBaseTemp"].Value < LowestTempRoom["_____Temperature"]["_____LocalBaseTemp"].Value then LowestTempRoom = v; end
+				if v:FindFirstChild("_____Temperature")["_____LocalBaseTemp"].Value < LowestTempRoom:FindFirstChild("_____Temperature")["_____LocalBaseTemp"].Value then LowestTempRoom = v; end
 			end
 		end
 		if LowestTempRoom then
 			RoomName.Text = LowestTempRoom.Name;
-			RoomTemp.Text = (math.floor(LowestTempRoom["_____Temperature"].Value * 1000) / 1000)
+			RoomTemp.Text = (math.floor(LowestTempRoom:FindFirstChild("_____Temperature").Value * 1000) / 1000)
 		end
 	end
 end)
