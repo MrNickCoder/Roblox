@@ -352,7 +352,7 @@ local SideStatus = CreateSettings("Side Status", { Config = "SideStatus"; }, {
 	Off = function() Player.PlayerGui["Statusifier"].Enabled = false end;
 });
 
--- [[ CURSED OBJECT ]] --
+-- [[[ CURSED OBJECT ]]] --
 local Objects = CreateInfo("Cursed Object");
 if game.Workspace:FindFirstChild("SummoningCircle") then Objects.AddInfo("Summoning Circle"); end
 if game.Workspace:FindFirstChild("Ouija Board") then Objects.AddInfo("Ouija Board"); end
@@ -369,7 +369,9 @@ task.spawn(function()
 			if v.ClassName ~= "Part" and v.ClassName ~= "UnionOperation" then continue; end
 			if v:FindFirstChild("Exclude") then continue; end
 			if LowestTempRoom == nil then LowestTempRoom = v; continue; end
-			if v["_____Temperature"]["_____LocalBaseTemp"].Value < LowestTempRoom["_____Temperature"]["_____LocalBaseTemp"].Value then LowestTempRoom = v; end
+			if v:FindFirstChild("_____Temperature") then
+				if v["_____Temperature"]["_____LocalBaseTemp"].Value < LowestTempRoom["_____Temperature"]["_____LocalBaseTemp"].Value then LowestTempRoom = v; end
+			end
 		end
 		if LowestTempRoom then
 			RoomName.Text = LowestTempRoom.Name;
@@ -405,7 +407,9 @@ end)
 
 -- [[[ EVIDENCE ]]] --
 if RStorage:FindFirstChild("ActiveChallenges") then
-	
+	if not (RStorage["ActiveChallenges"]:FindFirstChild("evidencelessOne") and RStorage["ActiveChallenges"]:FindFirstChild("evidencelessTwo")) then
+		
+	end
 end
 
 -- [[[ PLAYER ]]] --
@@ -420,6 +424,7 @@ task.spawn(function()
 	end
 end)
 
+-- [[ EVENTS ]] --
 UserIS.InputBegan:Connect(function(input, gameProcessed)
 	if gameProcessed then return end
 	if input.KeyCode == Enum.KeyCode.LeftShift then Sprinting = true; end
