@@ -302,7 +302,7 @@ local CustomLightBrightness = CustomLights.AddTextbox({
 	Type = "Number";
 });
 
-local CustomSprint = CreateSettings("Custom Sprint", { Config = "CustomSprint"; Default = true; });
+local CustomSprint = CreateSettings("Custom Sprint", { Config = "CustomSprint"; });
 local CustomSprintSpeed = CustomSprint.AddTextbox({
 	Text = "13";
 }, {
@@ -347,7 +347,7 @@ game.Workspace.ChildAdded:Connect(function(instance)
 	GhostESP = CreateESP("[Ghost]", { Parent = instance:WaitForChild("Head"); Color = Color3.fromRGB(255, 0, 0); Enabled = ESP.Enabled; });
 end)
 
-local SideStatus = CreateSettings("Side Status", { Config = "SideStatus"; Default = true; }, {
+local SideStatus = CreateSettings("Side Status", { Config = "SideStatus"; }, {
 	On = function() Player.PlayerGui["Statusifier"].Enabled = true end;
 	Off = function() Player.PlayerGui["Statusifier"].Enabled = false end;
 });
