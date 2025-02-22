@@ -383,7 +383,6 @@ task.spawn(function()
 end)
 
 -- [[[ EVIDENCE ]]] --
-if 
 
 -- [[[ PLAYER ]]] --
 task.spawn(function()
