@@ -17,13 +17,13 @@ if not RService:IsStudio() then
 	if game.PlaceId == 6137321701 then return end
 	if HttpService:JSONDecode(game:HttpGet("https://apis.roblox.com/universes/v1/places/".. game.PlaceId .."/universe")).universeId ~= 2239430935 then return end
 
-	repeat task.wait() until game.Workspace:FindFirstChild(Player.Name);
-	repeat task.wait() until game.Workspace:FindFirstChild(Player.Name):FindFirstChild("HumanoidRootPart");
-	repeat task.wait() until game.Workspace:FindFirstChild("Map");
-	repeat task.wait() until game.Workspace:FindFirstChild("Map"):FindFirstChild("Doors");
-	repeat task.wait() until game.Workspace:FindFirstChild("Map"):FindFirstChild("Items");
-	repeat task.wait() until Player.PlayerGui:FindFirstChild("Journal");
-	repeat task.wait() until RStorage:FindFirstChild("ActiveChallenges");
+	repeat task.wait(.1) until game.Workspace:FindFirstChild(Player.Name);
+	repeat task.wait(.1) until game.Workspace:FindFirstChild(Player.Name):FindFirstChild("HumanoidRootPart");
+	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map");
+	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map"):FindFirstChild("Doors");
+	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map"):FindFirstChild("Items");
+	repeat task.wait(.1) until Player.PlayerGui:FindFirstChild("Journal");
+	repeat task.wait(.1) until RStorage:FindFirstChild("ActiveChallenges");
 
 	if Player.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then Player.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings"):Destroy() end;
 	if Player.PlayerGui:FindFirstChild("Statusifier") then Player.PlayerGui:FindFirstChild("Statusifier"):Destroy() end;
