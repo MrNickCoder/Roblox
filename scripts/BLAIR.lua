@@ -172,7 +172,7 @@ do
 					AnchorPoint = Vector2.new(0, 1);
 					BackgroundTransparency = 1;
 					Position = UDim2.new(0, 0, 1, 0);
-					Size = UDim2.new(0, 150, 0.45, 0);
+					Size = UDim2.new(0.1, 0, 0.45, 0);
 					Create("UIListLayout", { Padding = UDim.new(0, 5); });
 				});
 			});
