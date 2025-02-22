@@ -28,15 +28,15 @@ if not RService:IsStudio() then
 	if Player.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then Player.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings"):Destroy() end;
 	if Player.PlayerGui:FindFirstChild("Statusifier") then Player.PlayerGui:FindFirstChild("Statusifier"):Destroy() end;
 	
-	local Folder = "BLAIR"
+	local Folder = "BLAIR";
 	saveConfig = function()
 		if not isfolder(Folder) then makefolder(Folder); end
-		writefile(Folder.."/Settings.json", HttpService:JSONEncode(Config))
+		writefile(Folder.."/Settings.json", HttpService:JSONEncode(Config));
 	end
 	readConfig = function()
 		local success, e = pcall(function()
 			if not isfolder(Folder) then makefolder(Folder); end
-			return HttpService:JSONDecode(readfile(Folder.."/Settings.json"))
+			return HttpService:JSONDecode(readfile(Folder.."/Settings.json"));
 		end)
 		if success then return e else saveConfig(); return readConfig(); end
 	end
