@@ -285,11 +285,30 @@ local CustomLights = CreateSettings("Custom Lights", { Config = "CustomLight"; K
 	On = function() Light.Enabled = true end;
 	Off = function() Light.Enabled = false end;
 });
-local CustomLightsRange = CustomLights.AddTextbox({ Position = UDim2.new(0.25, 0, 0, -2); Size = UDim2.new(0.4, 0, 0.8, 0); Text = "60"; }, { Config = "CustomLightRange"; Type = "Number" });
-local CustomLightBrightness = CustomLights.AddTextbox({ Position = UDim2.new(0.75, 0, 0, -2); Size = UDim2.new(0.4, 0, 0.8, 0); Text = "10"; }, { Config = "CustomLightBrightness"; Type = "Number" });
+local CustomLightsRange = CustomLights.AddTextbox({
+	Position = UDim2.new(0.25, 0, 0, -2);
+	Size = UDim2.new(0.4, 0, 0.8, 0);
+	Text = "60";
+}, {
+	Config = "CustomLightRange";
+	Type = "Number";
+});
+local CustomLightBrightness = CustomLights.AddTextbox({
+	Position = UDim2.new(0.75, 0, 0, -2);
+	Size = UDim2.new(0.4, 0, 0.8, 0);
+	Text = "10";
+}, {
+	Config = "CustomLightBrightness";
+	Type = "Number";
+});
 
 local CustomSprint = CreateSettings("Custom Sprint", { Config = "CustomSprint"; Default = true; });
-local CustomSprintSpeed = CustomSprint.AddTextbox({ Text = "13"; }, { Config = "CustomSprintSpeed"; Type = "Number" });
+local CustomSprintSpeed = CustomSprint.AddTextbox({
+	Text = "13";
+}, {
+	Config = "CustomSprintSpeed";
+	Type = "Number";
+});
 
 local Fullbright = CreateSettings("Fullbright", { Config = "Fullbright"; Keybind = Enum.KeyCode.T; }, {
 	On = function()
