@@ -382,10 +382,11 @@ if game.Workspace["Map"]["Items"]:FindFirstChild("Tarot Cards") then Objects.Add
 local Room = CreateInfo("Possible Room");
 local RoomName = Room.AddInfo("Room Name");
 local RoomTemp = Room.AddInfo("Room Temp");
+local RoomWater = Room.AddInfo("Water Running");
 task.spawn(function()
 	while task.wait() do
 		local LowestTempRoom = nil;
-		for _, v in pairs(game.Workspace.Map["Zones"]:GetChildren()) do
+		for _, v in pairs(game.Workspace.["Map"]["Zones"]:GetChildren()) do
 			if v.ClassName ~= "Part" and v.ClassName ~= "UnionOperation" then continue; end
 			if v:FindFirstChild("Exclude") then continue; end
 			if LowestTempRoom == nil then LowestTempRoom = v; continue; end
@@ -397,6 +398,11 @@ task.spawn(function()
 			RoomName.Text = LowestTempRoom.Name;
 			RoomTemp.Text = (math.floor(LowestTempRoom:FindFirstChild("_____Temperature").Value * 1000) / 1000)
 		end
+		local FoundWater = false;
+		for _, waters in pairs(game.Workspace["Map"]["Water"]:GetChildren() do
+			if #waters:GetChildren() > 0 and waters:FindFirstChild("WaterRunning") then FoundWater = true; break; end
+		end
+		if FoundWater then RoomWater.Visible = true; else RoomWater.Visible = false; end
 	end
 end)
 
@@ -434,10 +440,16 @@ if RStorage:FindFirstChild("ActiveChallenges") then
 		local EvidenceOrb = Evidence.AddInfo("Orb");
 		local EvidencePrints = Evidence.AddInfo("Prints");
 		local EvidenceWritten = Evidence.AddInfo("Written");
+		EvidenceWritten.Visible = false;
+		
 		task.spawn(function()
 			while task.wait() do
 				if #game.Workspace["Map"]["Orbs"]:GetChildren() > 0 then EvidenceOrb.Visible = true; else EvidenceOrb.Visible = false; end
 				if #game.Workspace["Map"]["Prints"]:GetChildren() > 0 then EvidencePrints.Visible = true; else EvidencePrints.Visible = false; end
+				for _, item in pairs(game.Workspace["Map"]["Items"]:GetChildren() do
+					if item.Name ~= "Ghost Writing Book" then continue; end
+					if item:FindFirstChild("Written").Value then EvidenceWritten.Visible = true; break; end
+				end
 			end
 		end)
 	end
@@ -450,7 +462,7 @@ if RStorage:FindFirstChild("ActiveChallenges") then
 		local PlayerSanity = PlayerStats.AddInfo("Sanity");
 		task.spawn(function()
 			while task.wait() do
-				
+				PlayerSanity.Text = "Sanity: ".. (math.floor(Player.Sanity.Value * 100) / 100);
 			end
 		end)
 	end
