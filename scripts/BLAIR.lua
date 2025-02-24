@@ -384,6 +384,7 @@ local Room = CreateInfo("Possible Room");
 local RoomName = Room.AddInfo("Room Name");
 local RoomTemp = Room.AddInfo("Room Temp");
 local RoomWater = Room.AddInfo("Water Running");
+local RoomSalt = RoomAddInfo("Salt Stepped"); RoomSalt.Visible = false;
 task.spawn(function()
 	while task.wait() do
 		local LowestTempRoom = nil;
@@ -405,6 +406,11 @@ task.spawn(function()
 			if #waters:GetChildren() > 0 and waters:FindFirstChild("WaterRunning") then FoundWater = true; break; end
 		end
 		if FoundWater then RoomWater.Visible = true; else RoomWater.Visible = false; end
+		if not RoomSalt.Visible then
+			for _, salt in pairs(game.Workspace["Map"]["Misc"]:GetChildren()) do
+				if salt.Name == "SaltStepped" then RoomSalt.Visible = true; end
+			end
+		end
 	end
 end)
 
@@ -461,7 +467,7 @@ if RStorage:FindFirstChild("ActiveChallenges") then
 				end
 				if not Evidences["Fingerprints"].Visible and #game.Workspace["Map"]["Prints"]:GetChildren() > 0 then Evidences["Fingerprints"].Visible = true; end
 				if not Evidences["Freezing Temp."].Visible then
-					if LowestTemp["_____Temperature"]["_____LocalBaseTemp"].Value < 0.1 then Evidences["Freezing Temp."].Visible = true; end
+					if LowestTemp["_____Temperature"].Value < 0.1 then Evidences["Freezing Temp."].Visible = true; end
 				end
 				if not Evidences["Ghost Orbs"].Visible and #game.Workspace["Map"]["Orbs"]:GetChildren() > 0 then Evidences["Ghost Orbs"].Visible = true; end
 				if not Evidences["Ghost Writing"].Visible then
