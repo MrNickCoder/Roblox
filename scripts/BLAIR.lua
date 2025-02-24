@@ -384,7 +384,7 @@ local Room = CreateInfo("Possible Room");
 local RoomName = Room.AddInfo("Room Name");
 local RoomTemp = Room.AddInfo("Room Temp");
 local RoomWater = Room.AddInfo("Water Running");
-local RoomSalt = RoomAddInfo("Salt Stepped"); RoomSalt.Visible = false;
+local RoomSalt = Room.AddInfo("Salt Stepped"); RoomSalt.Visible = false;
 task.spawn(function()
 	while task.wait() do
 		local LowestTempRoom = nil;
