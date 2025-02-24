@@ -172,6 +172,7 @@ do
 			SideInfo = Create("ScreenGui", {
 				Name = "Statusifier";
 				Parent = Player.PlayerGui;
+				ResetOnSpawn = false;
 				Create("Frame", {
 					Name = "Container";
 					AnchorPoint = Vector2.new(0, 1);
