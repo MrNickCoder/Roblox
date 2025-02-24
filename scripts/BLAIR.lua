@@ -264,7 +264,7 @@ end
 
 -- [[ VARIABLES ]] --
 local Freecam = (loadstring or load)(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/FreecamModule.lua"))()
-Freecam.IgnoreGUI = {"Radio", "Statusifier"}
+--Freecam.IgnoreGUI = {"Radio", "Statusifier"}
 local Light = Create("SpotLight", {
 	Parent = Player.Character:FindFirstChild("HumanoidRootPart");
 	Brightness = 10;
@@ -275,7 +275,6 @@ local Light = Create("SpotLight", {
 });
 local Sprinting = false
 local Doors = {}
-
 function PopulateDoors(Model)
 	for _, v in pairs(Model:GetChildren()) do
 		if not table.find({"Part", "MeshPart", "Model"}, v.ClassName) then continue; end
@@ -284,6 +283,9 @@ function PopulateDoors(Model)
 	end
 end
 PopulateDoors(game.Workspace["Map"]["Doors"]);
+local SavedLighting = {}
+for index, value in pairs({"Ambient","OutdoorAmbient","ExposureCompensation","Atmosphere.Density","Bloom.Size","Bloom.Intensity"}) do
+end
 
 -- [[ USER INTERFACE ]] --
 local CustomLights = CreateSettings("Custom Lights", { Config = "CustomLight"; Keybind = Enum.KeyCode.R; }, {
