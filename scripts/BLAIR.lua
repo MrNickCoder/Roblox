@@ -287,6 +287,7 @@ end
 PopulateDoors(game.Workspace["Map"]["Doors"]);
 local SavedLighting = {}
 for _, value in pairs({"Ambient", "OutdoorAmbient", "Brightness"}) do SavedLighting[value] = Lighting[value]; end
+local LowestTemp = nil;
 
 -- [[ USER INTERFACE ]] --
 local CustomLights = CreateSettings("Custom Lights", { Config = "CustomLight"; Keybind = Enum.KeyCode.R; }, {
@@ -397,6 +398,7 @@ task.spawn(function()
 		if LowestTempRoom and LowestTempRoom:FindFirstChild("_____Temperature") then
 			RoomName.Text = LowestTempRoom.Name;
 			RoomTemp.Text = (math.floor(LowestTempRoom:FindFirstChild("_____Temperature").Value * 1000) / 1000)
+			LowestTemp = LowestTempRoom
 		end
 		local FoundWater = false;
 		for _, waters in pairs(game.Workspace["Map"]["Water"]:GetChildren()) do
@@ -437,20 +439,24 @@ end)
 if RStorage:FindFirstChild("ActiveChallenges") then
 	if not (RStorage["ActiveChallenges"]:FindFirstChild("evidencelessOne") and RStorage["ActiveChallenges"]:FindFirstChild("evidencelessTwo")) then
 		local Evidence = CreateInfo("Evidences");
-		local EvidenceOrb = Evidence.AddInfo("Orb");
-		local EvidencePrints = Evidence.AddInfo("Prints");
-		local EvidenceWritten = Evidence.AddInfo("Written");
-		EvidenceWritten.Visible = false;
+		local Evidences = {}
+		for _, evi in pairs("Ghost Orbs", "Fingerprints", "Ghost Writing", "Freezing Temp.") do
+			Evidences[evi] = Evidence.AddInfo(evi);
+			Evidences[evi].Visible = false;
+		end
 		
 		task.spawn(function()
 			while task.wait() do
-				if #game.Workspace["Map"]["Orbs"]:GetChildren() > 0 then EvidenceOrb.Visible = true; else EvidenceOrb.Visible = false; end
-				if #game.Workspace["Map"]["Prints"]:GetChildren() > 0 then EvidencePrints.Visible = true; else EvidencePrints.Visible = false; end
-				if not EvidenceWritten.Visible then
+				if not Evidences["Ghost Orbs"].Visible and #game.Workspace["Map"]["Orbs"]:GetChildren() > 0 then Evidences["Ghost Orbs"].Visible = true; end
+				if not Evidences["Fingerprints"].Visible and #game.Workspace["Map"]["Prints"]:GetChildren() > 0 then Evidences["Fingerprints"].Visible = true; end
+				if not Evidences["Ghost Writing"].Visible then
 					for _, item in pairs(game.Workspace["Map"]["Items"]:GetChildren()) do
 						if item.Name ~= "Ghost Writing Book" then continue; end
-						if item:FindFirstChild("Written").Value then EvidenceWritten.Visible = true; break; end
+						if item:FindFirstChild("Written").Value then Evidences["Ghost Writing"].Visible = true; break; end
 					end
+				end
+				if not Evidences["Freezing Temp."].Visible then
+					if LowestTemp["_____Temperature"]["_____LocalBaseTemp"].Value < 0.1 then Evidences["Freezing Temp."].Visible = true; end
 				end
 			end
 		end)
