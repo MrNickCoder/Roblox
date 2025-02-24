@@ -315,15 +315,22 @@ local CustomSprintSpeed = CustomSprint.AddTextbox({
 	Config = "CustomSprintSpeed";
 	Type = "Number";
 });
-
+local FullbrightAmbient;
 local Fullbright = CreateSettings("Fullbright", { Config = "Fullbright"; Keybind = Enum.KeyCode.T; }, {
 	On = function()
-		Lighting.Ambient = Color3.fromRGB(138, 138, 138);
+		if FullbrightAmbient then Lighting.Ambient = Color3.fromRGB(tonumber(FullbrightAmbient.Text), tonumber(FullbrightAmbient.Text), tonumber(FullbrightAmbient.Text));
+		else Lighting.Ambient = Color3.fromRGB(138, 138, 138); end
 		Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128);
 		Lighting.Brightness = 2;
 	end;
 	Off = function() for index, value in pairs(SavedLighting) do Lighting[index] = value; end;
 });
+FullbrightAmbient = Fullbright.AddTextbox({
+	Text = "138";
+}, {
+	Config = "FullbrightAmbient";
+	Type = "Number";
+);
 local NoClipDoor = CreateSettings("No Clip Door", { Config = "NoClipDoor"; Keybind = Enum.KeyCode.X; }, {
 	On = function()
 		for _, v in pairs(Doors) do v.CanCollide = false end
