@@ -446,9 +446,11 @@ if RStorage:FindFirstChild("ActiveChallenges") then
 			while task.wait() do
 				if #game.Workspace["Map"]["Orbs"]:GetChildren() > 0 then EvidenceOrb.Visible = true; else EvidenceOrb.Visible = false; end
 				if #game.Workspace["Map"]["Prints"]:GetChildren() > 0 then EvidencePrints.Visible = true; else EvidencePrints.Visible = false; end
-				for _, item in pairs(game.Workspace["Map"]["Items"]:GetChildren() do
-					if item.Name ~= "Ghost Writing Book" then continue; end
-					if item:FindFirstChild("Written").Value then EvidenceWritten.Visible = true; break; end
+				if not EvidenceWritten.Visible then
+					for _, item in pairs(game.Workspace["Map"]["Items"]:GetChildren() do
+						if item.Name ~= "Ghost Writing Book" then continue; end
+						if item:FindFirstChild("Written").Value then EvidenceWritten.Visible = true; break; end
+					end
 				end
 			end
 		end)
