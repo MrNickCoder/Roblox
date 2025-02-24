@@ -1,4 +1,4 @@
-repeat task.wait() until game:IsLoaded()
+if not game:IsLoaded() then game.Loaded:Wait() end
 
 -- [[ SERVICES ]] --
 local HttpService = game:GetService("HttpService");
@@ -262,6 +262,7 @@ do
 end
 
 -- [[ VARIABLES ]] --
+local Freecam = (loadstring or load)(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/FreecamModule.lua"))()
 local Light = Create("SpotLight", {
 	Parent = Player.Character:FindFirstChild("HumanoidRootPart");
 	Brightness = 10;
@@ -418,11 +419,30 @@ end)
 -- [[[ EVIDENCE ]]] --
 if RStorage:FindFirstChild("ActiveChallenges") then
 	if not (RStorage["ActiveChallenges"]:FindFirstChild("evidencelessOne") and RStorage["ActiveChallenges"]:FindFirstChild("evidencelessTwo")) then
-		
+		local Evidence = CreateInfo("Evidences");
+		local EvidenceOrb = Evidence.AddInfo("Orb");
+		local EvidencePrints = Evidence.AddInfo("Prints");
+		task.spawn(function()
+			while task.wait() do
+				if #game.Workspace["Map"]["Orbs"]:GetChildren() > 0 then EvidenceOrb.Visible = true; else EvidenceOrb.Visible = false; end
+				if #game.Workspace["Map"]["Prints"]:GetChildren() > 0 then EvidencePrints.Visible = true; else EvidencePrints.Visible = false; end
+			end
+		end)
 	end
 end
 
 -- [[[ PLAYER ]]] --
+if RStorage:FindFirstChild("ActiveChallenges") then
+	if not RStorage["ActiveChallenges"]:FindFirstChild("noSanity") then
+		local PlayerStats = CreateInfo("Player Status");
+		local PlayerSanity = PlayerStats.AddInfo("Sanity");
+		task.spawn(function()
+			while task.wait() do
+				
+			end
+		end)
+	end
+end
 task.spawn(function()
 	while task.wait() do
 		Light.Brightness = tonumber(CustomLightBrightness.Text) or 0;
@@ -438,6 +458,8 @@ end)
 UserIS.InputBegan:Connect(function(input, gameProcessed)
 	if gameProcessed then return end
 	if input.KeyCode == Enum.KeyCode.LeftShift then Sprinting = true; end
+	if input.KeyCode == Enum.KeyCode.M then Freecam.ToggleFreecam(); end
+	
 	if Sprinting then
 		if input.KeyCode == Enum.KeyCode.LeftBracket then local speed = tonumber(CustomSprintSpeed.Text); CustomSprintSpeed.Text = tostring(speed + 1); end
 		if input.KeyCode == Enum.KeyCode.RightBracket then local speed = tonumber(CustomSprintSpeed.Text); CustomSprintSpeed.Text = tostring(speed - 1); end
