@@ -386,7 +386,7 @@ local RoomWater = Room.AddInfo("Water Running");
 task.spawn(function()
 	while task.wait() do
 		local LowestTempRoom = nil;
-		for _, v in pairs(game.Workspace.["Map"]["Zones"]:GetChildren()) do
+		for _, v in pairs(game.Workspace["Map"]["Zones"]:GetChildren()) do
 			if v.ClassName ~= "Part" and v.ClassName ~= "UnionOperation" then continue; end
 			if v:FindFirstChild("Exclude") then continue; end
 			if LowestTempRoom == nil then LowestTempRoom = v; continue; end
@@ -399,7 +399,7 @@ task.spawn(function()
 			RoomTemp.Text = (math.floor(LowestTempRoom:FindFirstChild("_____Temperature").Value * 1000) / 1000)
 		end
 		local FoundWater = false;
-		for _, waters in pairs(game.Workspace["Map"]["Water"]:GetChildren() do
+		for _, waters in pairs(game.Workspace["Map"]["Water"]:GetChildren()) do
 			if #waters:GetChildren() > 0 and waters:FindFirstChild("WaterRunning") then FoundWater = true; break; end
 		end
 		if FoundWater then RoomWater.Visible = true; else RoomWater.Visible = false; end
@@ -447,7 +447,7 @@ if RStorage:FindFirstChild("ActiveChallenges") then
 				if #game.Workspace["Map"]["Orbs"]:GetChildren() > 0 then EvidenceOrb.Visible = true; else EvidenceOrb.Visible = false; end
 				if #game.Workspace["Map"]["Prints"]:GetChildren() > 0 then EvidencePrints.Visible = true; else EvidencePrints.Visible = false; end
 				if not EvidenceWritten.Visible then
-					for _, item in pairs(game.Workspace["Map"]["Items"]:GetChildren() do
+					for _, item in pairs(game.Workspace["Map"]["Items"]:GetChildren()) do
 						if item.Name ~= "Ghost Writing Book" then continue; end
 						if item:FindFirstChild("Written").Value then EvidenceWritten.Visible = true; break; end
 					end
