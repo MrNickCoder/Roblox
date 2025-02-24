@@ -267,14 +267,19 @@ end
 -- [[ INITIALIZE ]] --
 local Freecam = (loadstring or load)(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/FreecamModule.lua"))()
 Freecam.IgnoreGUI = {"Radio", "Journal", "Statusifier"}
-local Light = Create("SpotLight", {
-	Parent = Player.Character:FindFirstChild("HumanoidRootPart");
-	Brightness = 10;
-	Range = 60;
-	Face = Enum.NormalId.Front;
-	Angle = 120;
-	Shadows = false;
-});
+local Light;
+if Player.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild("SpotLight") then
+	Light = Player.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild("SpotLight")
+else
+	Light = Create("SpotLight", {
+		Parent = Player.Character:FindFirstChild("HumanoidRootPart");
+		Brightness = 10;
+		Range = 60;
+		Face = Enum.NormalId.Front;
+		Angle = 120;
+		Shadows = false;
+	});
+end
 local Sprinting = false
 local Doors = {}
 function PopulateDoors(Model)
