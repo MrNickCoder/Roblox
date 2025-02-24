@@ -323,7 +323,7 @@ local Fullbright = CreateSettings("Fullbright", { Config = "Fullbright"; Keybind
 		Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128);
 		Lighting.Brightness = 2;
 	end;
-	Off = function() for index, value in pairs(SavedLighting) do Lighting[index] = value; end;
+	Off = function() for index, value in pairs(SavedLighting) do Lighting[index] = value; end; end;
 });
 FullbrightAmbient = Fullbright.AddTextbox({
 	Text = "138";
