@@ -253,8 +253,10 @@ do
 		});
 		task.spawn(function()
 			while task.wait() do
-				if not Data.UI.Parent then break; end
-				Data.Distance.Text = (math.floor((Data.UI.Parent.Position - Player.Character.PrimaryPart.Position).Magnitude * 100) / 100) .."m";
+				pcall(function()
+					if not Data.UI.Parent then break; end
+					Data.Distance.Text = (math.floor((Data.UI.Parent.Position - Player.Character.PrimaryPart.Position).Magnitude * 100) / 100) .."m";
+				end)
 			end
 		end)
 
@@ -431,6 +433,7 @@ if RStorage:FindFirstChild("ActiveChallenges") then
 		local Evidence = CreateInfo("Evidences");
 		local EvidenceOrb = Evidence.AddInfo("Orb");
 		local EvidencePrints = Evidence.AddInfo("Prints");
+		local EvidenceWritten = Evidence.AddInfo("Written");
 		task.spawn(function()
 			while task.wait() do
 				if #game.Workspace["Map"]["Orbs"]:GetChildren() > 0 then EvidenceOrb.Visible = true; else EvidenceOrb.Visible = false; end
