@@ -440,23 +440,41 @@ if RStorage:FindFirstChild("ActiveChallenges") then
 	if not (RStorage["ActiveChallenges"]:FindFirstChild("evidencelessOne") and RStorage["ActiveChallenges"]:FindFirstChild("evidencelessTwo")) then
 		local Evidence = CreateInfo("Evidences");
 		local Evidences = {}
-		for _, evi in pairs({"Ghost Orbs", "Fingerprints", "Ghost Writing", "Freezing Temp."}) do
+		for _, evi in pairs({"EMF Level 5","Fingerprints","Freezing Temp.","Ghost Orbs","Ghost Writing","Spirit Box"}) do
 			Evidences[evi] = Evidence.AddInfo(evi);
 			Evidences[evi].Visible = false;
 		end
 		
+		function FindSpiritBox(Object)
+			for _, sb in pairs(Object:GetChildren()) do
+				if sb.Name ~= "Spirit Box" then continue; end
+				for _, talk in pairs(sb:FindFirstChild("GhostTalk"):GetChildren()) do
+					if talk.Playing then Evidences["Spirit Box"].Visible = true; end
+				end
+			end
+		end
+		
 		task.spawn(function()
 			while task.wait() do
-				if not Evidences["Ghost Orbs"].Visible and #game.Workspace["Map"]["Orbs"]:GetChildren() > 0 then Evidences["Ghost Orbs"].Visible = true; end
+				if not Evidences["EMF Level 5"].Visible then
+					
+				end
 				if not Evidences["Fingerprints"].Visible and #game.Workspace["Map"]["Prints"]:GetChildren() > 0 then Evidences["Fingerprints"].Visible = true; end
+				if not Evidences["Freezing Temp."].Visible then
+					if LowestTemp["_____Temperature"]["_____LocalBaseTemp"].Value < 0.1 then Evidences["Freezing Temp."].Visible = true; end
+				end
+				if not Evidences["Ghost Orbs"].Visible and #game.Workspace["Map"]["Orbs"]:GetChildren() > 0 then Evidences["Ghost Orbs"].Visible = true; end
 				if not Evidences["Ghost Writing"].Visible then
 					for _, item in pairs(game.Workspace["Map"]["Items"]:GetChildren()) do
 						if item.Name ~= "Ghost Writing Book" then continue; end
 						if item:FindFirstChild("Written").Value then Evidences["Ghost Writing"].Visible = true; break; end
 					end
 				end
-				if not Evidences["Freezing Temp."].Visible then
-					if LowestTemp["_____Temperature"]["_____LocalBaseTemp"].Value < 0.1 then Evidences["Freezing Temp."].Visible = true; end
+				if not Evidences["Spirit Box"].Visible then
+					for _, players in pairs(game:GetService("Players"):GetChildren()) do
+						if players.Character then FindSpiritBox(players.Character); end
+					end
+					FindSpiritBox(game.Workspace["Map"]["Items"]);
 				end
 			end
 		end)
