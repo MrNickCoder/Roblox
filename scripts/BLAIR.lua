@@ -284,8 +284,7 @@ function PopulateDoors(Model)
 end
 PopulateDoors(game.Workspace["Map"]["Doors"]);
 local SavedLighting = {}
-for index, value in pairs({"Ambient","OutdoorAmbient","ExposureCompensation","Atmosphere.Density","Bloom.Size","Bloom.Intensity"}) do
-end
+for _, value in pairs({"Ambient","OutdoorAmbient","Brightness"}) do SavedLighting[value] = Lighting[value]; end
 
 -- [[ USER INTERFACE ]] --
 local CustomLights = CreateSettings("Custom Lights", { Config = "CustomLight"; Keybind = Enum.KeyCode.R; }, {
@@ -323,11 +322,7 @@ local Fullbright = CreateSettings("Fullbright", { Config = "Fullbright"; Keybind
 		Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128);
 		Lighting.Brightness = 2;
 	end;
-	Off = function()
-		Lighting.Ambient = Color3.fromRGB(11, 11, 11);
-		Lighting.OutdoorAmbient = Color3.fromRGB(16, 16, 16);
-		Lighting.Brightness = 0;
-	end;
+	Off = function() for index, value in pairs(SavedLighting) do Lighting[index] = value; end;
 });
 local NoClipDoor = CreateSettings("No Clip Door", { Config = "NoClipDoor"; Keybind = Enum.KeyCode.X; }, {
 	On = function()
