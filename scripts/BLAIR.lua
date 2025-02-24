@@ -440,7 +440,7 @@ if RStorage:FindFirstChild("ActiveChallenges") then
 	if not (RStorage["ActiveChallenges"]:FindFirstChild("evidencelessOne") and RStorage["ActiveChallenges"]:FindFirstChild("evidencelessTwo")) then
 		local Evidence = CreateInfo("Evidences");
 		local Evidences = {}
-		for _, evi in pairs("Ghost Orbs", "Fingerprints", "Ghost Writing", "Freezing Temp.") do
+		for _, evi in pairs({"Ghost Orbs", "Fingerprints", "Ghost Writing", "Freezing Temp."}) do
 			Evidences[evi] = Evidence.AddInfo(evi);
 			Evidences[evi].Visible = false;
 		end
