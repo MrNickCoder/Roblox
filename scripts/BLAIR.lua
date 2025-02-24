@@ -264,7 +264,7 @@ end
 
 -- [[ VARIABLES ]] --
 local Freecam = (loadstring or load)(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/FreecamModule.lua"))()
-Freecam.IgnoreGUI = {"Radio", "Statusifier"}
+Freecam.IgnoreGUI = {"Radio", "Journal", "Statusifier"}
 local Light = Create("SpotLight", {
 	Parent = Player.Character:FindFirstChild("HumanoidRootPart");
 	Brightness = 10;
