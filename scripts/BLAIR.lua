@@ -292,6 +292,7 @@ end
 PopulateDoors(game.Workspace["Map"]["Doors"]);
 local SavedLighting = {}
 for _, value in pairs({"Ambient", "OutdoorAmbient", "Brightness"}) do SavedLighting[value] = Lighting[value]; end
+local AtmosphereDensity = Lighting["Atmosphere"].Density
 local LowestTemp = nil;
 
 -- [[ USER INTERFACE ]] --
@@ -331,8 +332,12 @@ local Fullbright = CreateSettings("Fullbright", { Config = "Fullbright"; Keybind
 		else Lighting.Ambient = Color3.fromRGB(138, 138, 138); end
 		Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128);
 		Lighting.Brightness = 2;
+		Lighting["Atmosphere"].Density = 0
 	end;
-	Off = function() for index, value in pairs(SavedLighting) do Lighting[index] = value; end; end;
+	Off = function()
+		for index, value in pairs(SavedLighting) do Lighting[index] = value; end;
+		Lighting["Atmosphere"].Density = AtmosphereDensity
+	end;
 });
 FullbrightAmbient = Fullbright.AddTextbox({
 	Text = "138";
