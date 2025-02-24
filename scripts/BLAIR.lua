@@ -391,7 +391,7 @@ task.spawn(function()
 			if v:FindFirstChild("_____Temperature")["_____LocalBaseTemp"].Value > LowestTempRoom:FindFirstChild("_____Temperature")["_____LocalBaseTemp"].Value then continue; end
 			LowestTempRoom = v;
 		end
-		if LowestTempRoom then
+		if LowestTempRoom and LowestTempRoom:FindFirstChild("_____Temperature") then
 			RoomName.Text = LowestTempRoom.Name;
 			RoomTemp.Text = (math.floor(LowestTempRoom:FindFirstChild("_____Temperature").Value * 1000) / 1000)
 		end
