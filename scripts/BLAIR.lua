@@ -330,7 +330,7 @@ FullbrightAmbient = Fullbright.AddTextbox({
 }, {
 	Config = "FullbrightAmbient";
 	Type = "Number";
-);
+});
 local NoClipDoor = CreateSettings("No Clip Door", { Config = "NoClipDoor"; Keybind = Enum.KeyCode.X; }, {
 	On = function()
 		for _, v in pairs(Doors) do v.CanCollide = false end
