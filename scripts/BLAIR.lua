@@ -262,7 +262,7 @@ do
 	end
 end
 
--- [[ VARIABLES ]] --
+-- [[ INITIALIZE ]] --
 local Freecam = (loadstring or load)(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/FreecamModule.lua"))()
 Freecam.IgnoreGUI = {"Radio", "Journal", "Statusifier"}
 local Light = Create("SpotLight", {
@@ -284,7 +284,7 @@ function PopulateDoors(Model)
 end
 PopulateDoors(game.Workspace["Map"]["Doors"]);
 local SavedLighting = {}
-for _, value in pairs({"Ambient","OutdoorAmbient","Brightness"}) do SavedLighting[value] = Lighting[value]; end
+for _, value in pairs({"Ambient", "OutdoorAmbient", "Brightness"}) do SavedLighting[value] = Lighting[value]; end
 
 -- [[ USER INTERFACE ]] --
 local CustomLights = CreateSettings("Custom Lights", { Config = "CustomLight"; Keybind = Enum.KeyCode.R; }, {
@@ -318,7 +318,7 @@ local CustomSprintSpeed = CustomSprint.AddTextbox({
 local FullbrightAmbient;
 local Fullbright = CreateSettings("Fullbright", { Config = "Fullbright"; Keybind = Enum.KeyCode.T; }, {
 	On = function()
-		if FullbrightAmbient then Lighting.Ambient = Color3.fromRGB(tonumber(FullbrightAmbient.Text), tonumber(FullbrightAmbient.Text), tonumber(FullbrightAmbient.Text));
+		if FullbrightAmbient and FullbrightAmbient.Text ~= "" then Lighting.Ambient = Color3.fromRGB(tonumber(FullbrightAmbient.Text), tonumber(FullbrightAmbient.Text), tonumber(FullbrightAmbient.Text));
 		elseif Config["FullbrightAmbient"] then Lighting.Ambient = Color3.fromRGB(tonumber(Config["FullbrightAmbient"]), tonumber(Config["FullbrightAmbient"]), tonumber(Config["FullbrightAmbient"]));
 		else Lighting.Ambient = Color3.fromRGB(138, 138, 138); end
 		Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128);
@@ -404,9 +404,11 @@ local GhostActivity = Ghost.AddInfo("Activity");
 local GhostLocation = Ghost.AddInfo("Location");
 local GhostSpeed = Ghost.AddInfo("WalkSpeed");
 local GhostDuration = Ghost.AddInfo("Duration");
+local GhostDisruption = Ghost.AddInfo("Disrupting");
 task.spawn(function()
 	while task.wait() do
 		GhostActivity.Text = "Activity: ".. RStorage["Activity"].Value;
+		if RStorage["Disruption"].Value then GhostDisruption.Visible = true; else GhostDisruption.Visible = false; end
 		if game.Workspace:FindFirstChild("Ghost") then
 			for _, v in pairs({GhostLocation, GhostSpeed, GhostDuration}) do v.Visible = true; end
 
