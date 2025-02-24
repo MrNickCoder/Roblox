@@ -11,6 +11,8 @@ local Freecam = {
 	VEL_STIFFNESS = 1.5;
 	PAN_STIFFNESS = 1.0;
 	FOV_STIFFNESS = 4.0;
+	
+	IgnoreGUI = {};
 }
 
 ------------------------------------------------------------------------
@@ -353,6 +355,7 @@ local PlayerState = {} do
 		if playergui then
 			for _, gui in pairs(playergui:GetChildren()) do
 				if gui:IsA("ScreenGui") and gui.Enabled then
+					if table.find(Freecam.IgnoreGUI, gui.Name then continue end
 					screenGuis[#screenGuis + 1] = gui
 					gui.Enabled = false
 				end
