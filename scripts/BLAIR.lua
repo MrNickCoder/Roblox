@@ -253,8 +253,8 @@ do
 		});
 		task.spawn(function()
 			while task.wait() do
+				if not Data.UI.Parent then break; end
 				pcall(function()
-					if not Data.UI.Parent then break; end
 					Data.Distance.Text = (math.floor((Data.UI.Parent.Position - Player.Character.PrimaryPart.Position).Magnitude * 100) / 100) .."m";
 				end)
 			end
