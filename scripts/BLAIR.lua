@@ -319,6 +319,7 @@ local FullbrightAmbient;
 local Fullbright = CreateSettings("Fullbright", { Config = "Fullbright"; Keybind = Enum.KeyCode.T; }, {
 	On = function()
 		if FullbrightAmbient then Lighting.Ambient = Color3.fromRGB(tonumber(FullbrightAmbient.Text), tonumber(FullbrightAmbient.Text), tonumber(FullbrightAmbient.Text));
+		elseif Config["FullbrightAmbient"] then Lighting.Ambient = Color3.fromRGB(tonumber(Config["FullbrightAmbient"]), tonumber(Config["FullbrightAmbient"]), tonumber(Config["FullbrightAmbient"]));
 		else Lighting.Ambient = Color3.fromRGB(138, 138, 138); end
 		Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128);
 		Lighting.Brightness = 2;
