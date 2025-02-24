@@ -355,7 +355,7 @@ local PlayerState = {} do
 		if playergui then
 			for _, gui in pairs(playergui:GetChildren()) do
 				if gui:IsA("ScreenGui") and gui.Enabled then
-					if table.find(Freecam.IgnoreGUI, gui.Name then continue end
+					if table.find(Freecam.IgnoreGUI, gui.Name) then continue end
 					screenGuis[#screenGuis + 1] = gui
 					gui.Enabled = false
 				end
