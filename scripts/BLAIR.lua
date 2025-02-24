@@ -266,7 +266,7 @@ end
 
 -- [[ INITIALIZE ]] --
 local Freecam = (loadstring or load)(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/FreecamModule.lua"))()
-Freecam.IgnoreGUI = {"Radio", "Journal", "Statusifier"}
+Freecam.IgnoreGUI = {"Radio", "Journal", "MobileUI", "Statusifier"}
 local Light;
 if Player.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild("SpotLight") then
 	Light = Player.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild("SpotLight")
