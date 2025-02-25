@@ -199,7 +199,7 @@ do
 			AutomaticSize = Enum.AutomaticSize.Y;
 			BackgroundColor3 = Color3.fromRGB(0, 0, 0);
 			BackgroundTransparency = 0.5;
-			Size = UDim2.new(0, 150, 0, 0);
+			Size = UDim2.new(1, 0, 0, 0);
 			Create("TextLabel", {
 				BackgroundTransparency = 1;
 				Size = UDim2.new(1, 0, 0, 15);
