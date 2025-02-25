@@ -1,6 +1,8 @@
 if not game:IsLoaded() then game.Loaded:Wait() end
 
+--------------------
 -- [[ SERVICES ]] --
+--------------------
 local HttpService = game:GetService("HttpService");
 local Player = game:GetService("Players").LocalPlayer;
 local Lighting = game:GetService("Lighting");
@@ -8,7 +10,9 @@ local RStorage = game:GetService("ReplicatedStorage");
 local UserIS = game:GetService("UserInputService");
 local RService = game:GetService("RunService");
 
+------------------
 -- [[ CONFIG ]] --
+------------------
 local Config = {}
 local saveConfig = function() end
 local readConfig = function() end
@@ -45,7 +49,9 @@ if not RService:IsStudio() then
 	Config = readConfig();
 end
 
+---------------------
 -- [[ UTILITIES ]] --
+---------------------
 do
 	function Create(Name, Data)
 		local Object = Instance.new(Name, Data.Parent);
@@ -111,6 +117,7 @@ do
 		Data.AddTextbox = function(Properties, Options)
 			Properties.Text = Options and Config[Options.Config] or Properties.Text or "";
 			local Type = Options and Options.Type or "Text";
+			local Negative = Options and Options.Negative or false;
 			local Control = Create("TextBox", {
 				Parent = Data.Button;
 				AnchorPoint = Vector2.new(0.5, 1);
@@ -131,7 +138,8 @@ do
 				end
 			end;
 			
-			if Type == "Number" then Control:GetPropertyChangedSignal("Text"):Connect(function() Control.Text = Control.Text:gsub('%D+', ''); end) end
+			if Type == "Integer" then Control:GetPropertyChangedSignal("Text"):Connect(function() Control.Text = string.match(Control.Text, (Negative and "[-]?" or "").."%d*"); end) end
+			if Type == "Number" then Control:GetPropertyChangedSignal("Text"):Connect(function() Control.Text = string.match(Control.Text, (Negative and "[-]?" or "").."%d*[%.]?%d*"); end) end
 			
 			Control.FocusLost:Connect(function()
 				if Options.Config then
@@ -175,11 +183,11 @@ do
 				ResetOnSpawn = false;
 				Create("Frame", {
 					Name = "Container";
-					AnchorPoint = Vector2.new(0, 1);
 					BackgroundTransparency = 1;
-					Position = UDim2.new(0, 0, 1, 0);
-					Size = UDim2.new(0.1, 0, 0.45, 0);
+					Position = UDim2.new(0, 0, 0.55, 0);
+					Size = UDim2.new(0, 150, 0, 0);
 					Create("UIListLayout", { Padding = UDim.new(0, 5); });
+					Create("UIScale", { Scale = 1; });
 				});
 			});
 		end
@@ -191,7 +199,7 @@ do
 			AutomaticSize = Enum.AutomaticSize.Y;
 			BackgroundColor3 = Color3.fromRGB(0, 0, 0);
 			BackgroundTransparency = 0.5;
-			Size = UDim2.new(1, 0, 0, 0);
+			Size = UDim2.new(0, 150, 0, 0);
 			Create("TextLabel", {
 				BackgroundTransparency = 1;
 				Size = UDim2.new(1, 0, 0, 15);
@@ -204,7 +212,7 @@ do
 				AutomaticSize = Enum.AutomaticSize.Y;
 				BackgroundTransparency = 1;
 				Position = UDim2.new(0, 0, 0, 15);
-				Size = UDim2.new(1, 0, 0, 0);
+				Size = UDim2.new(1, 0, 0, 15);
 				Create("UIListLayout", { Padding = UDim.new(0, 0); });
 			});
 		});
@@ -213,7 +221,7 @@ do
 			return Create("TextLabel", {
 				Parent = Data.List;
 				BackgroundTransparency = 1;
-				Size = UDim2.new(1, 0, 0, 15);
+				Size = UDim2.new(1, 0, 1, 0);
 				Font = Enum.Font.SourceSans;
 				Text = Text;
 				TextColor3 = Color3.fromRGB(255, 255, 255);
@@ -264,7 +272,9 @@ do
 	end
 end
 
+----------------------
 -- [[ INITIALIZE ]] --
+----------------------
 local Freecam = (loadstring or load)(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/FreecamModule.lua"))()
 Freecam.IgnoreGUI = {"Radio", "Journal", "MobileUI", "Statusifier"}
 local Light;
@@ -295,7 +305,9 @@ for _, value in pairs({"Ambient", "OutdoorAmbient", "Brightness"}) do SavedLight
 local AtmosphereDensity = Lighting["Atmosphere"].Density
 local LowestTemp = nil;
 
+--------------------------
 -- [[ USER INTERFACE ]] --
+--------------------------
 local CustomLights = CreateSettings("Custom Lights", { Config = "CustomLight"; Keybind = Enum.KeyCode.R; }, {
 	On = function() Light.Enabled = true end;
 	Off = function() Light.Enabled = false end;
@@ -304,26 +316,16 @@ local CustomLightsRange = CustomLights.AddTextbox({
 	Position = UDim2.new(0.25, 0, 0, -2);
 	Size = UDim2.new(0.4, 0, 0.8, 0);
 	Text = "60";
-}, {
-	Config = "CustomLightRange";
-	Type = "Number";
-});
+}, { Config = "CustomLightRange"; Type = "Integer"; });
 local CustomLightBrightness = CustomLights.AddTextbox({
 	Position = UDim2.new(0.75, 0, 0, -2);
 	Size = UDim2.new(0.4, 0, 0.8, 0);
 	Text = "10";
-}, {
-	Config = "CustomLightBrightness";
-	Type = "Number";
-});
+}, { Config = "CustomLightBrightness"; Type = "Integer"; });
 
 local CustomSprint = CreateSettings("Custom Sprint", { Config = "CustomSprint"; });
-local CustomSprintSpeed = CustomSprint.AddTextbox({
-	Text = "13";
-}, {
-	Config = "CustomSprintSpeed";
-	Type = "Number";
-});
+local CustomSprintSpeed = CustomSprint.AddTextbox({ Text = "13"; }, { Config = "CustomSprintSpeed"; Type = "Number"; });
+
 local FullbrightAmbient;
 local Fullbright = CreateSettings("Fullbright", { Config = "Fullbright"; Keybind = Enum.KeyCode.T; }, {
 	On = function()
@@ -339,12 +341,8 @@ local Fullbright = CreateSettings("Fullbright", { Config = "Fullbright"; Keybind
 		Lighting["Atmosphere"].Density = AtmosphereDensity
 	end;
 });
-FullbrightAmbient = Fullbright.AddTextbox({
-	Text = "138";
-}, {
-	Config = "FullbrightAmbient";
-	Type = "Number";
-});
+FullbrightAmbient = Fullbright.AddTextbox({ Text = "138"; }, { Config = "FullbrightAmbient"; Type = "Integer"; });
+
 local NoClipDoor = CreateSettings("No Clip Door", { Config = "NoClipDoor"; Keybind = Enum.KeyCode.X; }, {
 	On = function()
 		for _, v in pairs(Doors) do v.CanCollide = false end
@@ -382,14 +380,19 @@ local SideStatus = CreateSettings("Side Status", { Config = "SideStatus"; }, {
 	On = function() Player.PlayerGui["Statusifier"].Enabled = true end;
 	Off = function() Player.PlayerGui["Statusifier"].Enabled = false end;
 });
+local SideStatusScale = SideStatus.AddTextbox({ Text = "1"; }, { Config = "SideStatusScale"; Type = "Number"; });
 
+---------------------------
 -- [[[ CURSED OBJECT ]]] --
+---------------------------
 local Objects = CreateInfo("Cursed Object");
 if game.Workspace:FindFirstChild("SummoningCircle") then Objects.AddInfo("Summoning Circle"); end
 if game.Workspace:FindFirstChild("Ouija Board") then Objects.AddInfo("Ouija Board"); end
 if game.Workspace["Map"]["Items"]:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); end
 
+------------------
 -- [[[ ROOM ]]] --
+------------------
 local Room = CreateInfo("Possible Room");
 local RoomName = Room.AddInfo("Room Name");
 local RoomTemp = Room.AddInfo("Room Temp");
@@ -424,7 +427,9 @@ task.spawn(function()
 	end
 end)
 
+-------------------
 -- [[[ GHOST ]]] --
+-------------------
 local Ghost = CreateInfo("Ghost Status");
 local GhostActivity = Ghost.AddInfo("Activity");
 local GhostLocation = Ghost.AddInfo("Location");
@@ -451,7 +456,9 @@ task.spawn(function()
 	end
 end)
 
+----------------------
 -- [[[ EVIDENCE ]]] --
+----------------------
 if RStorage:FindFirstChild("ActiveChallenges") then
 	if not (RStorage["ActiveChallenges"]:FindFirstChild("evidencelessOne") and RStorage["ActiveChallenges"]:FindFirstChild("evidencelessTwo")) then
 		local Evidence = CreateInfo("Evidences");
@@ -497,7 +504,9 @@ if RStorage:FindFirstChild("ActiveChallenges") then
 	end
 end
 
+--------------------
 -- [[[ PLAYER ]]] --
+--------------------
 if RStorage:FindFirstChild("ActiveChallenges") then
 	if not RStorage["ActiveChallenges"]:FindFirstChild("noSanity") then
 		local PlayerStats = CreateInfo("Player Status");
@@ -509,6 +518,10 @@ if RStorage:FindFirstChild("ActiveChallenges") then
 		end)
 	end
 end
+
+------------------
+-- [[ EVENTS ]] --
+------------------
 task.spawn(function()
 	while task.wait() do
 		Light.Brightness = tonumber(CustomLightBrightness.Text) or 0;
@@ -517,10 +530,12 @@ task.spawn(function()
 		if CustomSprint.Enabled and Sprinting then
 			Player.Character:FindFirstChild("Humanoid").WalkSpeed = tonumber(CustomSprintSpeed.Text);
 		end
+
+		if Player.PlayerGui:FindFirstChild("Statusifier") then
+			Player.PlayerGui["Statusifier"]["Container"]["UIScale"].Scale = tonumber(SideStatusScale) or 1;
+		end
 	end
 end)
-
--- [[ EVENTS ]] --
 UserIS.InputBegan:Connect(function(input, gameProcessed)
 	if gameProcessed then return end
 	if input.KeyCode == Enum.KeyCode.LeftShift then Sprinting = true; end
