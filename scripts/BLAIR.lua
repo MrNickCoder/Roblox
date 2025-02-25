@@ -212,7 +212,7 @@ do
 				AutomaticSize = Enum.AutomaticSize.Y;
 				BackgroundTransparency = 1;
 				Position = UDim2.new(0, 0, 0, 15);
-				Size = UDim2.new(1, 0, 0, 15);
+				Size = UDim2.new(1, 0, 0, 0);
 				Create("UIListLayout", { Padding = UDim.new(0, 0); });
 			});
 		});
@@ -221,7 +221,7 @@ do
 			return Create("TextLabel", {
 				Parent = Data.List;
 				BackgroundTransparency = 1;
-				Size = UDim2.new(1, 0, 1, 0);
+				Size = UDim2.new(1, 0, 0, 15);
 				Font = Enum.Font.SourceSans;
 				Text = Text;
 				TextColor3 = Color3.fromRGB(255, 255, 255);
