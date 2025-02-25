@@ -522,6 +522,8 @@ end
 ------------------
 -- [[ EVENTS ]] --
 ------------------
+local timeBetween = 0
+local heldDown = false
 task.spawn(function()
 	while task.wait() do
 		Light.Brightness = tonumber(CustomLightBrightness.Text) or 0;
@@ -540,6 +542,16 @@ UserIS.InputBegan:Connect(function(input, gameProcessed)
 	if gameProcessed then return end
 	if input.KeyCode == Enum.KeyCode.LeftShift then Sprinting = true; end
 	if input.KeyCode == Enum.KeyCode.M then Freecam.ToggleFreecam(); end
+	if input.KeyCode == Enum.KeyCode.J then
+		heldDown = true
+		task.spawn(function()
+			repeat task.wait(1); timeBetween += 1; until timeBetween == 2 or heldDown = false;
+			if timeBetween ~= 2 then timeBetween = 0; return; end
+			timeBetween = 0;
+			Player.PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible = not Player.PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible;
+			Player.PlayerGui["Statusifier"]["Container"].Visible = not Player.PlayerGui["Statusifier"]["Container"].Visible;
+		end)
+	end
 	
 	if Sprinting then
 		if input.KeyCode == Enum.KeyCode.LeftBracket then local speed = tonumber(CustomSprintSpeed.Text); CustomSprintSpeed.Text = tostring(speed + 1); end
@@ -548,6 +560,7 @@ UserIS.InputBegan:Connect(function(input, gameProcessed)
 end)
 UserIS.InputEnded:Connect(function(input)
 	if input.KeyCode == Enum.KeyCode.LeftShift then Sprinting = false; end
+	if input.KeyCode == Enum.KeyCode.J then timeBetween = 0; heldDown = false; end
 end)
 if Player.PlayerGui:FindFirstChild("MobileUI") then
 	Player.PlayerGui["MobileUI"].SprintButton.MouseButton1Down:Connect(function() Sprinting = true; end)
