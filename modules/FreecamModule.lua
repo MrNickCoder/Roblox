@@ -34,6 +34,7 @@ local Players				= game:GetService("Players")
 local RunService			= game:GetService("RunService")
 local StarterGui			= game:GetService("StarterGui")
 local UserInputService		= game:GetService("UserInputService")
+local GuiService			= game:GetService("GuiService")
 local Workspace				= game:GetService("Workspace")
 
 local LocalPlayer = Players.LocalPlayer
@@ -49,6 +50,73 @@ Workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
 		Camera = newCamera
 	end
 end)
+
+------------------------------------------------------------------------
+
+local GUI = {} do
+	local function Create(Name, Data)
+		local Object = Instance.new(Name, Data.Parent);
+		for Index, Value in next, Data do
+			if Index ~= "Parent" then
+				if typeof(Value) == "Instance" then Value.Parent = Object;
+				else Object[Index] = Value; end
+			end
+		end
+		return Object;
+	end
+	
+	GUI.UI = Create("ScreenGui", {
+		Name = "MobileFreecam";
+		Parent = LocalPlayer.PlayerGui;
+		Enabled = false;
+		Create("Frame", {
+			Name = "Controls";
+			BackgroundTransparency = 1;
+			Position = UDim2.new(0, 35, 1, -179);
+			Size = UDim2.new(0, 155, 0, 155);
+		});
+	});
+	GUI.Forward = Create("Frame", {
+		Parent = GUI.UI["Controls"];
+		BackgroundTransparency = 0.82;
+		Position = UDim2.new(0.333, 0, 0, 0);
+		Size = UDim2.new(0.333, 0, 0.333, 0);
+		Create("UICorner", { CornerRadius = UDim.new(0, 4); });
+		Create("TextButton", { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 1, 0); Text = ""; });
+		Create("TextLabel", { BackgroundTransparency = 1; Rotation = 90; Size = UDim2.new(1, 0, 1, 0); Font = Enum.Font.FredokaOne; Text = "<"; TextScaled = true; TextStrokeTransparency = 0.8; })
+	});
+	GUI.Backward = Create("Frame", {
+		Parent = GUI.UI["Controls"];
+		BackgroundTransparency = 0.82;
+		Position = UDim2.new(0.333, 0, 0.667, 0);
+		Size = UDim2.new(0.333, 0, 0.333, 0);
+		Create("UICorner", { CornerRadius = UDim.new(0, 4); });
+		Create("TextButton", { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 1, 0); Text = ""; });
+		Create("TextLabel", { BackgroundTransparency = 1; Rotation = -90; Size = UDim2.new(1, 0, 1, 0); Font = Enum.Font.FredokaOne; Text = "<"; TextScaled = true; TextStrokeTransparency = 0.8; })
+	});
+	GUI.Left = Create("Frame", {
+		Parent = GUI.UI["Controls"];
+		BackgroundTransparency = 0.82;
+		Position = UDim2.new(0, 0, 0.333, 0);
+		Size = UDim2.new(0.333, 0, 0.333, 0);
+		Create("UICorner", { CornerRadius = UDim.new(0, 4); });
+		Create("TextButton", { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 1, 0); Text = ""; });
+		Create("TextLabel", { BackgroundTransparency = 1; Rotation = 0; Size = UDim2.new(1, 0, 1, 0); Font = Enum.Font.FredokaOne; Text = "<"; TextScaled = true; TextStrokeTransparency = 0.8; })
+	});
+	GUI.Right = Create("Frame", {
+		Parent = GUI.UI["Controls"];
+		BackgroundTransparency = 0.82;
+		Position = UDim2.new(0.667, 0, 0.333, 0);
+		Size = UDim2.new(0.333, 0, 0.333, 0);
+		Create("UICorner", { CornerRadius = UDim.new(0, 4); });
+		Create("TextButton", { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 1, 0); Text = ""; });
+		Create("TextLabel", { BackgroundTransparency = 1; Rotation = 180; Size = UDim2.new(1, 0, 1, 0); Font = Enum.Font.FredokaOne; Text = "<"; TextScaled = true; TextStrokeTransparency = 0.8; })
+	});
+	
+	local TouchGUI = LocalPlayer.PlayerGui["TouchGui"];
+	function GUI:Show() GUI.UI.Enabled = true; TouchGUI.Parent = nil end
+	function GUI:Hide() GUI.UI.Enabled = false; TouchGUI.Parent = LocalPlayer.PlayerGui; end
+end
 
 ------------------------------------------------------------------------
 
@@ -134,14 +202,6 @@ local Input = {} do
 		D = 0,
 		E = 0,
 		Q = 0,
---[[		U = 0,
-		H = 0,
-		J = 0,
-		K = 0,
-		I = 0,
-		Y = 0,
---]]		Up = 0,
-		Down = 0,
 		LeftShift = 0,
 		RightShift = 0,
 	}
@@ -172,9 +232,9 @@ local Input = {} do
 		)*NAV_GAMEPAD_SPEED
 
 		local kKeyboard = Vector3.new(
-			keyboard.D - keyboard.A--[[ + keyboard.K - keyboard.H]],
-			keyboard.E - keyboard.Q--[[ + keyboard.I - keyboard.Y]],
-			keyboard.S - keyboard.W--[[ + keyboard.J - keyboard.U]]
+			keyboard.D - keyboard.A,
+			keyboard.E - keyboard.Q,
+			keyboard.S - keyboard.W
 		)*NAV_KEYBOARD_SPEED
 
 		local shift = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
@@ -183,6 +243,13 @@ local Input = {} do
 	end
 
 	function Input.Pan(dt)
+		if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.MouseEnabled
+			and not UserInputService.GamepadEnabled and not GuiService:IsTenFootInterface() then
+			local x = -UserInputService:GetMouseDelta().X
+			local y = -UserInputService:GetMouseDelta().Y
+			local delta = Vector2.new(y, x)
+			mouse.Delta = delta
+		end
 		local kGamepad = Vector2.new(
 			thumbstickCurve(gamepad.Thumbstick2.Y),
 			thumbstickCurve(-gamepad.Thumbstick2.X)
@@ -239,13 +306,13 @@ local Input = {} do
 
 		function Input.StartCapture()
 			ContextActionService:BindActionAtPriority("FreecamKeyboard", Keypress, false, Freecam.INPUT_PRIORITY,
-				Enum.KeyCode.W, --Enum.KeyCode.U,
-				Enum.KeyCode.A, --Enum.KeyCode.H,
-				Enum.KeyCode.S, --Enum.KeyCode.J,
-				Enum.KeyCode.D, --Enum.KeyCode.K,
-				Enum.KeyCode.E, --Enum.KeyCode.I,
-				Enum.KeyCode.Q, --Enum.KeyCode.Y,
-				Enum.KeyCode.Up, Enum.KeyCode.Down
+				Enum.KeyCode.W,
+				Enum.KeyCode.A,
+				Enum.KeyCode.S,
+				Enum.KeyCode.D
+				--Enum.KeyCode.E,
+				--Enum.KeyCode.Q,
+				--Enum.KeyCode.Up, Enum.KeyCode.Down
 			)
 			ContextActionService:BindActionAtPriority("FreecamMousePan",          MousePan,   false, Freecam.INPUT_PRIORITY, Enum.UserInputType.MouseMovement)
 			ContextActionService:BindActionAtPriority("FreecamMouseWheel",        MouseWheel, false, Freecam.INPUT_PRIORITY, Enum.UserInputType.MouseWheel)
@@ -426,6 +493,10 @@ do
 		fovSpring:Reset(0)
 
 		PlayerState.Push()
+		if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.MouseEnabled
+			and not UserInputService.GamepadEnabled and not GuiService:IsTenFootInterface() then
+			GUI:Show();
+		end
 		RunService:BindToRenderStep("Freecam", Enum.RenderPriority.Camera.Value, StepFreecam)
 		Input.StartCapture()
 	end
@@ -434,6 +505,10 @@ do
 		Input.StopCapture()
 		RunService:UnbindFromRenderStep("Freecam")
 		PlayerState.Pop()
+		if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.MouseEnabled
+			and not UserInputService.GamepadEnabled and not GuiService:IsTenFootInterface() then
+			GUI:Hide();
+		end
 	end
 	
 	function Freecam.ToggleFreecam()
