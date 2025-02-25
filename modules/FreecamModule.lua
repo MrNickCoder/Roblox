@@ -313,7 +313,7 @@ local Input = {} do
 				Enum.KeyCode.W,
 				Enum.KeyCode.A,
 				Enum.KeyCode.S,
-				Enum.KeyCode.D
+				Enum.KeyCode.D,
 				Enum.KeyCode.E,
 				Enum.KeyCode.Q,
 				Enum.KeyCode.Up, Enum.KeyCode.Down
