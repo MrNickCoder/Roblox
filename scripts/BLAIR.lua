@@ -545,7 +545,7 @@ UserIS.InputBegan:Connect(function(input, gameProcessed)
 	if input.KeyCode == Enum.KeyCode.J then
 		heldDown = true
 		task.spawn(function()
-			repeat task.wait(1); timeBetween += 1; until timeBetween == 2 or heldDown = false;
+			repeat task.wait(1); timeBetween += 1; until timeBetween == 2 or heldDown == false;
 			if timeBetween ~= 2 then timeBetween = 0; return; end
 			timeBetween = 0;
 			Player.PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible = not Player.PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible;
