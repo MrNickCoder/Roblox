@@ -532,7 +532,7 @@ task.spawn(function()
 		end
 
 		if Player.PlayerGui:FindFirstChild("Statusifier") then
-			Player.PlayerGui["Statusifier"]["Container"]["UIScale"].Scale = tonumber(SideStatusScale) or 1;
+			Player.PlayerGui["Statusifier"]["Container"]["UIScale"].Scale = tonumber(SideStatusScale.Text) or 1;
 		end
 	end
 end)
