@@ -314,9 +314,9 @@ local Input = {} do
 				Enum.KeyCode.A,
 				Enum.KeyCode.S,
 				Enum.KeyCode.D
-				--Enum.KeyCode.E,
-				--Enum.KeyCode.Q,
-				--Enum.KeyCode.Up, Enum.KeyCode.Down
+				Enum.KeyCode.E,
+				Enum.KeyCode.Q,
+				Enum.KeyCode.Up, Enum.KeyCode.Down
 			)
 			ContextActionService:BindActionAtPriority("FreecamMousePan",          MousePan,   false, Freecam.INPUT_PRIORITY, Enum.UserInputType.MouseMovement)
 			ContextActionService:BindActionAtPriority("FreecamMouseWheel",        MouseWheel, false, Freecam.INPUT_PRIORITY, Enum.UserInputType.MouseWheel)
