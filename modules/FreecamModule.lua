@@ -113,9 +113,11 @@ local GUI = {} do
 		Create("TextLabel", { BackgroundTransparency = 1; Rotation = 180; Size = UDim2.new(1, 0, 1, 0); Font = Enum.Font.FredokaOne; Text = "<"; TextScaled = true; TextStrokeTransparency = 0.8; })
 	});
 	
-	local TouchGUI = LocalPlayer.PlayerGui["TouchGui"];
-	function GUI:Show() GUI.UI.Enabled = true; TouchGUI.Parent = nil end
-	function GUI:Hide() GUI.UI.Enabled = false; TouchGUI.Parent = LocalPlayer.PlayerGui; end
+	if LocalPlayer:FindFirstChild("TouchGui") then
+		local TouchGUI = LocalPlayer.PlayerGui["TouchGui"];
+		function GUI:Show() GUI.UI.Enabled = true; TouchGUI.Parent = nil end
+		function GUI:Hide() GUI.UI.Enabled = false; TouchGUI.Parent = LocalPlayer.PlayerGui; end
+	end
 end
 
 ------------------------------------------------------------------------
