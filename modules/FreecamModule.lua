@@ -204,6 +204,8 @@ local Input = {} do
 		D = 0,
 		E = 0,
 		Q = 0,
+		Up = 0,
+		Down = 0,
 		LeftShift = 0,
 		RightShift = 0,
 	}
