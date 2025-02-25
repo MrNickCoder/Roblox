@@ -46,7 +46,7 @@ if not RService:IsStudio() then
 		end)
 		if success then return e else saveConfig(); return readConfig(); end
 	end
-	Config = readConfig();
+	for i, v in next, readConfig() do Config[i] = v; end
 end
 
 ---------------------
