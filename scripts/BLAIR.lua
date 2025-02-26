@@ -11,6 +11,8 @@ local RStorage = game:GetService("ReplicatedStorage");
 local UserIS = game:GetService("UserInputService");
 local RService = game:GetService("RunService");
 
+if HttpService:JSONDecode(game:HttpGet("https://apis.roblox.com/universes/v1/places/".. game.PlaceId .."/universe")).universeId ~= 2239430935 then return end
+
 StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Loading Script!"; });
 
 local sScript, eScript = pcall(function()
@@ -23,7 +25,6 @@ local sScript, eScript = pcall(function()
 
 	if not RService:IsStudio() then
 		if game.PlaceId == 6137321701 then return end
-		if HttpService:JSONDecode(game:HttpGet("https://apis.roblox.com/universes/v1/places/".. game.PlaceId .."/universe")).universeId ~= 2239430935 then return end
 		
 		print("Loading BLAIR Script!");
 		
