@@ -1,4 +1,5 @@
 if not game:IsLoaded() then game.Loaded:Wait() end
+if game:GetService("HttpService"):JSONDecode(game:HttpGet("https://apis.roblox.com/universes/v1/places/".. game.PlaceId .."/universe")).universeId ~= 2239430935 then return end
 
 --------------------
 -- [[ SERVICES ]] --
@@ -11,7 +12,6 @@ local RStorage = game:GetService("ReplicatedStorage");
 local UserIS = game:GetService("UserInputService");
 local RService = game:GetService("RunService");
 
-if HttpService:JSONDecode(game:HttpGet("https://apis.roblox.com/universes/v1/places/".. game.PlaceId .."/universe")).universeId ~= 2239430935 then return end
 
 StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Loading Script!"; });
 
