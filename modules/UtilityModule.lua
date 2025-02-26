@@ -5,7 +5,7 @@ local Utility = {
 	ActualHour = os.date("!*t").hour,
 }
 do
-	function Utility:Create(Name, Data)
+	function Utility:Instance(Name, Data)
 		local Object = Instance.new(Name, Data.Parent);
 		for Index, Value in next, Data do
 			if Index ~= "Parent" then
