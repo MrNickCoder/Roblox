@@ -37,6 +37,8 @@ local UserInputService		= game:GetService("UserInputService")
 local GuiService			= game:GetService("GuiService")
 local Workspace				= game:GetService("Workspace")
 
+local Utility				= (loadstring or load)(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/UtilityModule.lua"))()
+
 local LocalPlayer = Players.LocalPlayer
 if not LocalPlayer then
 	Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
@@ -65,7 +67,7 @@ local GUI = {} do
 		return Object;
 	end
 	
-	GUI.UI = Create("ScreenGui", {
+	GUI.UI = Utility:Instance("ScreenGui", {
 		Name = "MobileFreecam";
 		Parent = LocalPlayer.PlayerGui;
 		Enabled = false;
@@ -76,41 +78,41 @@ local GUI = {} do
 			Size = UDim2.new(0, 155, 0, 155);
 		});
 	});
-	GUI.Forward = Create("Frame", {
+	GUI.Forward = Utility:Instance("Frame", {
 		Parent = GUI.UI["Controls"];
 		BackgroundTransparency = 0.82;
 		Position = UDim2.new(0.333, 0, 0, 0);
 		Size = UDim2.new(0.333, 0, 0.333, 0);
-		Create("UICorner", { CornerRadius = UDim.new(0, 4); });
-		Create("TextButton", { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 1, 0); Text = ""; });
-		Create("TextLabel", { BackgroundTransparency = 1; Rotation = 90; Size = UDim2.new(1, 0, 1, 0); Font = Enum.Font.FredokaOne; Text = "<"; TextScaled = true; TextStrokeTransparency = 0.8; })
+		Utility:Instance("UICorner", { CornerRadius = UDim.new(0, 4); });
+		Utility:Instance("TextButton", { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 1, 0); Text = ""; });
+		Utility:Instance("TextLabel", { BackgroundTransparency = 1; Rotation = 90; Size = UDim2.new(1, 0, 1, 0); Font = Enum.Font.FredokaOne; Text = "<"; TextScaled = true; TextStrokeTransparency = 0.8; })
 	});
-	GUI.Backward = Create("Frame", {
+	GUI.Backward = Utility:Instance("Frame", {
 		Parent = GUI.UI["Controls"];
 		BackgroundTransparency = 0.82;
 		Position = UDim2.new(0.333, 0, 0.667, 0);
 		Size = UDim2.new(0.333, 0, 0.333, 0);
-		Create("UICorner", { CornerRadius = UDim.new(0, 4); });
-		Create("TextButton", { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 1, 0); Text = ""; });
-		Create("TextLabel", { BackgroundTransparency = 1; Rotation = -90; Size = UDim2.new(1, 0, 1, 0); Font = Enum.Font.FredokaOne; Text = "<"; TextScaled = true; TextStrokeTransparency = 0.8; })
+		Utility:Instance("UICorner", { CornerRadius = UDim.new(0, 4); });
+		Utility:Instance("TextButton", { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 1, 0); Text = ""; });
+		Utility:Instance("TextLabel", { BackgroundTransparency = 1; Rotation = -90; Size = UDim2.new(1, 0, 1, 0); Font = Enum.Font.FredokaOne; Text = "<"; TextScaled = true; TextStrokeTransparency = 0.8; })
 	});
-	GUI.Left = Create("Frame", {
+	GUI.Left = Utility:Instance("Frame", {
 		Parent = GUI.UI["Controls"];
 		BackgroundTransparency = 0.82;
 		Position = UDim2.new(0, 0, 0.333, 0);
 		Size = UDim2.new(0.333, 0, 0.333, 0);
-		Create("UICorner", { CornerRadius = UDim.new(0, 4); });
-		Create("TextButton", { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 1, 0); Text = ""; });
-		Create("TextLabel", { BackgroundTransparency = 1; Rotation = 0; Size = UDim2.new(1, 0, 1, 0); Font = Enum.Font.FredokaOne; Text = "<"; TextScaled = true; TextStrokeTransparency = 0.8; })
+		Utility:Instance("UICorner", { CornerRadius = UDim.new(0, 4); });
+		Utility:Instance("TextButton", { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 1, 0); Text = ""; });
+		Utility:Instance("TextLabel", { BackgroundTransparency = 1; Rotation = 0; Size = UDim2.new(1, 0, 1, 0); Font = Enum.Font.FredokaOne; Text = "<"; TextScaled = true; TextStrokeTransparency = 0.8; })
 	});
-	GUI.Right = Create("Frame", {
+	GUI.Right = Utility:Instance("Frame", {
 		Parent = GUI.UI["Controls"];
 		BackgroundTransparency = 0.82;
 		Position = UDim2.new(0.667, 0, 0.333, 0);
 		Size = UDim2.new(0.333, 0, 0.333, 0);
-		Create("UICorner", { CornerRadius = UDim.new(0, 4); });
-		Create("TextButton", { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 1, 0); Text = ""; });
-		Create("TextLabel", { BackgroundTransparency = 1; Rotation = 180; Size = UDim2.new(1, 0, 1, 0); Font = Enum.Font.FredokaOne; Text = "<"; TextScaled = true; TextStrokeTransparency = 0.8; })
+		Utility:Instance("UICorner", { CornerRadius = UDim.new(0, 4); });
+		Utility:Instance("TextButton", { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 1, 0); Text = ""; });
+		Utility:Instance("TextLabel", { BackgroundTransparency = 1; Rotation = 180; Size = UDim2.new(1, 0, 1, 0); Font = Enum.Font.FredokaOne; Text = "<"; TextScaled = true; TextStrokeTransparency = 0.8; })
 	});
 	
 	if LocalPlayer.PlayerGui:FindFirstChild("TouchGui") then
