@@ -5,7 +5,17 @@ local Utility = {
 	ActualHour = os.date("!*t").hour,
 }
 do
-
+	function Utility:Create(Name, Data)
+		local Object = Instance.new(Name, Data.Parent);
+		for Index, Value in next, Data do
+			if Index ~= "Parent" then
+				if typeof(Value) == "Instance" then Value.Parent = Object;
+				else Object[Index] = Value; end
+			end
+		end
+		return Object;
+	end
+	
 	function Utility:Comma_Value(Text:string)
 		local Value = Text;
 		while true do
