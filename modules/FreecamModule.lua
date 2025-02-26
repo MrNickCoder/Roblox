@@ -71,7 +71,7 @@ local GUI = {} do
 		Name = "MobileFreecam";
 		Parent = LocalPlayer.PlayerGui;
 		Enabled = false;
-		Create("Frame", {
+		Utility:Instance("Frame", {
 			Name = "Controls";
 			BackgroundTransparency = 1;
 			Position = UDim2.new(0, 35, 1, -179);
