@@ -5,25 +5,27 @@ if game:GetService("HttpService"):JSONDecode(game:HttpGet("https://apis.roblox.c
 -- [[ SERVICES ]] --
 --------------------
 local HttpService = game:GetService("HttpService");
-local Player = game:GetService("Players").LocalPlayer;
+local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui");
 local Lighting = game:GetService("Lighting");
 local RStorage = game:GetService("ReplicatedStorage");
 local UserIS = game:GetService("UserInputService");
 local RService = game:GetService("RunService");
 
+local LocalPlayer = Players.LocalPlayer;
+
 StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Loading Script!"; });
 
-local sScript, eScript = pcall(function()
+local Success, Data = pcall(function()
 	print("Loading BLAIR Script!");
 	if game.PlaceId == 6137321701 then return false; end
-	repeat task.wait(.1) until game.Workspace:FindFirstChild(Player.Name);
-	repeat task.wait(.1) until game.Workspace:FindFirstChild(Player.Name):FindFirstChild("HumanoidRootPart");
+	repeat task.wait(.1) until game.Workspace:FindFirstChild(LocalPlayer.Name);
+	repeat task.wait(.1) until game.Workspace:FindFirstChild(LocalPlayer.Name):FindFirstChild("HumanoidRootPart");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map"):FindFirstChild("Van");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map"):FindFirstChild("Doors");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map"):FindFirstChild("Items");
-	repeat task.wait(.1) until Player.PlayerGui:FindFirstChild("Journal");
+	repeat task.wait(.1) until LocalPlayer.PlayerGui:FindFirstChild("Journal");
 	repeat task.wait(.1) until RStorage:FindFirstChild("ActiveChallenges");
 	task.wait(5);
 
@@ -52,8 +54,8 @@ local sScript, eScript = pcall(function()
 	}
 	Config = Utility:LoadConfig(Config, "BLAIR", "Settings.json");
 
-	if Player.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then Player.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings"):Destroy() end;
-	if Player.PlayerGui:FindFirstChild("Statusifier") then Player.PlayerGui:FindFirstChild("Statusifier"):Destroy() end;
+	if LocalPlayer.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then LocalPlayer.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings"):Destroy() end;
+	if LocalPlayer.PlayerGui:FindFirstChild("Statusifier") then LocalPlayer.PlayerGui:FindFirstChild("Statusifier"):Destroy() end;
 
 	---------------------
 	-- [[ UTILITIES ]] --
@@ -67,12 +69,12 @@ local sScript, eScript = pcall(function()
 			local Off = Callback and Callback.Off or function() end;
 			
 			local Settings;
-			if Player.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then
-				Settings = Player.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings");
+			if LocalPlayer.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then
+				Settings = LocalPlayer.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings");
 			else
 				Settings = Utility:Instance("Frame", {
 					Name = "Settings";
-					Parent = Player.PlayerGui.Journal.JournalFrame;
+					Parent = LocalPlayer.PlayerGui.Journal.JournalFrame;
 					AnchorPoint = Vector2.new(0, 0.5);
 					BackgroundTransparency = 1;
 					Size = UDim2.new(1, 0, 0.04, 0);
@@ -112,6 +114,7 @@ local sScript, eScript = pcall(function()
 			Data.Toggle = Data.Button["Frame"];
 			Data.AddTextbox = function(Properties, Options)
 				Properties.Text = Options and Config[Options.Config] or Properties.Text or "";
+				local Display = Options and Options.Display or "";
 				local Type = Options and Options.Type or "Text";
 				local Negative = Options and Options.Negative or false;
 				local Control = Utility:Instance("TextBox", {
@@ -125,6 +128,18 @@ local sScript, eScript = pcall(function()
 					TextColor3 = Color3.fromRGB(255, 255, 255);
 					TextScaled = true;
 					Utility:Instance("UICorner", { CornerRadius = UDim.new(0, 5); });
+					Utility:Instance("TextLabel", {
+						AnchorPoint = Vector2.new(0.5, 0.5);
+						BackgroundTransparency = 1;
+						Position = UDim2.new(0.5, 0, -0.1, 0);
+						Size = UDim2.new(0.9, 0, 0.6, 0);
+						Font = Enum.Font.FredokaOne;
+						Text = Display;
+						TextColor3 = Color3.fromRGB(255, 255, 255);
+						TextScaled = true;
+						TextStrokeTransparency = 0;
+						TextXAlignment = Enum.TextXAlignment.Left;
+					});
 				});
 				for Index, Value in pairs(Properties or {}) do
 					Control[Index] = Value;
@@ -170,12 +185,12 @@ local sScript, eScript = pcall(function()
 		end
 		function CreateInfo(Name, Options)
 			local SideInfo;
-			if Player.PlayerGui:FindFirstChild("Statusifier") then
-				SideInfo = Player.PlayerGui:FindFirstChild("Statusifier");
+			if LocalPlayer.PlayerGui:FindFirstChild("Statusifier") then
+				SideInfo = LocalPlayer.PlayerGui:FindFirstChild("Statusifier");
 			else
 				SideInfo = Utility:Instance("ScreenGui", {
 					Name = "Statusifier";
-					Parent = Player.PlayerGui;
+					Parent = LocalPlayer.PlayerGui;
 					ResetOnSpawn = false;
 					Utility:Instance("Frame", {
 						Name = "Container";
@@ -259,7 +274,7 @@ local sScript, eScript = pcall(function()
 				while task.wait() do
 					if not Data.UI.Parent then break; end
 					pcall(function()
-						Data.Distance.Text = (math.floor((Data.UI.Parent.Position - Player.Character.PrimaryPart.Position).Magnitude * 100) / 100) .."m";
+						Data.Distance.Text = (math.floor((Data.UI.Parent.Position - LocalPlayer.Character.PrimaryPart.Position).Magnitude * 100) / 100) .."m";
 					end)
 				end
 			end)
@@ -274,11 +289,11 @@ local sScript, eScript = pcall(function()
 	local Freecam = (loadstring or load)(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/FreecamModule.lua"))()
 	Freecam.IgnoreGUI = {"Radio", "Journal", "MobileUI", "Statusifier"}
 	local Light;
-	if Player.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild("SpotLight") then
-		Light = Player.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild("SpotLight")
+	if LocalPlayer.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild("SpotLight") then
+		Light = LocalPlayer.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild("SpotLight")
 	else
 		Light = Utility:Instance("SpotLight", {
-			Parent = Player.Character:FindFirstChild("HumanoidRootPart");
+			Parent = LocalPlayer.Character:FindFirstChild("HumanoidRootPart");
 			Brightness = 10;
 			Range = 60;
 			Face = Enum.NormalId.Front;
@@ -312,15 +327,15 @@ local sScript, eScript = pcall(function()
 		Position = UDim2.new(0.25, 0, 0, -2);
 		Size = UDim2.new(0.4, 0, 0.8, 0);
 		Text = "60";
-	}, { Config = "CustomLightRange"; Type = "Integer"; });
+	}, { Config = "CustomLightRange"; Display = "Range"; Type = "Integer"; });
 	local CustomLightBrightness = CustomLights.AddTextbox({
 		Position = UDim2.new(0.75, 0, 0, -2);
 		Size = UDim2.new(0.4, 0, 0.8, 0);
 		Text = "10";
-	}, { Config = "CustomLightBrightness"; Type = "Integer"; });
+	}, { Config = "CustomLightBrightness"; Display = "Brightness"; Type = "Integer"; });
 
 	local CustomSprint = CreateSettings("Custom Sprint", { Config = "CustomSprint"; });
-	local CustomSprintSpeed = CustomSprint.AddTextbox({ Text = "13"; }, { Config = "CustomSprintSpeed"; Type = "Number"; });
+	local CustomSprintSpeed = CustomSprint.AddTextbox({ Text = "13"; }, { Config = "CustomSprintSpeed"; Display = "Speed"; Type = "Number"; });
 
 	local FullbrightAmbient;
 	local Fullbright = CreateSettings("Fullbright", { Config = "Fullbright"; Keybind = Enum.KeyCode.T; }, {
@@ -337,7 +352,7 @@ local sScript, eScript = pcall(function()
 			Lighting["Atmosphere"].Density = AtmosphereDensity
 		end;
 	});
-	FullbrightAmbient = Fullbright.AddTextbox({ Text = "138"; }, { Config = "FullbrightAmbient"; Type = "Integer"; });
+	FullbrightAmbient = Fullbright.AddTextbox({ Text = "138"; }, { Config = "FullbrightAmbient"; Display = "Ambient"; Type = "Integer"; });
 
 	local NoClipDoor = CreateSettings("No Clip Door", { Config = "NoClipDoor"; Keybind = Enum.KeyCode.X; }, {
 		On = function()
@@ -354,8 +369,9 @@ local sScript, eScript = pcall(function()
 
 	local VoodooESP = nil;
 	if game.Workspace:FindFirstChild("VoodooDoll") then
-		VoodooESP = CreateESP("[Voodoo]", { Parent = game.Workspace:WaitForChild("VoodooDoll"); Color = Color3.fromRGB(0, 255, 0) });
+		VoodooESP = CreateESP("[Voodoo]", { Parent = game.Workspace:WaitForChild("VoodooDoll"); Color = Color3.fromRGB(0, 255, 0); });
 	end
+	local GeneratorESP = CreateESP("[Generator]", { Parent = game.Workspace["Map"]["Generators"]:GetChildren()[1]; Color = Color3.fromRGB(255, 16, 240); });
 	local GhostESP = nil;
 	local ESP = CreateSettings("ESP", { Config = "ESP"; }, {
 		On = function()
@@ -373,10 +389,10 @@ local sScript, eScript = pcall(function()
 	end)
 
 	local SideStatus = CreateSettings("Side Status", { Config = "SideStatus"; }, {
-		On = function() Player.PlayerGui["Statusifier"].Enabled = true end;
-		Off = function() Player.PlayerGui["Statusifier"].Enabled = false end;
+		On = function() LocalPlayer.PlayerGui["Statusifier"].Enabled = true end;
+		Off = function() LocalPlayer.PlayerGui["Statusifier"].Enabled = false end;
 	});
-	local SideStatusScale = SideStatus.AddTextbox({ Text = "1"; }, { Config = "SideStatusScale"; Type = "Number"; });
+	local SideStatusScale = SideStatus.AddTextbox({ Text = "1"; }, { Config = "SideStatusScale"; Display = "Scale"; Type = "Number"; });
 
 	---------------------------
 	-- [[[ CURSED OBJECT ]]] --
@@ -385,6 +401,7 @@ local sScript, eScript = pcall(function()
 	if game.Workspace:FindFirstChild("SummoningCircle") then Objects.AddInfo("Summoning Circle"); end
 	if game.Workspace:FindFirstChild("Ouija Board") then Objects.AddInfo("Ouija Board"); end
 	if game.Workspace["Map"]["Items"]:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); end
+	for _, Player in pairs(Players:GetChildren()) do if Player.Character and Player.Character:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); break; end end
 
 	------------------
 	-- [[[ ROOM ]]] --
@@ -490,8 +507,8 @@ local sScript, eScript = pcall(function()
 						end
 					end
 					if not Evidences["Spirit Box"].Visible then
-						for _, players in pairs(game:GetService("Players"):GetChildren()) do
-							if players.Character then FindSpiritBox(players.Character); end
+						for _, Player in pairs(Players:GetChildren()) do
+							if Player.Character then FindSpiritBox(Player.Character); end
 						end
 						FindSpiritBox(game.Workspace["Map"]["Items"]);
 					end
@@ -509,7 +526,7 @@ local sScript, eScript = pcall(function()
 			local PlayerSanity = PlayerStats.AddInfo("Sanity");
 			local PlayerThread = Utility:Thread("Player", function()
 				while task.wait() do
-					PlayerSanity.Text = "Sanity: ".. (math.floor(Player.Sanity.Value * 100) / 100);
+					PlayerSanity.Text = "Sanity: ".. (math.floor(LocalPlayer.Sanity.Value * 100) / 100);
 				end
 			end):Start()
 		end
@@ -525,13 +542,8 @@ local sScript, eScript = pcall(function()
 			Light.Brightness = tonumber(CustomLightBrightness.Text) or 0;
 			Light.Range = tonumber(CustomLightsRange.Text) or 0;
 
-			if CustomSprint.Enabled and Sprinting then
-				Player.Character:FindFirstChild("Humanoid").WalkSpeed = tonumber(CustomSprintSpeed.Text);
-			end
-
-			if Player.PlayerGui:FindFirstChild("Statusifier") then
-				Player.PlayerGui["Statusifier"]["Container"]["UIScale"].Scale = tonumber(SideStatusScale.Text) or 1;
-			end
+			if CustomSprint.Enabled and Sprinting then LocalPlayer.Character:FindFirstChild("Humanoid").WalkSpeed = tonumber(CustomSprintSpeed.Text) or 13; end
+			if LocalPlayer.PlayerGui:FindFirstChild("Statusifier") then LocalPlayer.PlayerGui["Statusifier"]["Container"]["UIScale"].Scale = tonumber(SideStatusScale.Text) or 1; end
 		end
 	end):Start()
 	
@@ -545,8 +557,8 @@ local sScript, eScript = pcall(function()
 				repeat task.wait(1); timeBetween += 1; until timeBetween == 2 or heldDown == false;
 				if timeBetween ~= 2 then timeBetween = 0; return; end
 				timeBetween = 0;
-				Player.PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible = not Player.PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible;
-				Player.PlayerGui["Statusifier"]["Container"].Visible = not Player.PlayerGui["Statusifier"]["Container"].Visible;
+				LocalPlayer.PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible = not LocalPlayer.PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible;
+				LocalPlayer.PlayerGui["Statusifier"]["Container"].Visible = not LocalPlayer.PlayerGui["Statusifier"]["Container"].Visible;
 			end)
 		end
 		
@@ -559,13 +571,13 @@ local sScript, eScript = pcall(function()
 		if input.KeyCode == Enum.KeyCode.LeftShift then Sprinting = false; end
 		if input.KeyCode == Enum.KeyCode.J then timeBetween = 0; heldDown = false; end
 	end)
-	if Player.PlayerGui:FindFirstChild("MobileUI") then
-		Player.PlayerGui["MobileUI"].SprintButton.MouseButton1Down:Connect(function() Sprinting = true; end)
-		Player.PlayerGui["MobileUI"].SprintButton.MouseButton1Up:Connect(function() Sprinting = false; end)
+	if LocalPlayer.PlayerGui:FindFirstChild("MobileUI") then
+		LocalPlayer.PlayerGui["MobileUI"].SprintButton.MouseButton1Down:Connect(function() Sprinting = true; end)
+		LocalPlayer.PlayerGui["MobileUI"].SprintButton.MouseButton1Up:Connect(function() Sprinting = false; end)
 	end
 
 	print("BLAIR Script!");
 end)
 
-if sScript then StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Successfully Loaded!"; });
-else StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Error Loading!"; }); end
+if Success then StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Successfully Loaded!"; });
+else StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Error Loading!"; }); print(Data); end
