@@ -377,10 +377,12 @@ local Success, Data = pcall(function()
 	local ESP = CreateSettings("ESP", { Config = "ESP"; }, {
 		On = function()
 			if VoodooESP then VoodooESP.UI.Enabled = true; end
+			if GeneratorESP then GeneratorESP.UI.Enabled = true; end
 			if GhostESP then GhostESP.UI.Enabled = true; end
 		end;
 		Off = function()
 			if VoodooESP then VoodooESP.UI.Enabled = false; end
+			if GeneratorESP then GeneratorESP.UI.Enabled = false; end
 			if GhostESP then GhostESP.UI.Enabled = false; end
 		end;
 	});
@@ -575,6 +577,17 @@ local Success, Data = pcall(function()
 	if PlayerGui:FindFirstChild("MobileUI") then
 		PlayerGui["MobileUI"].SprintButton.MouseButton1Down:Connect(function() Sprinting = true; end)
 		PlayerGui["MobileUI"].SprintButton.MouseButton1Up:Connect(function() Sprinting = false; end)
+		PlayerGui["MobileUI"].Frame.JournalButton.MouseButton1Down:Connect(function()
+			heldDown = true
+			task.spawn(function()
+				repeat task.wait(1); timeBetween += 1; until timeBetween == 2 or heldDown == false;
+				if timeBetween ~= 2 then timeBetween = 0; return; end
+				timeBetween = 0;
+				PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible = not PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible;
+				PlayerGui["Statusifier"]["Container"].Visible = not PlayerGui["Statusifier"]["Container"].Visible;
+			end)
+		end)
+		PlayerGui["MobileUI"].Frame.JournalButton.MouseLeave:Connect(function() timeBetween = 0; heldDown = false; end)
 	end
 
 	print("BLAIR Script!");
