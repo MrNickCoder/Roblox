@@ -15,11 +15,12 @@ local RService = game:GetService("RunService");
 local LocalPlayer = Players.LocalPlayer;
 local PlayerGui = LocalPlayer.PlayerGui;
 
-StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Loading Script!"; });
 
-local Success, Data = pcall(function()
+if game.PlaceId == 6137321701 then StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "No Loading in Lobby!"; }); return; end
+
+StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Loading Script!"; });
+local Success, Result = pcall(function()
 	print("Loading BLAIR Script!");
-	if game.PlaceId == 6137321701 then return false; end
 	repeat task.wait(.1) until game.Workspace:FindFirstChild(LocalPlayer.Name);
 	repeat task.wait(.1) until game.Workspace:FindFirstChild(LocalPlayer.Name):FindFirstChild("HumanoidRootPart");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map");
@@ -593,5 +594,9 @@ local Success, Data = pcall(function()
 	print("BLAIR Script!");
 end)
 
-if Success then StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Successfully Loaded!"; });
-else StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Error Loading!"; }); print(Data); end
+if Success then
+	StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Successfully Loaded!"; });
+else
+	StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Error Loading!"; });
+	error(Result);
+end
