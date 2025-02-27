@@ -339,6 +339,15 @@ local Input = {} do
 			ContextActionService:UnbindAction("FreecamGamepadTrigger")
 			ContextActionService:UnbindAction("FreecamGamepadThumbstick")
 		end
+		
+		GUI.Forward.TextButton.MouseButton1Down:Connect(function() keyboard["W"] = 1; end)
+		GUI.Forward.TextButton.MouseLeave:Connect(function() keyboard["W"] = 0; end)
+		GUI.Backward.TextButton.MouseButton1Down:Connect(function() keyboard["S"] = 1; end)
+		GUI.Backward.TextButton.MouseLeave:Connect(function() keyboard["S"] = 0; end)
+		GUI.Left.TextButton.MouseButton1Down:Connect(function() keyboard["A"] = 1; end)
+		GUI.Left.TextButton.MouseLeave:Connect(function() keyboard["A"] = 0; end)
+		GUI.Right.TextButton.MouseButton1Down:Connect(function() keyboard["D"] = 1; end)
+		GUI.Right.TextButton.MouseLeave:Connect(function() keyboard["D"] = 0; end)
 	end
 end
 
