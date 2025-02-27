@@ -13,6 +13,7 @@ local UserIS = game:GetService("UserInputService");
 local RService = game:GetService("RunService");
 
 local LocalPlayer = Players.LocalPlayer;
+local PlayerGui = LocalPlayer.PlayerGui;
 
 StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Loading Script!"; });
 
@@ -25,7 +26,7 @@ local Success, Data = pcall(function()
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map"):FindFirstChild("Van");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map"):FindFirstChild("Doors");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map"):FindFirstChild("Items");
-	repeat task.wait(.1) until LocalPlayer.PlayerGui:FindFirstChild("Journal");
+	repeat task.wait(.1) until PlayerGui:FindFirstChild("Journal");
 	repeat task.wait(.1) until RStorage:FindFirstChild("ActiveChallenges");
 	task.wait(5);
 
@@ -39,6 +40,9 @@ local Success, Data = pcall(function()
 		["CustomLightRange"] = "60";
 		["CustomLightBrightness"] = "10";
 		
+		["CustomSprint"] = false;
+		["CustomSprintSpeed"] = "13";
+		
 		["Fullbright"] = false;
 		["FullbrightAmbient"] = "255";
 		
@@ -46,16 +50,15 @@ local Success, Data = pcall(function()
 		
 		["ESP"] = false;
 		
-		["CustomSprint"] = false;
-		["CustomSprintSpeed"] = "13";
+		["Freecam"] = false;
 		
 		["SideStatus"] = false;
 		["SideStatusScale"] = "1";
 	}
 	Config = Utility:LoadConfig(Config, "BLAIR", "Settings.json");
 
-	if LocalPlayer.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then LocalPlayer.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings"):Destroy() end;
-	if LocalPlayer.PlayerGui:FindFirstChild("Statusifier") then LocalPlayer.PlayerGui:FindFirstChild("Statusifier"):Destroy() end;
+	if PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then PlayerGui.Journal.JournalFrame:FindFirstChild("Settings"):Destroy() end;
+	if PlayerGui:FindFirstChild("Statusifier") then PlayerGui:FindFirstChild("Statusifier"):Destroy() end;
 
 	---------------------
 	-- [[ UTILITIES ]] --
@@ -69,12 +72,12 @@ local Success, Data = pcall(function()
 			local Off = Callback and Callback.Off or function() end;
 			
 			local Settings;
-			if LocalPlayer.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then
-				Settings = LocalPlayer.PlayerGui.Journal.JournalFrame:FindFirstChild("Settings");
+			if PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then
+				Settings = PlayerGui.Journal.JournalFrame:FindFirstChild("Settings");
 			else
 				Settings = Utility:Instance("Frame", {
 					Name = "Settings";
-					Parent = LocalPlayer.PlayerGui.Journal.JournalFrame;
+					Parent = PlayerGui.Journal.JournalFrame;
 					AnchorPoint = Vector2.new(0, 0.5);
 					BackgroundTransparency = 1;
 					Size = UDim2.new(1, 0, 0.04, 0);
@@ -185,12 +188,12 @@ local Success, Data = pcall(function()
 		end
 		function CreateInfo(Name, Options)
 			local SideInfo;
-			if LocalPlayer.PlayerGui:FindFirstChild("Statusifier") then
-				SideInfo = LocalPlayer.PlayerGui:FindFirstChild("Statusifier");
+			if PlayerGui:FindFirstChild("Statusifier") then
+				SideInfo = PlayerGui:FindFirstChild("Statusifier");
 			else
 				SideInfo = Utility:Instance("ScreenGui", {
 					Name = "Statusifier";
-					Parent = LocalPlayer.PlayerGui;
+					Parent = PlayerGui;
 					ResetOnSpawn = false;
 					Utility:Instance("Frame", {
 						Name = "Container";
@@ -273,9 +276,7 @@ local Success, Data = pcall(function()
 			task.spawn(function()
 				while task.wait() do
 					if not Data.UI.Parent then break; end
-					pcall(function()
-						Data.Distance.Text = (math.floor((Data.UI.Parent.Position - LocalPlayer.Character.PrimaryPart.Position).Magnitude * 100) / 100) .."m";
-					end)
+					pcall(function() Data.Distance.Text = (math.floor((Data.UI.Parent.Position - LocalPlayer.Character.PrimaryPart.Position).Magnitude * 100) / 100) .."m"; end)
 				end
 			end)
 
@@ -389,8 +390,8 @@ local Success, Data = pcall(function()
 	end)
 
 	local SideStatus = CreateSettings("Side Status", { Config = "SideStatus"; }, {
-		On = function() LocalPlayer.PlayerGui["Statusifier"].Enabled = true end;
-		Off = function() LocalPlayer.PlayerGui["Statusifier"].Enabled = false end;
+		On = function() PlayerGui["Statusifier"].Enabled = true end;
+		Off = function() PlayerGui["Statusifier"].Enabled = false end;
 	});
 	local SideStatusScale = SideStatus.AddTextbox({ Text = "1"; }, { Config = "SideStatusScale"; Display = "Scale"; Type = "Number"; });
 
@@ -543,7 +544,7 @@ local Success, Data = pcall(function()
 			Light.Range = tonumber(CustomLightsRange.Text) or 0;
 
 			if CustomSprint.Enabled and Sprinting then LocalPlayer.Character:FindFirstChild("Humanoid").WalkSpeed = tonumber(CustomSprintSpeed.Text) or 13; end
-			if LocalPlayer.PlayerGui:FindFirstChild("Statusifier") then LocalPlayer.PlayerGui["Statusifier"]["Container"]["UIScale"].Scale = tonumber(SideStatusScale.Text) or 1; end
+			if PlayerGui:FindFirstChild("Statusifier") then PlayerGui["Statusifier"]["Container"]["UIScale"].Scale = tonumber(SideStatusScale.Text) or 1; end
 		end
 	end):Start()
 	
@@ -557,8 +558,8 @@ local Success, Data = pcall(function()
 				repeat task.wait(1); timeBetween += 1; until timeBetween == 2 or heldDown == false;
 				if timeBetween ~= 2 then timeBetween = 0; return; end
 				timeBetween = 0;
-				LocalPlayer.PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible = not LocalPlayer.PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible;
-				LocalPlayer.PlayerGui["Statusifier"]["Container"].Visible = not LocalPlayer.PlayerGui["Statusifier"]["Container"].Visible;
+				PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible = not PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible;
+				PlayerGui["Statusifier"]["Container"].Visible = not PlayerGui["Statusifier"]["Container"].Visible;
 			end)
 		end
 		
@@ -571,9 +572,9 @@ local Success, Data = pcall(function()
 		if input.KeyCode == Enum.KeyCode.LeftShift then Sprinting = false; end
 		if input.KeyCode == Enum.KeyCode.J then timeBetween = 0; heldDown = false; end
 	end)
-	if LocalPlayer.PlayerGui:FindFirstChild("MobileUI") then
-		LocalPlayer.PlayerGui["MobileUI"].SprintButton.MouseButton1Down:Connect(function() Sprinting = true; end)
-		LocalPlayer.PlayerGui["MobileUI"].SprintButton.MouseButton1Up:Connect(function() Sprinting = false; end)
+	if PlayerGui:FindFirstChild("MobileUI") then
+		PlayerGui["MobileUI"].SprintButton.MouseButton1Down:Connect(function() Sprinting = true; end)
+		PlayerGui["MobileUI"].SprintButton.MouseButton1Up:Connect(function() Sprinting = false; end)
 	end
 
 	print("BLAIR Script!");
