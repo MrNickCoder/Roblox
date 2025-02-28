@@ -288,6 +288,9 @@ local Success, Result = pcall(function()
 					pcall(function() Data.Distance.Text = (math.floor((Data.UI.Parent.Position - LocalPlayer.Character.PrimaryPart.Position).Magnitude * 100) / 100) .."m"; end)
 				end
 			end)
+			
+			function Data:Enable() Data.Highlight.Enabled = true; Data.UI.Enabled = true; end
+			function Data:Disable() Data.Highlight.Enabled = false; Data.UI.Enabled = false; end
 
 			return Data
 		end
@@ -385,14 +388,14 @@ local Success, Result = pcall(function()
 	local GhostESP = nil;
 	local ESP = CreateSettings("ESP", { Config = "ESP"; }, {
 		On = function()
-			if VoodooESP then VoodooESP.UI.Enabled = true; end
-			if GeneratorESP then GeneratorESP.UI.Enabled = true; end
-			if GhostESP then GhostESP.UI.Enabled = true; end
+			if VoodooESP then VoodooESP:Enable(); end
+			if GeneratorESP then GeneratorESP:Enable(); end
+			if GhostESP then GhostESP:Enable(); end
 		end;
 		Off = function()
-			if VoodooESP then VoodooESP.UI.Enabled = false; end
-			if GeneratorESP then GeneratorESP.UI.Enabled = false; end
-			if GhostESP then GhostESP.UI.Enabled = false; end
+			if VoodooESP then VoodooESP:Disable(); end
+			if GeneratorESP then GeneratorESP:Disable(); end
+			if GhostESP then GhostESP:Disable(); end
 		end;
 	});
 	game.Workspace.ChildAdded:Connect(function(instance)
