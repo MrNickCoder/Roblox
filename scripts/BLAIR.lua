@@ -415,10 +415,14 @@ local Success, Result = pcall(function()
 	-- [[[ CURSED OBJECT ]]] --
 	---------------------------
 	local Objects = CreateInfo("Cursed Object");
-	if game.Workspace:FindFirstChild("SummoningCircle") then Objects.AddInfo("Summoning Circle"); end
-	if game.Workspace:FindFirstChild("Ouija Board") then Objects.AddInfo("Ouija Board"); end
-	if game.Workspace["Map"]["Items"]:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); end
-	for _, Player in pairs(Players:GetChildren()) do if Player.Character and Player.Character:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); break; end end
+	task.spawn(function()
+		pcall(function()
+			if game.Workspace:WaitForChild("SummoningCircle", 10) then Objects.AddInfo("Summoning Circle"); end
+			if game.Workspace:WaitForChild("Ouija Board", 10) then Objects.AddInfo("Ouija Board"); end
+			if game.Workspace["Map"]["Items"]:WaitForChild("Tarot Cards", 10) then Objects.AddInfo("Tarot Cards"); end
+			for _, Player in pairs(Players:GetChildren()) do if Player.Character and Player.Character:WaitForChild("Tarot Cards", 10) then Objects.AddInfo("Tarot Cards"); break; end end
+		end)
+	end)
 
 	------------------
 	-- [[[ ROOM ]]] --
