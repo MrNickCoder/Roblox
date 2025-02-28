@@ -116,7 +116,8 @@ local Success, Result = pcall(function()
 				});
 			});
 			Data.Toggle = Data.Button["Frame"];
-			Data.AddTextbox = function(Properties, Options)
+			
+			function Data:AddTextbox(Properties, Options)
 				Properties.Text = Options and Config[Options.Config] or Properties.Text or "";
 				local Display = Options and Options.Display or "";
 				local Type = Options and Options.Type or "Text";
@@ -165,6 +166,7 @@ local Success, Result = pcall(function()
 				
 				return Control
 			end;
+			
 			Data.Set = function(Value)
 				Data.Enabled = Value;
 				if Data.Enabled then pcall(function() On(); Data.Toggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0); end)
@@ -336,19 +338,19 @@ local Success, Result = pcall(function()
 		On = function() Light.Enabled = true end;
 		Off = function() Light.Enabled = false end;
 	});
-	local CustomLightsRange = CustomLights.AddTextbox({
+	local CustomLightsRange = CustomLights:AddTextbox({
 		Position = UDim2.new(0.25, 0, 0, -2);
 		Size = UDim2.new(0.4, 0, 0.8, 0);
 		Text = "60";
 	}, { Config = "CustomLightRange"; Display = "Range"; Type = "Integer"; });
-	local CustomLightBrightness = CustomLights.AddTextbox({
+	local CustomLightBrightness = CustomLights:AddTextbox({
 		Position = UDim2.new(0.75, 0, 0, -2);
 		Size = UDim2.new(0.4, 0, 0.8, 0);
 		Text = "10";
 	}, { Config = "CustomLightBrightness"; Display = "Brightness"; Type = "Integer"; });
 
 	local CustomSprint = CreateSettings("Custom Sprint", { Config = "CustomSprint"; });
-	local CustomSprintSpeed = CustomSprint.AddTextbox({ Text = "13"; }, { Config = "CustomSprintSpeed"; Display = "Speed"; Type = "Number"; });
+	local CustomSprintSpeed = CustomSprint:AddTextbox({ Text = "13"; }, { Config = "CustomSprintSpeed"; Display = "Speed"; Type = "Number"; });
 
 	local FullbrightAmbient;
 	local Fullbright = CreateSettings("Fullbright", { Config = "Fullbright"; Keybind = Enum.KeyCode.T; }, {
@@ -365,7 +367,7 @@ local Success, Result = pcall(function()
 			Lighting["Atmosphere"].Density = AtmosphereDensity
 		end;
 	});
-	FullbrightAmbient = Fullbright.AddTextbox({ Text = "138"; }, { Config = "FullbrightAmbient"; Display = "Ambient"; Type = "Integer"; });
+	FullbrightAmbient = Fullbright:AddTextbox({ Text = "138"; }, { Config = "FullbrightAmbient"; Display = "Ambient"; Type = "Integer"; });
 
 	local NoClipDoor = CreateSettings("No Clip Door", { Config = "NoClipDoor"; Keybind = Enum.KeyCode.X; }, {
 		On = function()
@@ -407,7 +409,7 @@ local Success, Result = pcall(function()
 		On = function() PlayerGui["Statusifier"].Enabled = true end;
 		Off = function() PlayerGui["Statusifier"].Enabled = false end;
 	});
-	local SideStatusScale = SideStatus.AddTextbox({ Text = "1"; }, { Config = "SideStatusScale"; Display = "Scale"; Type = "Number"; });
+	local SideStatusScale = SideStatus:AddTextbox({ Text = "1"; }, { Config = "SideStatusScale"; Display = "Scale"; Type = "Number"; });
 
 	---------------------------
 	-- [[[ CURSED OBJECT ]]] --
