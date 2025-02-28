@@ -417,10 +417,10 @@ local Success, Result = pcall(function()
 	local Objects = CreateInfo("Cursed Object");
 	task.spawn(function()
 		pcall(function()
-			if game.Workspace:WaitForChild("SummoningCircle", 10) then Objects.AddInfo("Summoning Circle"); end
-			if game.Workspace:WaitForChild("Ouija Board", 10) then Objects.AddInfo("Ouija Board"); end
-			if game.Workspace["Map"]["Items"]:WaitForChild("Tarot Cards", 10) then Objects.AddInfo("Tarot Cards"); end
-			for _, Player in pairs(Players:GetChildren()) do if Player.Character and Player.Character:WaitForChild("Tarot Cards", 10) then Objects.AddInfo("Tarot Cards"); break; end end
+			if game.Workspace:WaitForChild("SummoningCircle", 5) then Objects.AddInfo("Summoning Circle"); end
+			if game.Workspace:WaitForChild("Ouija Board", 5) then Objects.AddInfo("Ouija Board"); end
+			if game.Workspace["Map"]["Items"]:WaitForChild("Tarot Cards", 5) then Objects.AddInfo("Tarot Cards"); end
+			for _, Player in pairs(Players:GetChildren()) do if Player.Character and Player.Character:WaitForChild("Tarot Cards", 5) then Objects.AddInfo("Tarot Cards"); break; end end
 		end)
 	end)
 
