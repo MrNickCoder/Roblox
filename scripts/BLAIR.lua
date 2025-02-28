@@ -248,6 +248,13 @@ local Success, Result = pcall(function()
 		end
 		function CreateESP(Text, Properties)
 			local Data = {}
+			Data.Highlight = Utility:Instance("Highlight", {
+				Name = "ESP_Highlight";
+				Parent = Properties.Parent;
+				Enabled = Properties.Enabled;
+				FillColor = Properties.Color or Color3.fromRGB(255, 255, 255);
+				FillTransparency = 0.75;
+			});
 			Data.UI = Utility:Instance("BillboardGui", {
 				Name = "ESP";
 				Parent = Properties.Parent;
@@ -274,6 +281,7 @@ local Success, Result = pcall(function()
 				TextColor3 = Properties.Color or Color3.fromRGB(255, 255, 255);
 				TextScaled = true;
 			});
+			
 			task.spawn(function()
 				while task.wait() do
 					if not Data.UI.Parent then break; end
