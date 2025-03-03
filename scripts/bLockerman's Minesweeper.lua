@@ -1,7 +1,10 @@
 ---------------------
 -- [[ VARIABLES ]] --
 ---------------------
-local Tiles = game:GetService("Workspace").Flags
+local Tiles = game:GetService("Workspace").Flag.Parts
+
+local Opened = { Color3.fromRGB(255, 255, 125); Color3.fromRGB(230, 230, 113); }
+local Closed = { Color3.fromRGB(103, 180, 88); Color3.fromRGB(117, 205, 100); }
 
 ---------------------
 -- [[ FUNCTIONS ]] --
@@ -26,4 +29,6 @@ function getNeighbors(block)
 		getBlockAtPosition(blockPos + Vector3.new(-blockSize.X, 0, blockSize.Z));
 		getBlockAtPosition(blockPos + Vector3.new(0, 0, blockSize.Z));
 	}
+end
+function isSafe()
 end
