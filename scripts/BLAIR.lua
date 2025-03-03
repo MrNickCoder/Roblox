@@ -31,7 +31,7 @@ local Success, Result = pcall(function()
 	repeat task.wait(.1) until RStorage:FindFirstChild("ActiveChallenges");
 	task.wait(5);
 
-	local Utility = (loadstring or load)(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/UtilityModule.lua"))()
+	local Utility = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/UtilityModule.lua"))()
 	
 	------------------
 	-- [[ CONFIG ]] --
@@ -301,7 +301,7 @@ local Success, Result = pcall(function()
 	----------------------
 	-- [[ INITIALIZE ]] --
 	----------------------
-	local Freecam = (loadstring or load)(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/FreecamModule.lua"))()
+	local Freecam = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/FreecamModule.lua"))()
 	Freecam.IgnoreGUI = {"Radio", "Journal", "MobileUI", "Statusifier"}
 	local Light;
 	if LocalPlayer.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild("SpotLight") then

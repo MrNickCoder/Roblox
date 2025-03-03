@@ -37,7 +37,7 @@ local UserInputService		= game:GetService("UserInputService")
 local GuiService			= game:GetService("GuiService")
 local Workspace				= game:GetService("Workspace")
 
-local Utility				= (loadstring or load)(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/UtilityModule.lua"))()
+local Utility				= loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/UtilityModule.lua"))()
 
 local LocalPlayer = Players.LocalPlayer
 if not LocalPlayer then
