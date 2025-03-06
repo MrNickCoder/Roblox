@@ -15,11 +15,11 @@ local RService = game:GetService("RunService");
 local LocalPlayer = Players.LocalPlayer;
 local PlayerGui = LocalPlayer.PlayerGui;
 
-if game.PlaceId == 6137321701 then StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "No Loading in Lobby!"; }); return; end
+if game.PlaceId == 6137321701 then StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "No Loading in Lobby!"; }); return; end
 
-StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Loading Script!"; });
+StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Loading Blair Script!"; });
 local Success, Result = pcall(function()
-	print("Loading BLAIR Script!");
+	print("Loading Blair Script!");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild(LocalPlayer.Name);
 	repeat task.wait(.1) until game.Workspace:FindFirstChild(LocalPlayer.Name):FindFirstChild("HumanoidRootPart");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map");
@@ -55,7 +55,7 @@ local Success, Result = pcall(function()
 		["SideStatus"] = false;
 		["SideStatusScale"] = "1";
 	}
-	Config = Utility:LoadConfig(Config, "BLAIR", "Settings.json");
+	Config = Utility:LoadConfig(Config, "Paradoxium/Blair", "Settings.json");
 
 	if PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then PlayerGui.Journal.JournalFrame:FindFirstChild("Settings"):Destroy() end;
 	if PlayerGui:FindFirstChild("Statusifier") then PlayerGui:FindFirstChild("Statusifier"):Destroy() end;
@@ -611,8 +611,8 @@ local Success, Result = pcall(function()
 end)
 
 if Success then
-	StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Successfully Loaded!"; });
+	StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Successfully Loaded Script!"; });
 else
-	StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Error Loading!"; });
+	StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Error Loading Script!"; });
 	error(Result);
 end
