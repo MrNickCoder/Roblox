@@ -251,14 +251,14 @@ local Success, Result = pcall(function()
 			local Data = {}
 			Data.Highlight = Utility:Instance("Highlight", {
 				Name = "ESP_Highlight";
-				Parent = Properties.Parent or Properties.ParentHighlight;
+				Parent = Properties.ParentHighlight or Properties.Parent;
 				Enabled = Properties.Enabled;
 				FillColor = Properties.Color or Color3.fromRGB(255, 255, 255);
 				FillTransparency = 0.75;
 			});
 			Data.UI = Utility:Instance("BillboardGui", {
 				Name = "ESP";
-				Parent = Properties.Parent or Properties.ParentUI;
+				Parent = Properties.ParentUI or Properties.Parent;
 				AlwaysOnTop = true;
 				Enabled = Properties.Enabled;
 				Size = UDim2.new(5, 0, 2, 0);
