@@ -15,7 +15,6 @@ local RService = game:GetService("RunService");
 local LocalPlayer = Players.LocalPlayer;
 local PlayerGui = LocalPlayer.PlayerGui;
 
-
 if game.PlaceId == 6137321701 then StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "No Loading in Lobby!"; }); return; end
 
 StarterGui:SetCore("SendNotification", { Title = "BLAIR"; Text = "Loading Script!"; });
@@ -252,14 +251,14 @@ local Success, Result = pcall(function()
 			local Data = {}
 			Data.Highlight = Utility:Instance("Highlight", {
 				Name = "ESP_Highlight";
-				Parent = Properties.Parent;
+				Parent = Properties.Parent or Properties.ParentHighlight;
 				Enabled = Properties.Enabled;
 				FillColor = Properties.Color or Color3.fromRGB(255, 255, 255);
 				FillTransparency = 0.75;
 			});
 			Data.UI = Utility:Instance("BillboardGui", {
 				Name = "ESP";
-				Parent = Properties.Parent;
+				Parent = Properties.Parent or Properties.ParentUI;
 				AlwaysOnTop = true;
 				Enabled = Properties.Enabled;
 				Size = UDim2.new(5, 0, 2, 0);
@@ -386,7 +385,7 @@ local Success, Result = pcall(function()
 	if game.Workspace:FindFirstChild("VoodooDoll") then VoodooESP = CreateESP("[Voodoo]", { Parent = game.Workspace:WaitForChild("VoodooDoll"); Color = Color3.fromRGB(0, 255, 0); }); end
 	local GeneratorESP = CreateESP("[Generator]", { Parent = game.Workspace["Map"]["Generators"]:GetChildren()[1]; Color = Color3.fromRGB(255, 16, 240); });
 	local GhostESP = nil;
-	if game.Workspace:FindFirstChild("Ghost") then GhostESP = CreateESP("[Ghost]", { Parent = instance:WaitForChild("Head"); Color = Color3.fromRGB(255, 0, 0); }); end
+	if game.Workspace:FindFirstChild("Ghost") then GhostESP = CreateESP("[Ghost]", { ParentUI = instance:WaitForChild("Head"); ParentHighlight = instance; Color = Color3.fromRGB(255, 0, 0); }); end
 	
 	local ESP = CreateSettings("ESP", { Config = "ESP"; }, {
 		On = function()
@@ -402,7 +401,7 @@ local Success, Result = pcall(function()
 	});
 	game.Workspace.ChildAdded:Connect(function(instance)
 		if instance.Name ~= "Ghost" then return; end
-		GhostESP = CreateESP("[Ghost]", { Parent = instance:WaitForChild("Head"); Color = Color3.fromRGB(255, 0, 0); Enabled = ESP.Enabled; });
+		GhostESP = CreateESP("[Ghost]", { ParentUI = instance:WaitForChild("Head"); ParentHighlight = instance; Color = Color3.fromRGB(255, 0, 0); Enabled = ESP.Enabled; });
 	end)
 
 	local SideStatus = CreateSettings("Side Status", { Config = "SideStatus"; }, {
