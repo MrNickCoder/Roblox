@@ -59,7 +59,7 @@ local Success, Result = pcall(function()
 	local File_Name = "Settings.json"
 	Config = Utility:LoadConfig(Config, Directory, File_Name);
 
-	if PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then PlayerGui.Journal.JournalFrame:FindFirstChild("Settings"):Destroy() end;
+	if PlayerGui.Journal.Background:FindFirstChild("Settings") then PlayerGui.Journal.Background:FindFirstChild("Settings"):Destroy() end;
 	if PlayerGui:FindFirstChild("Statusifier") then PlayerGui:FindFirstChild("Statusifier"):Destroy() end;
 
 	---------------------
@@ -74,13 +74,13 @@ local Success, Result = pcall(function()
 			local Off = Callback and Callback.Off or function() end;
 			
 			local Settings;
-			if PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then
-				Settings = PlayerGui.Journal.JournalFrame:FindFirstChild("Settings");
+			if PlayerGui.Journal.Background:FindFirstChild("Settings") then
+				Settings = PlayerGui.Journal.Background:FindFirstChild("Settings");
 			else
 				Settings = Utility:Instance("Frame", {
 					Name = "Settings";
-					Parent = PlayerGui.Journal.JournalFrame;
-					AnchorPoint = Vector2.new(0, 0.5);
+					Parent = PlayerGui.Journal.Background;
+					AnchorPoint = Vector2.new(0, 1);
 					BackgroundTransparency = 1;
 					Size = UDim2.new(1, 0, 0.04, 0);
 					Utility:Instance("UIListLayout", {
@@ -384,8 +384,8 @@ local Success, Result = pcall(function()
 		end;
 	});
 
-	local VoodooESP = nil;
-	if game.Workspace:FindFirstChild("VoodooDoll") then VoodooESP = CreateESP("[Voodoo]", { Parent = game.Workspace:WaitForChild("VoodooDoll"); Color = Color3.fromRGB(0, 255, 0); }); end
+	local BooBooESP = nil;
+	if game.Workspace:FindFirstChild("BooBooDoll") then BooBooESP = CreateESP("[BooBoo]", { Parent = game.Workspace:WaitForChild("BooBooDoll"); Color = Color3.fromRGB(0, 255, 0); }); end
 	local GeneratorESP = CreateESP("[Generator]", { Parent = game.Workspace["Map"]["Generators"]:GetChildren()[1]; Color = Color3.fromRGB(255, 16, 240); });
 	local GhostESP = nil;
 	if game.Workspace:FindFirstChild("Ghost") then
@@ -394,12 +394,12 @@ local Success, Result = pcall(function()
 	
 	local ESP = CreateSettings("ESP", { Config = "ESP"; }, {
 		On = function()
-			if VoodooESP then VoodooESP:Enable(); end
+			if BooBooESP then BooBooESP:Enable(); end
 			if GeneratorESP then GeneratorESP:Enable(); end
 			if GhostESP then GhostESP:Enable(); end
 		end;
 		Off = function()
-			if VoodooESP then VoodooESP:Disable(); end
+			if BooBooESP then BooBooESP:Disable(); end
 			if GeneratorESP then GeneratorESP:Disable(); end
 			if GhostESP then GhostESP:Disable(); end
 		end;
@@ -602,7 +602,7 @@ local Success, Result = pcall(function()
 				repeat task.wait(1); timeBetween["UI"] += 1; until timeBetween["UI"] == 2 or heldDown["UI"] == false;
 				if timeBetween["UI"] ~= 2 then timeBetween["UI"] = 0; return; end
 				timeBetween["UI"] = 0;
-				PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible = not PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible;
+				PlayerGui["Journal"]["Background"]["Settings"].Visible = not PlayerGui["Journal"]["Background"]["Settings"].Visible;
 				PlayerGui["Statusifier"]["Container"].Visible = not PlayerGui["Statusifier"]["Container"].Visible;
 			end)
 		end
@@ -625,7 +625,7 @@ local Success, Result = pcall(function()
 				repeat task.wait(1); timeBetween["UI"] += 1; until timeBetween["UI"] == 2 or heldDown["UI"] == false;
 				if timeBetween["UI"] ~= 2 then timeBetween["UI"] = 0; return; end
 				timeBetween["UI"] = 0;
-				PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible = not PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible;
+				PlayerGui["Journal"]["Background"]["Settings"].Visible = not PlayerGui["Journal"]["Background"]["Settings"].Visible;
 				PlayerGui["Statusifier"]["Container"].Visible = not PlayerGui["Statusifier"]["Container"].Visible;
 			end)
 		end)
