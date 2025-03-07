@@ -50,7 +50,15 @@ do
 	
 	function Utility:SaveConfig(Config:{any}, Directory:string, File:string)
 		local HttpService = game:GetService("HttpService")
-		if not isfolder(Directory) then makefolder(Directory) end
+		if not isfolder(Directory) then
+			local Folders = Directory:split("/")
+			local tempDirectory = Folders[1]
+			for _, folder in pairs(Folders) do
+				if folder == tempDirectory then makefolder(folder); continue; end
+				tempDirectory = tempDirectory .. "/" .. folder
+				makefolder(tempDirectory)
+			end
+		end
 
 		writefile(Directory .. "/" .. File, HttpService:JSONEncode(Config))
 		return self:LoadConfig(Config, Directory, File)
@@ -59,7 +67,15 @@ do
 	function Utility:LoadConfig(Config:{any}, Directory:string, File:string)
 		local Success, Response = pcall(function()
 			local HttpService = game:GetService("HttpService")
-			if not isfolder(Directory) then makefolder(Directory) end
+			if not isfolder(Directory) then
+				local Folders = Directory:split("/")
+				local tempDirectory = Folders[1]
+				for _, folder in pairs(Folders) do
+					if folder == tempDirectory then makefolder(folder); continue; end
+					tempDirectory = tempDirectory .. "/" .. folder
+					makefolder(tempDirectory)
+				end
+			end
 
 			return HttpService:JSONDecode(readfile(Directory .. "/" .. File))
 		end)
