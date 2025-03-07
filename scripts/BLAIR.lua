@@ -55,7 +55,9 @@ local Success, Result = pcall(function()
 		["SideStatus"] = false;
 		["SideStatusScale"] = "1";
 	}
-	Config = Utility:LoadConfig(Config, "Paradoxium/Blair", "Settings.json");
+	local Directory = "Paradoxium/Blair"
+	local File_Name = "Settings.json"
+	Config = Utility:LoadConfig(Config, Directory, File_Name);
 
 	if PlayerGui.Journal.JournalFrame:FindFirstChild("Settings") then PlayerGui.Journal.JournalFrame:FindFirstChild("Settings"):Destroy() end;
 	if PlayerGui:FindFirstChild("Statusifier") then PlayerGui:FindFirstChild("Statusifier"):Destroy() end;
@@ -149,7 +151,7 @@ local Success, Result = pcall(function()
 					Control[Index] = Value;
 					if Index == "Text" and Options.Config then
 						Config[Options.Config] = Value;
-						Utility:SaveConfig(Config, "BLAIR", "Settings.json");
+						Utility:SaveConfig(Config, Directory, File_Name);
 					end
 				end;
 				
@@ -159,7 +161,7 @@ local Success, Result = pcall(function()
 				Control.FocusLost:Connect(function()
 					if Options.Config then
 						Config[Options.Config] = Control.Text;
-						Utility:SaveConfig(Config, "BLAIR", "Settings.json");
+						Utility:SaveConfig(Config, Directory, File_Name);
 					end
 				end)
 				
@@ -172,7 +174,7 @@ local Success, Result = pcall(function()
 				else pcall(function() Off(); Data.Toggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0); end) end
 				if Options.Config then
 					Config[Options.Config] = Data.Enabled;
-					Utility:SaveConfig(Config, "BLAIR", "Settings.json");
+					Utility:SaveConfig(Config, Directory, File_Name);
 				end
 			end
 
