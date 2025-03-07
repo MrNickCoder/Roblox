@@ -303,8 +303,8 @@ local Success, Result = pcall(function()
 	----------------------
 	-- [[ INITIALIZE ]] --
 	----------------------
-	local Freecam = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/FreecamModule.lua"))()
-	Freecam.IgnoreGUI = {"Radio", "Journal", "MobileUI", "Statusifier"}
+	local FreecamModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/FreecamModule.lua"))()
+	FreecamModule.IgnoreGUI = {"Radio", "Journal", "MobileUI", "Statusifier"}
 	local Light;
 	if LocalPlayer.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild("SpotLight") then
 		Light = LocalPlayer.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild("SpotLight")
@@ -388,7 +388,9 @@ local Success, Result = pcall(function()
 	if game.Workspace:FindFirstChild("VoodooDoll") then VoodooESP = CreateESP("[Voodoo]", { Parent = game.Workspace:WaitForChild("VoodooDoll"); Color = Color3.fromRGB(0, 255, 0); }); end
 	local GeneratorESP = CreateESP("[Generator]", { Parent = game.Workspace["Map"]["Generators"]:GetChildren()[1]; Color = Color3.fromRGB(255, 16, 240); });
 	local GhostESP = nil;
-	if game.Workspace:FindFirstChild("Ghost") then GhostESP = CreateESP("[Ghost]", { ParentUI = instance:FindFirstChild("Head"); ParentHighlight = instance; Color = Color3.fromRGB(255, 0, 0); }); end
+	if game.Workspace:FindFirstChild("Ghost") then
+		pcall(function() GhostESP = CreateESP("[Ghost]", { ParentUI = instance:FindFirstChild("Head"); ParentHighlight = instance; Color = Color3.fromRGB(255, 0, 0); }); end)
+	end
 	
 	local ESP = CreateSettings("ESP", { Config = "ESP"; }, {
 		On = function()
@@ -406,6 +408,11 @@ local Success, Result = pcall(function()
 		if instance.Name ~= "Ghost" then return; end
 		GhostESP = CreateESP("[Ghost]", { ParentUI = instance:WaitForChild("Head"); ParentHighlight = instance; Color = Color3.fromRGB(255, 0, 0); Enabled = ESP.Enabled; });
 	end)
+	
+	local Freecam = CreateSettings("Freecam", { Config = "Freecam"; }, {
+		On = function() end;
+		Off = function() end;
+	});
 
 	local SideStatus = CreateSettings("Side Status", { Config = "SideStatus"; }, {
 		On = function() PlayerGui["Statusifier"].Enabled = true end;
@@ -472,6 +479,15 @@ local Success, Result = pcall(function()
 	local GhostSpeed = Ghost.AddInfo("WalkSpeed");
 	local GhostDuration = Ghost.AddInfo("Duration");
 	local GhostDisruption = Ghost.AddInfo("Disrupting");
+	local GhostBanshee = Ghost.AddInfo("Banshee Scream"); GhostBanshee.Visible = false;
+	local GhostFaejkur = Ghost.AddInfo("Faejkur Laugh"); GhostFaejkur.Visible = false;
+	function FindParabolic(Object)
+		for _, parabolic in pairs(Object:GetChildren()) do
+			if parabolic.Name ~= "Parabolic Microphone" then continue; end
+			if parabolic.Handle["BansheeScream"].Playing then GhostBanshee.Visible = true; end
+			if parabolic.Handle["FaeLaugh"].Playing then GhostFaejkur.Visible = true; end
+		end
+	end
 	local GhostThread = Utility:Thread("Ghost", function()
 		while task.wait() do
 			GhostActivity.Text = "Activity: ".. RStorage["Activity"].Value;
@@ -488,6 +504,12 @@ local Success, Result = pcall(function()
 				end)
 			else
 				for _, v in pairs({GhostLocation, GhostSpeed, GhostDuration}) do v.Visible = false; end
+			end
+			if not GhostBanshee.Visible or not GhostFaejkur.Visible then
+				for _, Player in pairs(Players:GetChildren()) do
+					if Player.Character then FindParabolic(Player.Character); end
+				end
+				FindParabolic(game.Workspace["Map"]["Items"]);
 			end
 		end
 	end):Start()
@@ -573,7 +595,7 @@ local Success, Result = pcall(function()
 	UserIS.InputBegan:Connect(function(input, gameProcessed)
 		if gameProcessed then return end
 		if input.KeyCode == Enum.KeyCode.LeftShift then Sprinting = true; end
-		if input.KeyCode == Enum.KeyCode.M then Freecam.ToggleFreecam(); end
+		if input.KeyCode == Enum.KeyCode.M and Freecam.Enabled then FreecamModule.ToggleFreecam(); end
 		if input.KeyCode == Enum.KeyCode.J then
 			heldDown = true
 			task.spawn(function()
@@ -608,6 +630,17 @@ local Success, Result = pcall(function()
 			end)
 		end)
 		PlayerGui["MobileUI"].Frame.JournalButton.MouseLeave:Connect(function() timeBetween = 0; heldDown = false; end)
+		PlayerGui["MobileUI"].FlashlightButton.MouseButton1Down:Connect(function()
+			if not Freecam.Enabled then return; end
+			heldDown = true
+			task.spawn(function()
+				repeat task.wait(1); timeBetween += 1; until timeBetween == 2 or heldDown == false;
+				if timeBetween ~= 2 then timeBetween = 0; return; end
+				timeBetween = 0;
+				FreecamModule.ToggleFreecam()
+			end)
+		end)
+		PlayerGui["MobileUI"].FlashlightButton.MouseLeave:Connect(function() timeBetween = 0; heldDown = false; end)
 	end
 
 	print("BLAIR Script!");
