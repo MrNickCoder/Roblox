@@ -388,7 +388,7 @@ local Success, Result = pcall(function()
 	if game.Workspace:FindFirstChild("VoodooDoll") then VoodooESP = CreateESP("[Voodoo]", { Parent = game.Workspace:WaitForChild("VoodooDoll"); Color = Color3.fromRGB(0, 255, 0); }); end
 	local GeneratorESP = CreateESP("[Generator]", { Parent = game.Workspace["Map"]["Generators"]:GetChildren()[1]; Color = Color3.fromRGB(255, 16, 240); });
 	local GhostESP = nil;
-	if game.Workspace:FindFirstChild("Ghost") then GhostESP = CreateESP("[Ghost]", { ParentUI = instance:WaitForChild("Head"); ParentHighlight = instance; Color = Color3.fromRGB(255, 0, 0); }); end
+	if game.Workspace:FindFirstChild("Ghost") then GhostESP = CreateESP("[Ghost]", { ParentUI = instance:FindFirstChild("Head"); ParentHighlight = instance; Color = Color3.fromRGB(255, 0, 0); }); end
 	
 	local ESP = CreateSettings("ESP", { Config = "ESP"; }, {
 		On = function()
