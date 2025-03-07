@@ -580,8 +580,8 @@ local Success, Result = pcall(function()
 	------------------
 	-- [[ EVENTS ]] --
 	------------------
-	local timeBetween = 0
-	local heldDown = false
+	local timeBetween = { ["UI"] = 0; ["Freecam"] = 0; }
+	local heldDown = { ["UI"] = false; ["Freecam"] = false; }
 	local UpdaterThread = Utility:Thread("Updater", function()
 		while task.wait() do
 			Light.Brightness = tonumber(CustomLightBrightness.Text) or 0;
@@ -597,11 +597,11 @@ local Success, Result = pcall(function()
 		if input.KeyCode == Enum.KeyCode.LeftShift then Sprinting = true; end
 		if input.KeyCode == Enum.KeyCode.M and Freecam.Enabled then FreecamModule.ToggleFreecam(); end
 		if input.KeyCode == Enum.KeyCode.J then
-			heldDown = true
+			heldDown["UI"] = true
 			task.spawn(function()
-				repeat task.wait(1); timeBetween += 1; until timeBetween == 2 or heldDown == false;
-				if timeBetween ~= 2 then timeBetween = 0; return; end
-				timeBetween = 0;
+				repeat task.wait(1); timeBetween["UI"] += 1; until timeBetween["UI"] == 2 or heldDown["UI"] == false;
+				if timeBetween["UI"] ~= 2 then timeBetween["UI"] = 0; return; end
+				timeBetween["UI"] = 0;
 				PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible = not PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible;
 				PlayerGui["Statusifier"]["Container"].Visible = not PlayerGui["Statusifier"]["Container"].Visible;
 			end)
@@ -614,33 +614,33 @@ local Success, Result = pcall(function()
 	end)
 	UserIS.InputEnded:Connect(function(input)
 		if input.KeyCode == Enum.KeyCode.LeftShift then Sprinting = false; end
-		if input.KeyCode == Enum.KeyCode.J then timeBetween = 0; heldDown = false; end
+		if input.KeyCode == Enum.KeyCode.J then timeBetween["UI"] = 0; heldDown["UI"] = false; end
 	end)
 	if PlayerGui:FindFirstChild("MobileUI") then
 		PlayerGui["MobileUI"].SprintButton.MouseButton1Down:Connect(function() Sprinting = true; end)
 		PlayerGui["MobileUI"].SprintButton.MouseButton1Up:Connect(function() Sprinting = false; end)
 		PlayerGui["MobileUI"].Frame.JournalButton.MouseButton1Down:Connect(function()
-			heldDown = true
+			heldDown["UI"] = true
 			task.spawn(function()
-				repeat task.wait(1); timeBetween += 1; until timeBetween == 2 or heldDown == false;
-				if timeBetween ~= 2 then timeBetween = 0; return; end
-				timeBetween = 0;
+				repeat task.wait(1); timeBetween["UI"] += 1; until timeBetween["UI"] == 2 or heldDown["UI"] == false;
+				if timeBetween["UI"] ~= 2 then timeBetween["UI"] = 0; return; end
+				timeBetween["UI"] = 0;
 				PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible = not PlayerGui["Journal"]["JournalFrame"]["Settings"].Visible;
 				PlayerGui["Statusifier"]["Container"].Visible = not PlayerGui["Statusifier"]["Container"].Visible;
 			end)
 		end)
-		PlayerGui["MobileUI"].Frame.JournalButton.MouseLeave:Connect(function() timeBetween = 0; heldDown = false; end)
+		PlayerGui["MobileUI"].Frame.JournalButton.MouseLeave:Connect(function() timeBetween["UI"] = 0; heldDown["UI"] = false; end)
 		PlayerGui["MobileUI"].FlashlightButton.MouseButton1Down:Connect(function()
 			if not Freecam.Enabled then return; end
-			heldDown = true
+			heldDown["Freecam"] = true
 			task.spawn(function()
-				repeat task.wait(1); timeBetween += 1; until timeBetween == 2 or heldDown == false;
-				if timeBetween ~= 2 then timeBetween = 0; return; end
-				timeBetween = 0;
+				repeat task.wait(1); timeBetween["Freecam"] += 1; until timeBetween["Freecam"] == 2 or heldDown["Freecam"] == false;
+				if timeBetween["Freecam"] ~= 2 then timeBetween["Freecam"] = 0; return; end
+				timeBetween["Freecam"] = 0;
 				FreecamModule.ToggleFreecam()
 			end)
 		end)
-		PlayerGui["MobileUI"].FlashlightButton.MouseLeave:Connect(function() timeBetween = 0; heldDown = false; end)
+		PlayerGui["MobileUI"].FlashlightButton.MouseLeave:Connect(function() timeBetween["Freecam"] = 0; heldDown["Freecam"] = false; end)
 	end
 
 	print("BLAIR Script!");
