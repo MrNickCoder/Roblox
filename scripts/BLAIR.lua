@@ -197,7 +197,7 @@ local Success, Result = pcall(function()
 					Name = "Statusifier";
 					Parent = PlayerGui;
 					ResetOnSpawn = false;
-					Enabled = Config["SideStatus"]
+					Enabled = Config["SideStatus"];
 					Utility:Instance("Frame", {
 						Name = "Container";
 						BackgroundTransparency = 1;
