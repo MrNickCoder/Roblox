@@ -71,6 +71,14 @@ local Success, Result = pcall(function()
 		end
 	end):Start();
 	
+	UserIS.InputBegan:Connect(function(input, gameProcessed)
+		if gameProcessed then return end
+		if input.KeyCode == Enum.KeyCode.RightControl then
+			if UserIS.MouseBehavior == Enum.MouseBehavior.LockCenter then print("Open")
+			else print("Close") end
+		end
+	end)
+	
 	print("Dead Rails Script!");
 end)
 
