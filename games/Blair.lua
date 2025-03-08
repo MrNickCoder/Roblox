@@ -433,6 +433,11 @@ local Success, Result = pcall(function()
 				if Player.Backpack:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); break; end
 				if Player.Character and Player.Character:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); break; end
 			end
+			if game.Workspace["Map"]["Items"]:WaitForChild("Music Box", 5) then Objects.AddInfo("Music Box"); end
+			for _, Player in pairs(Players:GetChildren()) do
+				if Player.Backpack:FindFirstChild("Music Box") then Objects.AddInfo("Music Box"); break; end
+				if Player.Character and Player.Character:FindFirstChild("Music Box") then Objects.AddInfo("Music Box"); break; end
+			end
 		end)
 	end)
 
