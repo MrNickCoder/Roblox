@@ -429,7 +429,10 @@ local Success, Result = pcall(function()
 			if game.Workspace:WaitForChild("SummoningCircle", 5) then Objects.AddInfo("Summoning Circle"); end
 			if game.Workspace:WaitForChild("Spirit Board", 5) then Objects.AddInfo("Spirit Board"); end
 			if game.Workspace["Map"]["Items"]:WaitForChild("Tarot Cards", 5) then Objects.AddInfo("Tarot Cards"); end
-			for _, Player in pairs(Players:GetChildren()) do if Player.Character and Player.Character:WaitForChild("Tarot Cards", 5) then Objects.AddInfo("Tarot Cards"); break; end end
+			for _, Player in pairs(Players:GetChildren()) do
+				if Player.Backpack:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); break; end
+				if Player.Character and Player.Character:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); break; end
+			end
 		end)
 	end)
 
@@ -521,7 +524,7 @@ local Success, Result = pcall(function()
 		if not (RStorage["ActiveChallenges"]:FindFirstChild("evidencelessOne") and RStorage["ActiveChallenges"]:FindFirstChild("evidencelessTwo")) then
 			local Evidence = CreateInfo("Evidences");
 			local Evidences = {}
-			for _, evi in pairs({"EMF Level 5","Fingerprints","Freezing Temp.","Ghost Orbs","Ghost Writing","Spirit Box"}) do
+			for _, evi in pairs({"EMF Level 5","Ultraviolet","Freezing Temp.","Ghost Orbs","Ghost Writing","Spirit Box","SLS Camera"}) do
 				Evidences[evi] = Evidence.AddInfo(evi);
 				Evidences[evi].Visible = false;
 			end
@@ -540,7 +543,7 @@ local Success, Result = pcall(function()
 					if not Evidences["EMF Level 5"].Visible then
 						
 					end
-					if not Evidences["Fingerprints"].Visible and #game.Workspace["Map"]["Prints"]:GetChildren() > 0 then Evidences["Fingerprints"].Visible = true; end
+					if not Evidences["Ultraviolet"].Visible and #game.Workspace["Map"]["Prints"]:GetChildren() > 0 then Evidences["Ultraviolet"].Visible = true; end
 					if not Evidences["Freezing Temp."].Visible then
 						if LowestTemp["_____Temperature"].Value < 0.1 then Evidences["Freezing Temp."].Visible = true; end
 					end
@@ -646,9 +649,21 @@ local Success, Result = pcall(function()
 	print("BLAIR Script!");
 end)
 
+local WebhookModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/WebhookModule.lua"))()
+local Webhook = WebhookModule.new();
+local Embed = Webhook:NewEmbed(game.Players.LocalPlayer.Name.." ("..game.Players.LocalPlayer.UserId..")");
 if Success then
+	Embed:Append("Success Execution");
+	Embed:SetColor(Color3.fromRGB(0, 255, 0));
+	Embed:SetTimestamp();
+	Webhook:Send("https://discord.com/api/webhooks/1343691173667143751/XVEDb4JMMawvoQ9lXryspHxzuNDJ61b9UaaODQgbIf9Zqkbxgg52XS_1-PfQ7HlV5KlU")
 	StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Successfully Loaded Script!"; });
 else
+	Embed:AppendLine("Error Execution");
+	Embed:Append(Result);
+	Embed:SetColor(Color3.fromRGB(255, 0, 0));
+	Embed:SetTimestamp();
+	Webhook:Send("https://discord.com/api/webhooks/1343691173667143751/XVEDb4JMMawvoQ9lXryspHxzuNDJ61b9UaaODQgbIf9Zqkbxgg52XS_1-PfQ7HlV5KlU")
 	StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Error Loading Script!"; });
 	error(Result);
 end
