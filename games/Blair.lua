@@ -252,39 +252,51 @@ local Success, Result = pcall(function()
 		end
 		function CreateESP(Text, Properties)
 			local Data = {}
-			Data.Highlight = Utility:Instance("Highlight", {
-				Name = "ESP_Highlight";
-				Parent = Properties.ParentHighlight or Properties.Parent;
-				Enabled = Properties.Enabled;
-				FillColor = Properties.Color or Color3.fromRGB(255, 255, 255);
-				FillTransparency = 0.75;
-			});
-			Data.UI = Utility:Instance("BillboardGui", {
-				Name = "ESP";
-				Parent = Properties.ParentUI or Properties.Parent;
-				AlwaysOnTop = true;
-				Enabled = Properties.Enabled;
-				Size = UDim2.new(5, 0, 2, 0);
-				StudsOffset = Vector3.new(0, 2, 0);
-				Utility:Instance("TextLabel", {
+			if (Properties.ParentHighlight and Properties.ParentHighlight:FindFirstChild("ESP_Highlight")) or (Properties.Parent and Properties.Parent:FindFirstChild("ESP_Highlight")) then
+				Data.Highlight = Properties.ParentHighlight:FindFirstChild("ESP_Highlight") or Properties.Parent:FindFirstChild("ESP_Highlight");
+				Data.Highlight.Enabled = Properties.Enabled;
+			else
+				Data.Highlight = Utility:Instance("Highlight", {
+					Name = "ESP_Highlight";
+					Parent = Properties.ParentHighlight or Properties.Parent;
+					Enabled = Properties.Enabled;
+					FillColor = Properties.Color or Color3.fromRGB(255, 255, 255);
+					FillTransparency = 0.75;
+				});
+			end
+			if (Properties.ParentUI and Properties.ParentUI:FindFirstChild("ESP")) or (Properties.Parent and Properties.Parent:FindFirstChild("ESP")) then
+				Data.UI = Properties.ParentUI:FindFirstChild("ESP") or Properties.Parent:FindFirstChild("ESP");
+				Data.UI.Enabled = Properties.Enabled;
+				Data.Distance = Data.UI["Distance"];
+			else
+				Data.UI = Utility:Instance("BillboardGui", {
+					Name = "ESP";
+					Parent = Properties.ParentUI or Properties.Parent;
+					AlwaysOnTop = true;
+					Enabled = Properties.Enabled;
+					Size = UDim2.new(5, 0, 2, 0);
+					StudsOffset = Vector3.new(0, 2, 0);
+					Utility:Instance("TextLabel", {
+						BackgroundTransparency = 1;
+						Size = UDim2.new(1, 0, 0.5, 0);
+						Font = Enum.Font.FredokaOne;
+						Text = Text;
+						TextColor3 = Properties.Color or Color3.fromRGB(255, 255, 255);
+						TextScaled = true;
+					});
+				});
+				Data.Distance = Utility:Instance("TextLabel", {
+					Name = "Distance";
+					Parent = Data.UI;
 					BackgroundTransparency = 1;
+					Position = UDim2.new(0, 0, 0.5, 0);
 					Size = UDim2.new(1, 0, 0.5, 0);
 					Font = Enum.Font.FredokaOne;
-					Text = Text;
+					Text = "0m";
 					TextColor3 = Properties.Color or Color3.fromRGB(255, 255, 255);
 					TextScaled = true;
 				});
-			});
-			Data.Distance = Utility:Instance("TextLabel", {
-				Parent = Data.UI;
-				BackgroundTransparency = 1;
-				Position = UDim2.new(0, 0, 0.5, 0);
-				Size = UDim2.new(1, 0, 0.5, 0);
-				Font = Enum.Font.FredokaOne;
-				Text = "0m";
-				TextColor3 = Properties.Color or Color3.fromRGB(255, 255, 255);
-				TextScaled = true;
-			});
+			end
 			
 			task.spawn(function()
 				while task.wait() do
@@ -293,8 +305,8 @@ local Success, Result = pcall(function()
 				end
 			end)
 			
-			function Data:Enable() Data.Highlight.Enabled = true; Data.UI.Enabled = true; end
-			function Data:Disable() Data.Highlight.Enabled = false; Data.UI.Enabled = false; end
+			function Data:Enable() pcall(function() Data.Highlight.Enabled = true; Data.UI.Enabled = true; end); end
+			function Data:Disable() pcall(function() Data.Highlight.Enabled = false; Data.UI.Enabled = false; end); end
 
 			return Data
 		end
@@ -485,6 +497,7 @@ local Success, Result = pcall(function()
 	local GhostActivity = Ghost.AddInfo("Activity");
 	local GhostLocation = Ghost.AddInfo("Location");
 	local GhostSpeed = Ghost.AddInfo("WalkSpeed");
+	local GhostBlink = Ghost.AddInfo("Blink");
 	local GhostDuration = Ghost.AddInfo("Duration");
 	local GhostDisruption = Ghost.AddInfo("Disrupting");
 	local GhostBanshee = Ghost.AddInfo("Banshee Scream"); GhostBanshee.Visible = false;
@@ -501,7 +514,7 @@ local Success, Result = pcall(function()
 			GhostActivity.Text = "Activity: ".. RStorage["Activity"].Value;
 			if RStorage["Disruption"].Value then GhostDisruption.Visible = true; else GhostDisruption.Visible = false; end
 			if game.Workspace:FindFirstChild("Ghost") then
-				for _, v in pairs({GhostLocation, GhostSpeed, GhostDuration}) do v.Visible = true; end
+				for _, v in pairs({GhostLocation, GhostSpeed, GhostDuration, GhostBlink}) do v.Visible = true; end
 
 				pcall(function()
 					if game.Workspace:WaitForChild("Ghost") then
@@ -511,7 +524,7 @@ local Success, Result = pcall(function()
 					end
 				end)
 			else
-				for _, v in pairs({GhostLocation, GhostSpeed, GhostDuration}) do v.Visible = false; end
+				for _, v in pairs({GhostLocation, GhostSpeed, GhostDuration, GhostBlink}) do v.Visible = false; end
 			end
 			if not GhostBanshee.Visible or not GhostFaejkur.Visible then
 				for _, Player in pairs(Players:GetChildren()) do
@@ -521,6 +534,21 @@ local Success, Result = pcall(function()
 			end
 		end
 	end):Start()
+	local blinkConnection;
+	game.Workspace.ChildAdded:Connect(function(instance)
+		if instance.Name ~= "Ghost" then return; end
+		local saveStamp = tick();
+		pcall(function()
+			blinkConnection = instance:WaitForChild("Head"):GetPropertyChangedSignal("Transparency"):Connect(function()
+				GhostBlink.Text = "Blink: ".. (math.floor((tick() - saveStamp) * 1000) / 1000) .."s"
+				saveStamp = tick();
+			end);
+		end);
+	end);
+	game.Workspace.ChildRemoved:Connect(function(instance)
+		if instance.Name ~= "Ghost" then return; end
+		pcall(function() blinkConnection:Disconnect(); end);
+	end);
 
 	----------------------
 	-- [[[ EVIDENCE ]]] --
