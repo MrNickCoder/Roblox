@@ -11,14 +11,14 @@ local Lighting = game:GetService("Lighting");
 local RStorage = game:GetService("ReplicatedStorage");
 local UserIS = game:GetService("UserInputService");
 local RService = game:GetService("RunService");
-local TweenService = game:GetService("TweenService")
+local TweenService = game:GetService("TweenService");
 
 local LocalPlayer = Players.LocalPlayer;
 local PlayerGui = LocalPlayer.PlayerGui;
 
 if game.PlaceId == 116495829188952 then StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "No Loading in Lobby!"; }); return; end
 
-StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Loading Script!"; });
+StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Loading Dead Rails Script!"; });
 local Success, Result = pcall(function()
 	print("Loading Dead Rails Script!");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild(LocalPlayer.Name);
@@ -48,9 +48,12 @@ local Success, Result = pcall(function()
 		["Status"] = false;
 		["StatusScale"] = "1";
 	}
-	local Directory = "Paradoxium/Blair"
+	local Directory = "Paradoxium/Dead Rails"
 	local File_Name = "Settings.json"
-	Config = Utility:LoadConfig(Config, "Paradoxium/Dead Rails", "Settings.json");
+	Config = Utility:LoadConfig(Config, Directory, File_Name);
+	
+	if PlayerGui:FindFirstChild("Dead Rails") then PlayerGui:FindFirstChild("Dead Rails"):Destroy() end;
+	if PlayerGui:FindFirstChild("Statusifier") then PlayerGui:FindFirstChild("Statusifier"):Destroy() end;
 	
 	---------------------
 	-- [[ UTILITIES ]] --
@@ -220,7 +223,7 @@ local Success, Result = pcall(function()
 				end
 				if Options.Config then
 					Config[Options.Config] = Data.Enabled;
-					--Utility:SaveConfig(Config, Directory, File_Name);
+					Utility:SaveConfig(Config, Directory, File_Name);
 				end
 			end
 			
@@ -351,13 +354,13 @@ if Success then
 	Embed:SetColor(Color3.fromRGB(0, 255, 0));
 	Embed:SetTimestamp(os.time());
 	--Webhook:Send("https://discord.com/api/webhooks/1343691173667143751/XVEDb4JMMawvoQ9lXryspHxzuNDJ61b9UaaODQgbIf9Zqkbxgg52XS_1-PfQ7HlV5KlU")
-	StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Successfully Loaded!"; });
+	StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Successfully Loaded Script!"; });
 else
 	Embed:AppendLine("Error Execution");
 	Embed:Append(Result);
 	Embed:SetColor(Color3.fromRGB(255, 0, 0));
 	Embed:SetTimestamp(os.time());
 	--Webhook:Send("https://discord.com/api/webhooks/1343691173667143751/XVEDb4JMMawvoQ9lXryspHxzuNDJ61b9UaaODQgbIf9Zqkbxgg52XS_1-PfQ7HlV5KlU")
-	StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Error Loading!"; });
+	StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Error Loading Script!"; });
 	error(Result);
 end
