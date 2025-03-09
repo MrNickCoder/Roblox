@@ -512,8 +512,8 @@ local Success, Result = pcall(function()
 	function FindParabolic(Object)
 		for _, parabolic in pairs(Object:GetChildren()) do
 			if parabolic.Name ~= "Parabolic Microphone" then continue; end
-			if parabolic.Handle["BansheeScream"].Playing then GhostBanshee.Visible = true; end
-			if parabolic.Handle["FaeLaugh"].Playing then GhostFaejkur.Visible = true; end
+			if parabolic.Handle:FindFirstChild("BansheeScream") and parabolic.Handle:FindFirstChild("BansheeScream").Playing then GhostBanshee.Visible = true; end
+			if parabolic.Handle:FindFirstChild("FaeLaugh") and parabolic.Handle:FindFirstChild("FaeLaugh").Playing then GhostFaejkur.Visible = true; end
 		end
 	end
 	local GhostThread = Utility:Thread("Ghost", function()
