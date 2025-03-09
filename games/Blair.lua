@@ -252,8 +252,11 @@ local Success, Result = pcall(function()
 		end
 		function CreateESP(Text, Properties)
 			local Data = {}
-			if (Properties.ParentHighlight and Properties.ParentHighlight:FindFirstChild("ESP_Highlight")) or (Properties.Parent and Properties.Parent:FindFirstChild("ESP_Highlight")) then
-				Data.Highlight = Properties.ParentHighlight:FindFirstChild("ESP_Highlight") or Properties.Parent:FindFirstChild("ESP_Highlight");
+			if (Properties.ParentHighlight and Properties.ParentHighlight:FindFirstChild("ESP_Highlight")) then
+				Data.Highlight = Properties.ParentHighlight:FindFirstChild("ESP_Highlight");
+				Data.Highlight.Enabled = Properties.Enabled;
+			elseif(Properties.Parent and Properties.Parent:FindFirstChild("ESP_Highlight")) then
+				Data.Highlight = Properties.Parent:FindFirstChild("ESP_Highlight");
 				Data.Highlight.Enabled = Properties.Enabled;
 			else
 				Data.Highlight = Utility:Instance("Highlight", {
@@ -264,8 +267,12 @@ local Success, Result = pcall(function()
 					FillTransparency = 0.75;
 				});
 			end
-			if (Properties.ParentUI and Properties.ParentUI:FindFirstChild("ESP")) or (Properties.Parent and Properties.Parent:FindFirstChild("ESP")) then
-				Data.UI = Properties.ParentUI:FindFirstChild("ESP") or Properties.Parent:FindFirstChild("ESP");
+			if (Properties.ParentUI and Properties.ParentUI:FindFirstChild("ESP")) then
+				Data.UI = Properties.ParentUI:FindFirstChild("ESP");
+				Data.UI.Enabled = Properties.Enabled;
+				Data.Distance = Data.UI["Distance"];
+			elseif (Properties.Parent and Properties.Parent:FindFirstChild("ESP")) then
+				Data.UI = Properties.Parent:FindFirstChild("ESP");
 				Data.UI.Enabled = Properties.Enabled;
 				Data.Distance = Data.UI["Distance"];
 			else
