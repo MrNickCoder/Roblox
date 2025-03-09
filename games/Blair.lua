@@ -509,6 +509,7 @@ local Success, Result = pcall(function()
 	local GhostDisruption = Ghost.AddInfo("Disrupting");
 	local GhostBanshee = Ghost.AddInfo("Banshee Scream"); GhostBanshee.Visible = false;
 	local GhostFaejkur = Ghost.AddInfo("Faejkur Laugh"); GhostFaejkur.Visible = false;
+	local GhostYama = Ghost.AddInfo("Yama Roar"); GhostYama.Visible = false;
 	function FindParabolic(Object)
 		for _, parabolic in pairs(Object:GetChildren()) do
 			if parabolic.Name ~= "Parabolic Microphone" then continue; end
