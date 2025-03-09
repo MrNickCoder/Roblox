@@ -434,8 +434,8 @@ local Success, Result = pcall(function()
 	});
 
 	local SideStatus = CreateSettings("Side Status", { Config = "SideStatus"; }, {
-		On = function() PlayerGui["Statusifier"].Enabled = true end;
-		Off = function() PlayerGui["Statusifier"].Enabled = false end;
+		On = function() PlayerGui["Statusifier"].Enabled = true; end;
+		Off = function() PlayerGui["Statusifier"].Enabled = false; end;
 	});
 	local SideStatusScale = SideStatus:AddTextbox({ Text = "1"; }, { Config = "SideStatusScale"; Display = "Scale"; Type = "Number"; });
 
