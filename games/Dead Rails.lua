@@ -201,7 +201,7 @@ local Success, Result = pcall(function()
 				Utility:Instance("UICorner", { CornerRadius = UDim.new(0, 4); });
 			});
 			
-			Data.Set = function(Value)
+			function Data:Set(Value)
 				Data.Enabled = Value;
 				local Info = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut);
 				if Data.Enabled then
@@ -227,13 +227,70 @@ local Success, Result = pcall(function()
 				end
 			end
 			
-			Data.Set(Data.Enabled);
-			Data.UI["Input"]["Button"].MouseButton1Down:Connect(function() Data.Set(not Data.Enabled); end)
+			Data:Set(Data.Enabled);
+			Data.UI["Input"]["Button"].MouseButton1Down:Connect(function() Data:Set(not Data.Enabled); end)
 			
 			return Data;
 		end
 		function Interface:CreateTextBox(Name, Options, Callback)
+			local Value = Options and Options.Default or "";
+			if Options and Config[Options.Config] then Value = Config[Options.Config] end
+			local Callback = Callback or function() end;
 			
+			local Data = {Value = Value};
+			Data.UI = Utility:Instance("Frame", {
+				Name = Name;
+				Parent = UserInterface["UI"]["Settings"];
+				BackgroundTransparency = 0.5;
+				Size = UDim2.new(0.92, 0, 0, 30);
+				Utility:Instance("TextLabel", {
+					Name = "Title";
+					AnchorPoint = Vector2.new(0, 0.5);
+					BackgroundTransparency = 1;
+					Position = UDim2.new(0.05, 0, 0.5, 0);
+					Size = UDim2.new(0.7, 0, 0.6, 0);
+					Font = Enum.Font.Ubuntu;
+					Text = Name;
+					TextColor3 = Color3.fromRGB(255, 255, 255);
+					TextScaled = true;
+					TextXAlignment = Enum.TextXAlignment.Left;
+				});
+				Utility:Instance("Frame", {
+					Name = "Input";
+					AnchorPoint = Vector2.new(1, 0.5);
+					BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+					BackgroundTransparency = 0.5;
+					Position = UDim2.new(0.95, 0, 0.5, 0);
+					Size = UDim2.new(0.2, 0, 0.6, 0);
+					Utility:Instance("TextBox", {
+						Name = "Box";
+						BackgroundTransparency = 1;
+						Position = UDim2.new(0, 2, 0, 2);
+						Size = UDim2.new(1, -4, 1, -4);
+						Font = Enum.Font.FredokaOne;
+						Text = Data.Value;
+						TextColor3 = Color3.fromRGB(255, 255, 255);
+						TextScaled = true;
+						Utility:Instance("UICorner", { CornerRadius = UDim.new(0, 4); });
+					});
+					Utility:Instance("UICorner", { CornerRadius = UDim.new(0, 4); });
+				});
+				Utility:Instance("UICorner", { CornerRadius = UDim.new(0, 4); });
+			});
+			
+			function Data:Set(Value)
+				Data.Value = Value;
+				Data.UI["Input"]["Box"].Text = Value
+				Callback();
+				if Options.Config then
+					Config[Options.Config] = Data.Value;
+					Utility:SaveConfig(Config, Directory, File_Name);
+				end
+			end
+			
+			Data.UI["Input"]["Box"].FocusLost:Connect(function() Data:Set(Data.UI["Input"]["Box"].Text); end)
+			
+			return Data;
 		end
 		function Interface:CreateSlider(Name, Options, Callback)
 			local Value = Options and Options.Default or Options.Min
