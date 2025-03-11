@@ -640,15 +640,15 @@ local Success, Result = pcall(function()
 		for _, building in pairs(game.Workspace["RandomBuildings"]:GetChildren()) do
 			task.spawn(function()
 				repeat task.wait() until building:FindFirstChild("ZombiePart") or building:FindFirstChild("StandaloneZombiePart");
-				if child:FindFirstChild("ZombiePart") then for _, enemy in pairs(building["ZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end end
-				if child:FindFirstChild("StandaloneZombiePart") then for _, enemy in pairs(building["StandaloneZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end end
+				if building:FindFirstChild("ZombiePart") then for _, enemy in pairs(building["ZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end end
+				if building:FindFirstChild("StandaloneZombiePart") then for _, enemy in pairs(building["StandaloneZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end end
 			end)
 		end
 		for _, town in pairs(game.Workspace["Towns"]:GetChildren()) do
 			task.spawn(function()
 				repeat task.wait() until town:FindFirstChild("ZombiePart") or town:FindFirstChild("StandaloneZombiePart");
-				if child:FindFirstChild("ZombiePart") then for _, enemy in pairs(town["ZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end end
-				if child:FindFirstChild("StandaloneZombiePart") then for _, enemy in pairs(town["StandaloneZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end end
+				if town:FindFirstChild("ZombiePart") then for _, enemy in pairs(town["ZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end end
+				if town:FindFirstChild("StandaloneZombiePart") then for _, enemy in pairs(town["StandaloneZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end end
 			end)
 		end
 		for _, baseplate in pairs(game.Workspace["Baseplates"]:GetChildren()) do
@@ -726,7 +726,7 @@ local Success, Result = pcall(function()
 		Default = {};
 		Items = {
 			-- [ DEAD BODIES ] --
-			"Zombie","Outlaw","Vampire","Werewolf","Horse",
+			"Zombie","Outlaw","Vampire","Werewolf","Wolf","Horse",
 			-- [ ARMORS ] --
 			"Helmet","Left Shoulder Armor","Right Shoulder Armor","Chestplate",
 			-- [ WEAPONS ] --
@@ -755,7 +755,7 @@ local Success, Result = pcall(function()
 	}, function(Value)
 		for _, item in pairs(game.Workspace["RuntimeItems"]:GetChildren()) do
 			task.spawn(function()
-				if not item:FindFirstChild("ObjectInfo") then continue; end
+				if not item:FindFirstChild("ObjectInfo") then return; end
 				if item:FindFirstChild("ESP_Highlight") then item:FindFirstChild("ESP_Highlight"):Destroy(); end
 				local ESP;
 				if item:FindFirstChild("ESP_Text") then ESP = item:FindFirstChild("ESP_Text");
@@ -808,8 +808,14 @@ local Success, Result = pcall(function()
 				UpdateNoClip(child, not NoClip.Enabled);
 			end)
 			repeat task.wait() until child:FindFirstChild("ZombiePart") or child:FindFirstChild("StandaloneZombiePart");
-			if child:FindFirstChild("ZombiePart") then child["ZombiePart"]["Zombies"].ChildAdded:Connect(function(child) AddEnemyESP(child); end); end
-			if child:FindFirstChild("StandaloneZombiePart") then child["StandaloneZombiePart"]["Zombies"].ChildAdded:Connect(function(child) AddEnemyESP(child); end); end
+			if child:FindFirstChild("ZombiePart") then
+				for _, enemy in pairs(child["ZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end
+				child["ZombiePart"]["Zombies"].ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end);
+			end
+			if child:FindFirstChild("StandaloneZombiePart") then
+				for _, enemy in pairs(child["StandaloneZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end
+				child["StandaloneZombiePart"]["Zombies"].ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end);
+			end
 		end)
 	end);
 	game.Workspace["Towns"].ChildAdded:Connect(function(child)
@@ -824,8 +830,14 @@ local Success, Result = pcall(function()
 				end)
 			end
 			repeat task.wait() until child:FindFirstChild("ZombiePart") or child:FindFirstChild("StandaloneZombiePart");
-			if child:FindFirstChild("ZombiePart") then child["ZombiePart"]["Zombies"].ChildAdded:Connect(function(child) AddEnemyESP(child); end); end
-			if child:FindFirstChild("StandaloneZombiePart") then child["StandaloneZombiePart"]["Zombies"].ChildAdded:Connect(function(child) AddEnemyESP(child); end); end
+			if child:FindFirstChild("ZombiePart") then
+				for _, enemy in pairs(child["ZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end
+				child["ZombiePart"]["Zombies"].ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end);
+			end
+			if child:FindFirstChild("StandaloneZombiePart") then
+				for _, enemy in pairs(child["StandaloneZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end
+				child["StandaloneZombiePart"]["Zombies"].ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end);
+			end
 		end)
 	end);
 	
@@ -846,7 +858,8 @@ local Success, Result = pcall(function()
 	game.Workspace["Baseplates"].ChildAdded:Connect(function(child)
 		task.spawn(function()
 			repeat task.wait() until child:FindFirstChild("CenterBaseplate");
-			child["CenterBaseplate"].Animals.ChildAdded:Connect(function(child) AddEnemyESP(child); end)
+			for _, enemy in pairs(child["CenterBaseplate"].Animals:GetChildren()) do AddEnemyESP(enemy); end
+			child["CenterBaseplate"].Animals.ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end)
 		end)
 	end);
 	
