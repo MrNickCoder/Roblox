@@ -233,6 +233,12 @@ local Success, Result = pcall(function()
 			
 			Data:Set(Data.Enabled);
 			Data.UI["Input"]["Button"].MouseButton1Down:Connect(function() Data:Set(not Data.Enabled); end)
+			if Keybind ~= nil then
+				UserIS.InputBegan:Connect(function(input, gameProcessed)
+					if gameProcessed then return; end
+					if input.KeyCode == Keybind then Data.Set(not Data.Enabled);end
+				end)
+			end
 			
 			return Data;
 		end
