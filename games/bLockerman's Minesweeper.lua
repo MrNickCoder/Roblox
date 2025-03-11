@@ -20,9 +20,9 @@ function getNeighbors(block)
 	local blockSize = block.Size;
 	
 	local offset = {
-		[-1, -1]; [0, -1]; [1, -1];
-		[-1,  0];          [1,  0];
-		[-1,  1]; [0,  1]; [1,  1];
+		{-1, -1}; {0, -1}; {1, -1};
+		{-1,  0};          {1,  0};
+		{-1,  1}; {0,  1}; {1,  1};
 	};
 	
 	local neighbors = {}
