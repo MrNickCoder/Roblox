@@ -5,7 +5,7 @@ if game:GetService("HttpService"):JSONDecode(game:HttpGet("https://apis.roblox.c
 -- [[ SERVICES ]] --
 --------------------
 local HttpService = game:GetService("HttpService");
-local Players = game:GetService("Players")
+local Players = game:GetService("Players");
 local StarterGui = game:GetService("StarterGui");
 local Lighting = game:GetService("Lighting");
 local RStorage = game:GetService("ReplicatedStorage");
@@ -15,6 +15,7 @@ local TweenService = game:GetService("TweenService");
 
 local LocalPlayer = Players.LocalPlayer;
 local PlayerGui = LocalPlayer.PlayerGui;
+local Mouse = LocalPlayer:GetMouse();
 
 if game.PlaceId == 6137321701 then StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "No Loading in Lobby!"; }); return; end
 

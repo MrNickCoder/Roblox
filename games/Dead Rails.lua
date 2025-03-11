@@ -5,7 +5,7 @@ if game:GetService("HttpService"):JSONDecode(game:HttpGet("https://apis.roblox.c
 -- [[ SERVICES ]] --
 --------------------
 local HttpService = game:GetService("HttpService");
-local Players = game:GetService("Players")
+local Players = game:GetService("Players");
 local StarterGui = game:GetService("StarterGui");
 local Lighting = game:GetService("Lighting");
 local RStorage = game:GetService("ReplicatedStorage");
