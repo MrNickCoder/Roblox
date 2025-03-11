@@ -668,9 +668,10 @@ local Success, Result = pcall(function()
 	function UpdateNoClip(Child, Clip)
 		for _, object in pairs(Child:GetChildren()) do
 			if string.find(object.Name, "ZombiePart") then continue; end
+			if table.find({"Ceiling","Floor","PorchFloor"}, object.Name) then continue; end
 			if #object:GetChildren() > 0 then UpdateNoClip(object, Clip); end
-			if table.find({"Ceiling", "Floor", "PorchFloor"}, object.Name) then continue; end
 			if not table.find({"Part", "MeshPart", "UnionOperation"}, object.ClassName) then continue; end
+			print("Changed Collision")
 			object.CanCollide = Clip;
 		end
 	end
@@ -807,10 +808,7 @@ local Success, Result = pcall(function()
 	
 	game.Workspace["RandomBuildings"].ChildAdded:Connect(function(child)
 		task.spawn(function()
-			task.spawn(function()
-				repeat task.wait() until child:FindFirstChild("Floor");
-				UpdateNoClip(child, not NoClip.Enabled);
-			end)
+			task.spawn(function() repeat task.wait() until child:FindFirstChild("Floor"); UpdateNoClip(child, not NoClip.Enabled); end)
 			task.spawn(function()
 				repeat task.wait() until child:FindFirstChild("ZombiePart") or child:FindFirstChild("StandaloneZombiePart");
 				if child:FindFirstChild("ZombiePart") then
