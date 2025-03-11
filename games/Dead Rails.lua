@@ -673,28 +673,26 @@ local Success, Result = pcall(function()
 	-- [[ USER INTERFACE ]] --
 	--------------------------
 	local Fullbright = Interface:CreateToggle("Fullbright", { Config = "Fullbright"; Keybind = Enum.KeyCode.T; });
-	local FullbrightAmbient = Interface:CreateSlider("Fullbright Ambient", { Config = "FullbrightAmbient"; Default = 255; Decimals = 1; Min = 0; Max = 255; })
+	local FullbrightAmbient = Interface:CreateSlider("Fullbright Ambient", { Config = "FullbrightAmbient"; Default = 255; Decimals = 1; Min = 0; Max = 255; });
 	
 	local NoClip = Interface:CreateToggle("No Clip", { Config = "NoClip"; Keybind = Enum.KeyCode.X; }, {
 		On = function()
-			for _, building in pairs(game.Workspace["RandomBuildings"]:GetChildren()) do UpdateNoClip(building, false); end
+			for _, building in pairs(game.Workspace["RandomBuildings"]:GetChildren()) do
+				task.spawn(function() repeat task.wait() until building:FindFirstChild("Floor"); UpdateNoClip(building, false); end)
+			end
 			for _, town in pairs(game.Workspace["Towns"]:GetChildren()) do
 				for _, building in pairs(town["Buildings"]:GetChildren()) do
-					task.spawn(function()
-						repeat task.wait() until building:FindFirstChild("Floor");
-						UpdateNoClip(building, false);
-					end)
+					task.spawn(function() repeat task.wait() until building:FindFirstChild("Floor"); UpdateNoClip(building, false); end)
 				end
 			end
 		end;
 		Off = function()
-			for _, building in pairs(game.Workspace["RandomBuildings"]:GetChildren()) do UpdateNoClip(building, true); end
+			for _, building in pairs(game.Workspace["RandomBuildings"]:GetChildren()) do
+				task.spawn(function() repeat task.wait() until building:FindFirstChild("Floor"); UpdateNoClip(building, true); end)
+			end
 			for _, town in pairs(game.Workspace["Towns"]:GetChildren()) do 
 				for _, building in pairs(town["Buildings"]:GetChildren()) do
-					task.spawn(function()
-						repeat task.wait() until building:FindFirstChild("Floor");
-						UpdateNoClip(building, true);
-					end)
+					task.spawn(function() repeat task.wait() until building:FindFirstChild("Floor"); UpdateNoClip(building, true); end)
 				end
 			end
 		end;
@@ -776,7 +774,7 @@ local Success, Result = pcall(function()
 	});
 	local StatusScale = Interface:CreateSlider("Status Scale", { Config = "StatusScale"; Default = 1; Decimals = 10; Min = 0.5; Max = 2; }, function(Value)
 		Statusifier["TopStatus"]["UIScale"].Scale = Value;
-	end)
+	end);
 	
 	local Time = Interface:CreateInfo("Time");
 	local Gas = Interface:CreateInfo("Gas");
@@ -807,37 +805,43 @@ local Success, Result = pcall(function()
 				repeat task.wait() until child:FindFirstChild("Floor");
 				UpdateNoClip(child, not NoClip.Enabled);
 			end)
-			repeat task.wait() until child:FindFirstChild("ZombiePart") or child:FindFirstChild("StandaloneZombiePart");
-			if child:FindFirstChild("ZombiePart") then
-				for _, enemy in pairs(child["ZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end
-				child["ZombiePart"]["Zombies"].ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end);
-			end
-			if child:FindFirstChild("StandaloneZombiePart") then
-				for _, enemy in pairs(child["StandaloneZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end
-				child["StandaloneZombiePart"]["Zombies"].ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end);
-			end
+			task.spawn(function()
+				repeat task.wait() until child:FindFirstChild("ZombiePart") or child:FindFirstChild("StandaloneZombiePart");
+				if child:FindFirstChild("ZombiePart") then
+					for _, enemy in pairs(child["ZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end
+					child["ZombiePart"]["Zombies"].ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end);
+				end
+				if child:FindFirstChild("StandaloneZombiePart") then
+					for _, enemy in pairs(child["StandaloneZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end
+					child["StandaloneZombiePart"]["Zombies"].ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end);
+				end
+			end)
 		end)
 	end);
 	game.Workspace["Towns"].ChildAdded:Connect(function(child)
 		task.spawn(function()
-			repeat task.wait() until child:FindFirstChild("Buildings");
-			if child:FindFirstChild("Buildings") then
-				child["Buildings"].ChildAdded:Connect(function(child)
-					task.spawn(function()
-						repeat task.wait() until child:FindFirstChild("Floor");
-						UpdateNoClip(child, not NoClip.Enabled);
+			task.spawn(function()
+				repeat task.wait() until child:FindFirstChild("Buildings");
+				if child:FindFirstChild("Buildings") then
+					for _, buildings in pairs(child["Buildings"]:GetChildren()) do
+						task.spawn(function() repeat task.wait() until buildings:FindFirstChild("Floor"); UpdateNoClip(buildings, not NoClip.Enabled); end)
+					end
+					child["Buildings"].ChildAdded:Connect(function(child)
+						task.spawn(function() repeat task.wait() until child:FindFirstChild("Floor"); UpdateNoClip(child, not NoClip.Enabled); end)
 					end)
-				end)
-			end
-			repeat task.wait() until child:FindFirstChild("ZombiePart") or child:FindFirstChild("StandaloneZombiePart");
-			if child:FindFirstChild("ZombiePart") then
-				for _, enemy in pairs(child["ZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end
-				child["ZombiePart"]["Zombies"].ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end);
-			end
-			if child:FindFirstChild("StandaloneZombiePart") then
-				for _, enemy in pairs(child["StandaloneZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end
-				child["StandaloneZombiePart"]["Zombies"].ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end);
-			end
+				end
+			end)
+			task.spawn(function()
+				repeat task.wait() until child:FindFirstChild("ZombiePart") or child:FindFirstChild("StandaloneZombiePart");
+				if child:FindFirstChild("ZombiePart") then
+					for _, enemy in pairs(child["ZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end
+					child["ZombiePart"]["Zombies"].ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end);
+				end
+				if child:FindFirstChild("StandaloneZombiePart") then
+					for _, enemy in pairs(child["StandaloneZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end
+					child["StandaloneZombiePart"]["Zombies"].ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end);
+				end
+			end)
 		end)
 	end);
 	
@@ -873,7 +877,7 @@ local Success, Result = pcall(function()
 			if UserIS.MouseBehavior == Enum.MouseBehavior.Default then UserInterface.Enabled = true; else UserInterface.Enabled = false; end
 		end
 	end)
-	]]
+	--]]
 	UIButton.MouseButton1Down:Connect(function()
 		heldDown = true;
 		task.spawn(function()
