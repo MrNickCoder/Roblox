@@ -632,46 +632,30 @@ local Success, Result = pcall(function()
 		return false;
 	end
 	
-	function AddEnemyESP(Child)
-		repeat task.wait() until Child:FindFirstChild("Humanoid");
-		if not IsHostile(Child) then return; end
+	function UpdateEnemyESP(Enemy)
+		repeat task.wait() until Enemy:FindFirstChild("Humanoid");
+		if not IsHostile(Enemy) then return; end
 		local ESP;
-		if Child:FindFirstChild("ESP_Highlight") then ESP = Child:FindFirstChild("ESP_Highlight"); ESP.Enabled = Config["ESPEnemies"];
-		else ESP = Interface:CreateESP("Highlight", { Parent = Child; Enabled = Config["ESPEnemies"]; FillColor = Color3.fromRGB(255, 0, 0); }); end
+		if Enemy:FindFirstChild("ESP_Highlight") then ESP = Enemy:FindFirstChild("ESP_Highlight"); ESP.Enabled = Config["ESPEnemies"];
+		else ESP = Interface:CreateESP("Highlight", { Parent = Enemy; Enabled = Config["ESPEnemies"]; FillColor = Color3.fromRGB(255, 0, 0); }); end
+	end
+
+	function UpdateItemsESP(Item)
+		if not Item:FindFirstChild("ObjectInfo") then return; end
+		if Item:FindFirstChild("ESP_Highlight") then Item:FindFirstChild("ESP_Highlight"):Destroy(); end
+		local ESP;
+		if Item:FindFirstChild("ESP_Text") then ESP = Item:FindFirstChild("ESP_Text");
+		else ESP = Interface:CreateESP("Text", { Parent = Item; Text = Item["ObjectInfo"]:FindFirstChild("Title").Text; }); end
+		if table.find(Config["ESPItemsList"], Item["ObjectInfo"]:FindFirstChild("Title").Text) and Config["ESPItems"] then ESP.Enabled = true;
+		else ESP.Enabled = false; end
 	end
 	
-	function UpdateEnemyESP()
-		for _, enemy in pairs(game.Workspace["NightEnemies"]:GetChildren()) do AddEnemyESP(enemy); end
-		for _, enemy in pairs(game.Workspace["RuntimeEnemies"]:GetChildren()) do AddEnemyESP(enemy); end
-		for _, building in pairs(game.Workspace["RandomBuildings"]:GetChildren()) do
-			task.spawn(function()
-				repeat task.wait() until building:FindFirstChild("ZombiePart") or building:FindFirstChild("StandaloneZombiePart");
-				if building:FindFirstChild("ZombiePart") then for _, enemy in pairs(building["ZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end end
-				if building:FindFirstChild("StandaloneZombiePart") then for _, enemy in pairs(building["StandaloneZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end end
-			end)
-		end
-		for _, town in pairs(game.Workspace["Towns"]:GetChildren()) do
-			task.spawn(function()
-				repeat task.wait() until town:FindFirstChild("ZombiePart") or town:FindFirstChild("StandaloneZombiePart");
-				if town:FindFirstChild("ZombiePart") then for _, enemy in pairs(town["ZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end end
-				if town:FindFirstChild("StandaloneZombiePart") then for _, enemy in pairs(town["StandaloneZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end end
-			end)
-		end
-		for _, baseplate in pairs(game.Workspace["Baseplates"]:GetChildren()) do
-			task.spawn(function()
-				repeat task.wait() until baseplate:FindFirstChild("CenterBaseplate");
-				for _, enemy in pairs(baseplate["CenterBaseplate"].Animals:GetChildren()) do AddEnemyESP(enemy); end
-			end)
-		end
-	end
-	
-	function UpdateNoClip(Child, Clip)
+	function UpdateCollision(Child, Clip)
 		for _, object in pairs(Child:GetChildren()) do
 			if string.find(object.Name, "ZombiePart") then continue; end
-			if table.find({"Ceiling","Floor","PorchFloor"}, object.Name) then continue; end
-			if #object:GetChildren() > 0 then UpdateNoClip(object, Clip); end
-			if not table.find({"Part", "MeshPart", "UnionOperation"}, object.ClassName) then continue; end
-			print("Changed Collision")
+			if #object:GetChildren() > 0 then UpdateCollision(object, Clip); end
+			if table.find({"Ceiling","Floor","PorchFloor","Roof","RoofSlant","FireRoof"}, object.Name) then continue; end
+			if not table.find({"Part","MeshPart","UnionOperation"}, object.ClassName) then continue; end
 			object.CanCollide = Clip;
 		end
 	end
@@ -682,50 +666,9 @@ local Success, Result = pcall(function()
 	local Fullbright = Interface:CreateToggle("Fullbright", { Config = "Fullbright"; Keybind = Enum.KeyCode.T; });
 	local FullbrightAmbient = Interface:CreateSlider("Fullbright Ambient", { Config = "FullbrightAmbient"; Default = 255; Decimals = 1; Min = 0; Max = 255; });
 	
-	local NoClip = Interface:CreateToggle("No Clip", { Config = "NoClip"; Keybind = Enum.KeyCode.X; }, {
-		On = function()
-			for _, building in pairs(game.Workspace["RandomBuildings"]:GetChildren()) do
-				task.spawn(function() repeat task.wait() until building:FindFirstChild("Floor"); UpdateNoClip(building, false); end)
-			end
-			for _, town in pairs(game.Workspace["Towns"]:GetChildren()) do
-				for _, building in pairs(town["Buildings"]:GetChildren()) do
-					task.spawn(function() repeat task.wait() until building:FindFirstChild("Floor"); UpdateNoClip(building, false); end)
-				end
-			end
-		end;
-		Off = function()
-			for _, building in pairs(game.Workspace["RandomBuildings"]:GetChildren()) do
-				task.spawn(function() repeat task.wait() until building:FindFirstChild("Floor"); UpdateNoClip(building, true); end)
-			end
-			for _, town in pairs(game.Workspace["Towns"]:GetChildren()) do 
-				for _, building in pairs(town["Buildings"]:GetChildren()) do
-					task.spawn(function() repeat task.wait() until building:FindFirstChild("Floor"); UpdateNoClip(building, true); end)
-				end
-			end
-		end;
-	});
+	local NoClip = Interface:CreateToggle("No Clip", { Config = "NoClip"; Keybind = Enum.KeyCode.X; });
 	
-	local ESPItems = Interface:CreateToggle("ESP Items", { Config = "ESPItems"; }, {
-		On = function()
-			for _, item in pairs(game.Workspace["RuntimeItems"]:GetChildren()) do
-				if not item:FindFirstChild("ObjectInfo") then continue; end
-				if item:FindFirstChild("ESP_Highlight") then item:FindFirstChild("ESP_Highlight"):Destroy(); end
-				local ESP;
-				if item:FindFirstChild("ESP_Text") then ESP = item:FindFirstChild("ESP_Text");
-				else ESP = Interface:CreateESP("Text", { Parent = item; Text = item["ObjectInfo"]:FindFirstChild("Title").Text; }); end
-				if table.find(Config["ESPItemsList"], item:FindFirstChild("ObjectInfo"):FindFirstChild("Title").Text) then ESP.Enabled = true;
-				else ESP.Enabled = false; end
-			end
-		end;
-		Off = function()
-			for _, item in pairs(game.Workspace["RuntimeItems"]:GetChildren()) do
-				if not item:FindFirstChild("ObjectInfo") then continue; end
-				if item:FindFirstChild("ESP_Highlight") then item:FindFirstChild("ESP_Highlight"):Destroy(); end
-				if item:FindFirstChild("ESP_Text") then item:FindFirstChild("ESP_Text").Enabled = false;
-				else Interface:CreateESP("Text", { Parent = item; Enabled = false; Text = item["ObjectInfo"]:FindFirstChild("Title").Text; }); end
-			end
-		end;
-	});
+	local ESPItems = Interface:CreateToggle("ESP Items", { Config = "ESPItems"; });
 	local ESPItemsList = Interface:CreateDropdown("ESP Items List", {
 		Config = "ESPItemsList";
 		Default = {};
@@ -735,10 +678,11 @@ local Success, Result = pcall(function()
 			-- [ ARMORS ] --
 			"Helmet","Left Shoulder Armor","Right Shoulder Armor","Chestplate",
 			-- [ WEAPONS ] --
-			"Revolver","Navy Revolver","Mauser",
+			"Revolver","Navy Revolver","Mauser","Electrocutioner",
 			"Shotgun","Sawed-off Shotgun",
 			"Rifle","Bolt-Action Rifle",
 			"Crucifix","Holy Water","Molotov",
+			"Shovel","Axe","Pickaxe","Sledge Hammer","Cavalry Sword","Tomahawk","Vampire Knife",
 			"Maxim Turret","Cannon",
 			"Dynamite",
 			-- [ AMMUNITION ] --
@@ -752,28 +696,15 @@ local Success, Result = pcall(function()
 			"Silver Bar","Silver Cup","Silver Painting","Silver Plate","Silver Statue","Silver Watch",
 			-- [ JUNKS ] --
 			"Barrel","Book","Chair","Newspaper","Rope","Teapot","Vase","Wheel",
+			-- [ FUEL ] --
+			"Wanted Poster",
 			-- [ SUPPLIES ] --
 			"Bandage","Snake Oil",
 			-- [ OTHERS ] --
 			"Lightning Rod"
 		};
-	}, function(Value)
-		for _, item in pairs(game.Workspace["RuntimeItems"]:GetChildren()) do
-			task.spawn(function()
-				if not item:FindFirstChild("ObjectInfo") then return; end
-				if item:FindFirstChild("ESP_Highlight") then item:FindFirstChild("ESP_Highlight"):Destroy(); end
-				local ESP;
-				if item:FindFirstChild("ESP_Text") then ESP = item:FindFirstChild("ESP_Text");
-				else ESP = Interface:CreateESP("Text", { Parent = item; Text = item:FindFirstChild("ObjectInfo"):FindFirstChild("Title").Text; }); end
-				if table.find(Value, item:FindFirstChild("ObjectInfo"):FindFirstChild("Title").Text) and ESPItems.Enabled then ESP.Enabled = true;
-				else ESP.Enabled = false; end
-			end)
-		end
-	end);
-	local ESPEnemies = Interface:CreateToggle("ESP Enemies", { Config = "ESPEnemies"; }, {
-		On = function() UpdateEnemyESP(); end;
-		Off = function() UpdateEnemyESP(); end;
 	});
+	local ESPEnemies = Interface:CreateToggle("ESP Enemies", { Config = "ESPEnemies"; });
 	
 	local Status = Interface:CreateToggle("Status", { Config = "Status"; }, {
 		On = function() PlayerGui["Statusifier"].Enabled = true; end;
@@ -805,71 +736,53 @@ local Success, Result = pcall(function()
 			end
 		end
 	end):Start();
-	
-	game.Workspace["RandomBuildings"].ChildAdded:Connect(function(child)
-		task.spawn(function()
-			task.spawn(function() repeat task.wait() until child:FindFirstChild("Floor"); UpdateNoClip(child, not NoClip.Enabled); end)
-			task.spawn(function()
-				repeat task.wait() until child:FindFirstChild("ZombiePart") or child:FindFirstChild("StandaloneZombiePart");
-				if child:FindFirstChild("ZombiePart") then
-					for _, enemy in pairs(child["ZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end
-					child["ZombiePart"]["Zombies"].ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end);
+
+	local GenerationThread = Utility:Thread("Generation", function()
+		while task.wait() do
+			pcall(function()
+				for _, enemy in pairs(game.Workspace["NightEnemies"]:GetChildren()) do UpdateEnemyESP(enemy); end
+				for _, enemy in pairs(game.Workspace["RuntimeEnemies"]:GetChildren()) do UpdateEnemyESP(enemy); end
+				for _, building in pairs(game.Workspace["RandomBuildings"]:GetChildren()) do
+					UpdateCollision(building, Config["NoClip"]);
+					task.spawn(function()
+						repeat task.wait() until building:FindFirstChild("ZombiePart") or building:FindFirstChild("StandaloneZombiePart");
+						if building:FindFirstChild("ZombiePart") then for _, enemy in pairs(building["ZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
+						if building:FindFirstChild("StandaloneZombiePart") then for _, enemy in pairs(building["StandaloneZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
+					end)
 				end
-				if child:FindFirstChild("StandaloneZombiePart") then
-					for _, enemy in pairs(child["StandaloneZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end
-					child["StandaloneZombiePart"]["Zombies"].ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end);
-				end
-			end)
-		end)
-	end);
-	game.Workspace["Towns"].ChildAdded:Connect(function(child)
-		task.spawn(function()
-			task.spawn(function()
-				repeat task.wait() until child:FindFirstChild("Buildings");
-				if child:FindFirstChild("Buildings") then
-					for _, buildings in pairs(child["Buildings"]:GetChildren()) do
-						task.spawn(function() repeat task.wait() until buildings:FindFirstChild("Floor"); UpdateNoClip(buildings, not NoClip.Enabled); end)
+				for _, town in pairs(game.Workspace["Towns"]:GetChildren()) do
+					repeat task.wait() until town:FindFirstChild("Church");
+					UpdateCollision(town["Church"], Config["NoClip"]);
+					repeat task.wait() until town:FindFirstChild("Buildings");
+					for _, building in pairs(town["Buildings"]:GetChildren()) do
+						UpdateCollision(building, Config["NoClip"]);
+						task.spawn(function()
+							repeat task.wait() until building:FindFirstChild("ZombiePart") or building:FindFirstChild("StandaloneZombiePart");
+							if building:FindFirstChild("ZombiePart") then for _, enemy in pairs(building["ZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
+							if building:FindFirstChild("StandaloneZombiePart") then for _, enemy in pairs(building["StandaloneZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
+						end)
 					end
-					child["Buildings"].ChildAdded:Connect(function(child)
-						task.spawn(function() repeat task.wait() until child:FindFirstChild("Floor"); UpdateNoClip(child, not NoClip.Enabled); end)
+					task.spawn(function()
+						repeat task.wait() until town:FindFirstChild("ZombiePart") or town:FindFirstChild("StandaloneZombiePart");
+						if town:FindFirstChild("ZombiePart") then for _, enemy in pairs(town["ZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
+						if town:FindFirstChild("StandaloneZombiePart") then for _, enemy in pairs(town["StandaloneZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
+					end)
+				end
+				for _, baseplate in pairs(game.Workspace["Baseplates"]:GetChildren()) do
+					task.spawn(function()
+						if baseplate:FindFirstChild("CenterBaseplate") then
+							repeat task.wait() until baseplate["CenterBaseplate"]:FindFirstChild("Animals");
+							for _, enemy in pairs(baseplate["CenterBaseplate"]["Animals"]:GetChildren()) do UpdateEnemyESP(enemy); end
+						end
 					end)
 				end
 			end)
-			task.spawn(function()
-				repeat task.wait() until child:FindFirstChild("ZombiePart") or child:FindFirstChild("StandaloneZombiePart");
-				if child:FindFirstChild("ZombiePart") then
-					for _, enemy in pairs(child["ZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end
-					child["ZombiePart"]["Zombies"].ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end);
-				end
-				if child:FindFirstChild("StandaloneZombiePart") then
-					for _, enemy in pairs(child["StandaloneZombiePart"]["Zombies"]:GetChildren()) do AddEnemyESP(enemy); end
-					child["StandaloneZombiePart"]["Zombies"].ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end);
-				end
-			end)
-		end)
-	end);
-	
-	game.Workspace["RuntimeItems"].ChildAdded:Connect(function(child)
-		task.spawn(function()
-			if not child:FindFirstChild("ObjectInfo") then return; end
-			if child:FindFirstChild("ESP_Highlight") then child:FindFirstChild("ESP_Highlight"):Destroy(); end
-			local ESP;
-			if child:FindFirstChild("ESP_Text") then ESP = child:FindFirstChild("ESP_Text"); ESP.Enabled = ESPItems.Enabled;
-			else ESP = Interface:CreateESP("Text", { Parent = child; Text = child:FindFirstChild("ObjectInfo"):FindFirstChild("Title").Text; }); end
-			if table.find(ESPItemsList.Value, child:FindFirstChild("ObjectInfo"):FindFirstChild("Title").Text) and ESPItems.Enabled then ESP.Enabled = true;
-			else ESP.Enabled = false; end
-		end)
-	end);
-	
-	game.Workspace["RuntimeEnemies"].ChildAdded:Connect(function(child) AddEnemyESP(child); end);
-	game.Workspace["NightEnemies"].ChildAdded:Connect(function(child) AddEnemyESP(child); end);
-	game.Workspace["Baseplates"].ChildAdded:Connect(function(child)
-		task.spawn(function()
-			repeat task.wait() until child:FindFirstChild("CenterBaseplate");
-			for _, enemy in pairs(child["CenterBaseplate"].Animals:GetChildren()) do AddEnemyESP(enemy); end
-			child["CenterBaseplate"].Animals.ChildAdded:Connect(function(enemy) AddEnemyESP(enemy); end)
-		end)
-	end);
+		end
+	end):Start();
+
+	local ItemsThread = Utility:Thread("Items", function()
+		for _, item in pairs(game.Workspace["RuntimeItems"]:GetChildren()) do task.spawn(function() UpdateItemsESP(item); end) end
+	end):Start();
 	
 	UserIS:GetPropertyChangedSignal("MouseBehavior"):Connect(function()
 		if UserIS.MouseBehavior == Enum.MouseBehavior.Default then UserInterface.Enabled = true; else UserInterface.Enabled = false; end
