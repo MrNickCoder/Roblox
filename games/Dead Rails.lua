@@ -160,8 +160,7 @@ local Success, Result = pcall(function()
 	local Interface = {}
 	do
 		function Interface:CreateToggle(Name, Options, Callback)
-			local Enabled = Options and Options.Default or false;
-			if Options and Config[Options.Config] then Enabled = Config[Options.Config] end
+			local Enabled = Options and (Config[Options.Config] or Options.Default or false);
 			local Keybind = Options and Options.Keybind or nil;
 			local On = Callback and Callback.On or function() end;
 			local Off = Callback and Callback.Off or function() end;
@@ -243,8 +242,7 @@ local Success, Result = pcall(function()
 			return Data;
 		end
 		function Interface:CreateTextBox(Name, Options, Callback)
-			local Value = Options and Options.Default or "";
-			if Options and Config[Options.Config] then Value = Config[Options.Config] end
+			local Value = Options and (Config[Options.Config] or Options.Default or "");
 			local Callback = Callback or function() end;
 			
 			local Data = {Value = Value};
@@ -307,8 +305,7 @@ local Success, Result = pcall(function()
 			local Min = Options and Options.Min or 0;
 			local Max = Options and Options.Max or 1;
 			local Decimals = Options and Options.Decimals or 1;
-			local Value = Options and Options.Default or Min;
-			if Options and Config[Options.Config] then Value = Config[Options.Config] end
+			local Value = Options and (Config[Options.Config] or Options.Default or Min);
 			local Callback = Callback or function(Value) end;
 			
 			local Data = { Value = Value; Decimals = Decimals; Min = Min; Max = Max; };
@@ -409,9 +406,8 @@ local Success, Result = pcall(function()
 		end
 		function Interface:CreateDropdown(Name, Options, Callback)
 			local Items = Options and Options.Items;
-			local Value = Options and Options.Default or {};
+			local Value = Options and (Config[Options.Config] or Options.Default or {});
 			local Multi = Options and Options.Multi or false;
-			if Options and Config[Options.Config] then Value = Config[Options.Config] end
 			local Callback = Callback or function() end;
 			
 			local Data = {Value = Value; Items = Items; Multi = Multi; };
@@ -645,7 +641,7 @@ local Success, Result = pcall(function()
 		local ESP;
 		if Item:FindFirstChild("ESP_Text") then ESP = Item:FindFirstChild("ESP_Text");
 		else ESP = Interface:CreateESP("Text", { Parent = Item; Text = Item["ObjectInfo"]:FindFirstChild("Title").Text; }); end
-		
+
 		if table.find(Config["ESPItemsList"], Item["ObjectInfo"]:FindFirstChild("Title").Text) and Config["ESPItems"] then ESP.Enabled = true;
 		else ESP.Enabled = false; end
 	end
