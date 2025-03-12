@@ -30,6 +30,7 @@ local Success, Result = pcall(function()
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("NightEnemies");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("RuntimeItems");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("Towns");
+	repeat task.wait(.1) until game.Workspace:FindFirstChild("SafeZones");
 	task.wait(5)
 	
 	local Utility = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/UtilityModule.lua"))()
@@ -642,8 +643,12 @@ local Success, Result = pcall(function()
 		if Item:FindFirstChild("ESP_Text") then ESP = Item:FindFirstChild("ESP_Text");
 		else ESP = Interface:CreateESP("Text", { Parent = Item; Text = Item["ObjectInfo"]:FindFirstChild("Title").Text; }); end
 
-		if table.find(Config["ESPItemsList"], Item["ObjectInfo"]:FindFirstChild("Title").Text) and Config["ESPItems"] then ESP.Enabled = true;
-		else ESP.Enabled = false; end
+		if not Config["ESPItems"] then ESP.Enabled = false; return; end
+		for _, label in pairs(Item["ObjectInfo"]:GetChildren()) do
+			if label.ClassName ~= "TextLabel" then continue; end
+			if table.find(Config["ESPItemsList"], label.Text) then ESP.Enabled = true; return; end
+		end
+		ESP.Enabled = false;
 	end
 	
 	function UpdateCollision(Child, Clip)
@@ -691,13 +696,13 @@ local Success, Result = pcall(function()
 			"Gold Bar","Gold Cup","Gold Painting","Gold Plate","Gold Statue","Gold Watch",
 			"Silver Bar","Silver Cup","Silver Painting","Silver Plate","Silver Statue","Silver Watch",
 			-- [ JUNKS ] --
-			"Barrel","Book","Chair","Newspaper","Rope","Teapot","Vase","Wheel",
-			-- [ FUEL ] --
-			"Wanted Poster",
+			"Barrel","Book","Chair","Newspaper","Rope","Teapot","Vase","Wheel","Wanted Poster",
 			-- [ SUPPLIES ] --
 			"Bandage","Snake Oil",
 			-- [ OTHERS ] --
-			"Lightning Rod"
+			"Lightning Rod",
+			-- [ TAGS ] --
+			"Gun","Ammo","Weapon","Corpse","Fuel","Valuable","Junk"
 		};
 	});
 	local ESPEnemies = Interface:CreateToggle("ESP Enemies", { Config = "ESPEnemies"; });
@@ -759,6 +764,16 @@ local Success, Result = pcall(function()
 					if baseplate:FindFirstChild("CenterBaseplate") then
 						repeat task.wait() until baseplate["CenterBaseplate"]:FindFirstChild("Animals");
 						for _, enemy in pairs(baseplate["CenterBaseplate"]["Animals"]:GetChildren()) do UpdateEnemyESP(enemy); end
+					end
+				end
+				for _, safezone in pairs(game.Workspace["SafeZones"]:GetChildren()) do
+					if safezone:FindFirstChild("Buildings") then
+						for _, building in pairs(game.Workspace["StartingZone"]["Buildings"]:GetChildren()) do UpdateCollision(building, Config["NoClip"]); end
+					end
+				end
+				if game.Workspace:FindFirstChild("StartingZone") then
+					if game.Workspace["StartingZone"]:FindFirstChild("Buildings") then
+						for _, building in pairs(game.Workspace["StartingZone"]["Buildings"]:GetChildren()) do UpdateCollision(building, Config["NoClip"]); end
 					end
 				end
 			end)
