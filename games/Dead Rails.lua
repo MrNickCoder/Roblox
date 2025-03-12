@@ -787,14 +787,6 @@ local Success, Result = pcall(function()
 	UserIS:GetPropertyChangedSignal("MouseBehavior"):Connect(function()
 		if UserIS.MouseBehavior == Enum.MouseBehavior.Default then UserInterface.Enabled = true; else UserInterface.Enabled = false; end
 	end);
-	--[[
-	UserIS.InputBegan:Connect(function(input, gameProcessed)
-		if gameProcessed then return end
-		if input.KeyCode == Enum.KeyCode.J then
-			if UserIS.MouseBehavior == Enum.MouseBehavior.Default then UserInterface.Enabled = true; else UserInterface.Enabled = false; end
-		end
-	end)
-	--]]
 	UIButton.MouseButton1Down:Connect(function()
 		heldDown = true;
 		task.spawn(function()
