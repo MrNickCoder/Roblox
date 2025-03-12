@@ -637,15 +637,16 @@ local Success, Result = pcall(function()
 	end
 
 	function UpdateItemsESP(Item)
-		if not Item:FindFirstChild("ObjectInfo") then return; end
 		if Item:FindFirstChild("ESP_Highlight") then Item["ESP_Highlight"]:Destroy(); end
+		if not Item:FindFirstChild("ObjectInfo") then return; end
 		local ESP;
 		if Item:FindFirstChild("ESP_Text") then ESP = Item:FindFirstChild("ESP_Text");
 		else ESP = Interface:CreateESP("Text", { Parent = Item; Text = Item["ObjectInfo"]:FindFirstChild("Title").Text; }); end
 
 		if not Config["ESPItems"] then ESP.Enabled = false; return; end
+		if table.find(Config["ESPItemsList"], Item["ObjectInfo"]["Title"].Text) then ESP.Enabled = true; return; end
 		for _, label in pairs(Item["ObjectInfo"]:GetChildren()) do
-			if label.ClassName ~= "TextLabel" then continue; end
+			if not label.ClassName == "TextLabel" then continue; end
 			if table.find(Config["ESPItemsList"], label.Text) then ESP.Enabled = true; return; end
 		end
 		ESP.Enabled = false;
@@ -781,7 +782,7 @@ local Success, Result = pcall(function()
 	end):Start();
 
 	local ItemsThread = Utility:Thread("Items", function()
-		for _, item in pairs(game.Workspace["RuntimeItems"]:GetChildren()) do task.spawn(function() UpdateItemsESP(item); end) end
+		for _, item in pairs(game.Workspace["RuntimeItems"]:GetChildren()) do UpdateItemsESP(item); end
 	end):Start();
 	
 	UserIS:GetPropertyChangedSignal("MouseBehavior"):Connect(function()
