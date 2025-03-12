@@ -635,17 +635,17 @@ local Success, Result = pcall(function()
 	function UpdateEnemyESP(Enemy)
 		repeat task.wait() until Enemy:FindFirstChild("Humanoid");
 		if not IsHostile(Enemy) then return; end
-		local ESP;
-		if Enemy:FindFirstChild("ESP_Highlight") then ESP = Enemy:FindFirstChild("ESP_Highlight"); ESP.Enabled = Config["ESPEnemies"];
-		else ESP = Interface:CreateESP("Highlight", { Parent = Enemy; Enabled = Config["ESPEnemies"]; FillColor = Color3.fromRGB(255, 0, 0); }); end
+		if Enemy:FindFirstChild("ESP_Highlight") then Enemy["ESP_Highlight"].Enabled = Config["ESPEnemies"];
+		else Interface:CreateESP("Highlight", { Parent = Enemy; Enabled = Config["ESPEnemies"]; FillColor = Color3.fromRGB(255, 0, 0); }); end
 	end
 
 	function UpdateItemsESP(Item)
 		if not Item:FindFirstChild("ObjectInfo") then return; end
-		if Item:FindFirstChild("ESP_Highlight") then Item:FindFirstChild("ESP_Highlight"):Destroy(); end
+		if Item:FindFirstChild("ESP_Highlight") then Item["ESP_Highlight"]:Destroy(); end
 		local ESP;
 		if Item:FindFirstChild("ESP_Text") then ESP = Item:FindFirstChild("ESP_Text");
 		else ESP = Interface:CreateESP("Text", { Parent = Item; Text = Item["ObjectInfo"]:FindFirstChild("Title").Text; }); end
+		
 		if table.find(Config["ESPItemsList"], Item["ObjectInfo"]:FindFirstChild("Title").Text) and Config["ESPItems"] then ESP.Enabled = true;
 		else ESP.Enabled = false; end
 	end
@@ -744,37 +744,26 @@ local Success, Result = pcall(function()
 				for _, enemy in pairs(game.Workspace["RuntimeEnemies"]:GetChildren()) do UpdateEnemyESP(enemy); end
 				for _, building in pairs(game.Workspace["RandomBuildings"]:GetChildren()) do
 					UpdateCollision(building, Config["NoClip"]);
-					task.spawn(function()
-						repeat task.wait() until building:FindFirstChild("ZombiePart") or building:FindFirstChild("StandaloneZombiePart");
-						if building:FindFirstChild("ZombiePart") then for _, enemy in pairs(building["ZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
-						if building:FindFirstChild("StandaloneZombiePart") then for _, enemy in pairs(building["StandaloneZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
-					end)
+					if building:FindFirstChild("ZombiePart") then for _, enemy in pairs(building["ZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
+					if building:FindFirstChild("StandaloneZombiePart") then for _, enemy in pairs(building["StandaloneZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
 				end
 				for _, town in pairs(game.Workspace["Towns"]:GetChildren()) do
-					repeat task.wait() until town:FindFirstChild("Church");
-					UpdateCollision(town["Church"], Config["NoClip"]);
-					repeat task.wait() until town:FindFirstChild("Buildings");
-					for _, building in pairs(town["Buildings"]:GetChildren()) do
-						UpdateCollision(building, Config["NoClip"]);
-						task.spawn(function()
-							repeat task.wait() until building:FindFirstChild("ZombiePart") or building:FindFirstChild("StandaloneZombiePart");
+					if town:FindFirstChild("Church") then UpdateCollision(town["Church"], Config["NoClip"]); end
+					if town:FindFirstChild("Buildings") then
+						for _, building in pairs(town["Buildings"]:GetChildren()) do
+							UpdateCollision(building, Config["NoClip"]);
 							if building:FindFirstChild("ZombiePart") then for _, enemy in pairs(building["ZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
 							if building:FindFirstChild("StandaloneZombiePart") then for _, enemy in pairs(building["StandaloneZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
-						end)
+						end
 					end
-					task.spawn(function()
-						repeat task.wait() until town:FindFirstChild("ZombiePart") or town:FindFirstChild("StandaloneZombiePart");
-						if town:FindFirstChild("ZombiePart") then for _, enemy in pairs(town["ZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
-						if town:FindFirstChild("StandaloneZombiePart") then for _, enemy in pairs(town["StandaloneZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
-					end)
+					if town:FindFirstChild("ZombiePart") then for _, enemy in pairs(town["ZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
+					if town:FindFirstChild("StandaloneZombiePart") then for _, enemy in pairs(town["StandaloneZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
 				end
 				for _, baseplate in pairs(game.Workspace["Baseplates"]:GetChildren()) do
-					task.spawn(function()
-						if baseplate:FindFirstChild("CenterBaseplate") then
-							repeat task.wait() until baseplate["CenterBaseplate"]:FindFirstChild("Animals");
-							for _, enemy in pairs(baseplate["CenterBaseplate"]["Animals"]:GetChildren()) do UpdateEnemyESP(enemy); end
-						end
-					end)
+					if baseplate:FindFirstChild("CenterBaseplate") then
+						repeat task.wait() until baseplate["CenterBaseplate"]:FindFirstChild("Animals");
+						for _, enemy in pairs(baseplate["CenterBaseplate"]["Animals"]:GetChildren()) do UpdateEnemyESP(enemy); end
+					end
 				end
 			end)
 		end
