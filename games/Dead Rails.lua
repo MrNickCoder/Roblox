@@ -768,7 +768,7 @@ local Success, Result = pcall(function()
 				end
 				for _, safezone in pairs(game.Workspace["SafeZones"]:GetChildren()) do
 					if safezone:FindFirstChild("Buildings") then
-						for _, building in pairs(game.Workspace["StartingZone"]["Buildings"]:GetChildren()) do UpdateCollision(building, Config["NoClip"]); end
+						for _, building in pairs(safezone["Buildings"]:GetChildren()) do UpdateCollision(building, Config["NoClip"]); end
 					end
 				end
 				if game.Workspace:FindFirstChild("StartingZone") then
