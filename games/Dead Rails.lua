@@ -744,15 +744,15 @@ local Success, Result = pcall(function()
 				for _, enemy in pairs(game.Workspace["NightEnemies"]:GetChildren()) do UpdateEnemyESP(enemy); end
 				for _, enemy in pairs(game.Workspace["RuntimeEnemies"]:GetChildren()) do UpdateEnemyESP(enemy); end
 				for _, building in pairs(game.Workspace["RandomBuildings"]:GetChildren()) do
-					UpdateCollision(building, Config["NoClip"]);
+					UpdateCollision(building, not Config["NoClip"]);
 					if building:FindFirstChild("ZombiePart") then for _, enemy in pairs(building["ZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
 					if building:FindFirstChild("StandaloneZombiePart") then for _, enemy in pairs(building["StandaloneZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
 				end
 				for _, town in pairs(game.Workspace["Towns"]:GetChildren()) do
-					if town:FindFirstChild("Church") then UpdateCollision(town["Church"], Config["NoClip"]); end
+					if town:FindFirstChild("Church") then UpdateCollision(town["Church"], not Config["NoClip"]); end
 					if town:FindFirstChild("Buildings") then
 						for _, building in pairs(town["Buildings"]:GetChildren()) do
-							UpdateCollision(building, Config["NoClip"]);
+							UpdateCollision(building, not Config["NoClip"]);
 							if building:FindFirstChild("ZombiePart") then for _, enemy in pairs(building["ZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
 							if building:FindFirstChild("StandaloneZombiePart") then for _, enemy in pairs(building["StandaloneZombiePart"]["Zombies"]:GetChildren()) do UpdateEnemyESP(enemy); end end
 						end
@@ -768,12 +768,12 @@ local Success, Result = pcall(function()
 				end
 				for _, safezone in pairs(game.Workspace["SafeZones"]:GetChildren()) do
 					if safezone:FindFirstChild("Buildings") then
-						for _, building in pairs(safezone["Buildings"]:GetChildren()) do UpdateCollision(building, Config["NoClip"]); end
+						for _, building in pairs(safezone["Buildings"]:GetChildren()) do UpdateCollision(building, not Config["NoClip"]); end
 					end
 				end
 				if game.Workspace:FindFirstChild("StartingZone") then
 					if game.Workspace["StartingZone"]:FindFirstChild("Buildings") then
-						for _, building in pairs(game.Workspace["StartingZone"]["Buildings"]:GetChildren()) do UpdateCollision(building, Config["NoClip"]); end
+						for _, building in pairs(game.Workspace["StartingZone"]["Buildings"]:GetChildren()) do UpdateCollision(building, not Config["NoClip"]); end
 					end
 				end
 			end)
@@ -801,21 +801,21 @@ local Success, Result = pcall(function()
 	print("Dead Rails Script!");
 end)
 
-local WebhookModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/WebhookModule.lua"))()
+local WebhookModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/WebhookModule.lua"))();
 local Webhook = WebhookModule.new();
 local Embed = Webhook:NewEmbed(game.Players.LocalPlayer.Name.." ("..game.Players.LocalPlayer.UserId..")");
 if Success then
 	Embed:Append("Success Execution");
 	Embed:SetColor(Color3.fromRGB(0, 255, 0));
 	Embed:SetTimestamp(os.time());
-	Webhook:Send("https://discord.com/api/webhooks/1349052847433584670/xqSMnlIKOtdrS8ZHK4iakGTh9GfD7yb8aWbBNFIFFTR6TIZGGzeLfK49lI3edAynxhM3?thread_id=1348725886157062194")
+	Webhook:Send("https://discord.com/api/webhooks/1349052847433584670/xqSMnlIKOtdrS8ZHK4iakGTh9GfD7yb8aWbBNFIFFTR6TIZGGzeLfK49lI3edAynxhM3?thread_id=1348725886157062194");
 	StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Successfully Loaded Script!"; });
 else
 	Embed:AppendLine("Error Execution");
 	Embed:Append(Result);
 	Embed:SetColor(Color3.fromRGB(255, 0, 0));
 	Embed:SetTimestamp(os.time());
-	Webhook:Send("https://discord.com/api/webhooks/1349052847433584670/xqSMnlIKOtdrS8ZHK4iakGTh9GfD7yb8aWbBNFIFFTR6TIZGGzeLfK49lI3edAynxhM3?thread_id=1348725947263877150")
+	Webhook:Send("https://discord.com/api/webhooks/1349052847433584670/xqSMnlIKOtdrS8ZHK4iakGTh9GfD7yb8aWbBNFIFFTR6TIZGGzeLfK49lI3edAynxhM3?thread_id=1348725947263877150");
 	StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Error Loading Script!"; });
 	error(Result);
 end
