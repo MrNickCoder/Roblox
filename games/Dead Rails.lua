@@ -526,20 +526,28 @@ local Success, Result = pcall(function()
 			Data:Populate(Data.Items);
 			
 			local Info = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut);
-			Data.UI.MouseEnter:Connect(function()
+			if UserIS.KeyboardEnabled and UserIS.MouseEnabled then
+				Data.UI.MouseEnter:Connect(function()
+					Data.UI["Input"]["Input"].Text = "";
+					TweenService:Create(Data.UI["Input"]["Input"], Info, { Size = UDim2.new(0.4, 0, 0.6, 0); }):Play();
+					Data.UI["ListContainer"].Visible = true;
+				end)
+				Data.UI.MouseLeave:Connect(function()
+					Data.UI["Input"]["Input"].Text = "▼";
+					for _, Item in pairs(Data.UI["ListContainer"]["List"]:GetChildren()) do
+						if Item.ClassName ~= "TextButton" then continue; end
+						Item.Visible = true;
+					end
+					TweenService:Create(Data.UI["Input"]["Input"], Info, { Size = UDim2.new(0.2, 0, 0.6, 0); }):Play();
+					Data.UI["ListContainer"].Visible = false;
+				end)
+			end
+			if UserIS.TouchEnabled and not UserIS.KeyboardEnabled and not UserIS.MouseEnabled then
 				Data.UI["Input"]["Input"].Text = "";
-				TweenService:Create(Data.UI["Input"]["Input"], Info, { Size = UDim2.new(0.4, 0, 0.6, 0); }):Play();
+				Data.UI["Input"]["Input"].Size = UDim2.new(0.4, 0, 0.6, 0);
 				Data.UI["ListContainer"].Visible = true;
-			end)
-			Data.UI.MouseLeave:Connect(function()
-				Data.UI["Input"]["Input"].Text = "▼";
-				for _, Item in pairs(Data.UI["ListContainer"]["List"]:GetChildren()) do
-					if Item.ClassName ~= "TextButton" then continue; end
-					Item.Visible = true;
-				end
-				TweenService:Create(Data.UI["Input"]["Input"], Info, { Size = UDim2.new(0.2, 0, 0.6, 0); }):Play();
-				Data.UI["ListContainer"].Visible = false;
-			end)
+			end
+
 			Data.UI["Input"]["Input"]:GetPropertyChangedSignal("Text"):Connect(function()
 				if Data.UI["Input"]["Input"].Text == "▼" then return; end
 				
