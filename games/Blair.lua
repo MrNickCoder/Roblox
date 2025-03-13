@@ -255,12 +255,16 @@ local Success, Result = pcall(function()
 		function CreateESP(Text, Properties)
 			local Data = {}
 			if (Properties.ParentHighlight and Properties.ParentHighlight:FindFirstChild("ESP_Highlight")) then
-				Data.Highlight = Properties.ParentHighlight:FindFirstChild("ESP_Highlight");
+				for _, instance in pairs(Properties.ParentHighlight:GetChildren()) do if instance.ClassName == "Highlight" then instance.Enabled = false; end end
+				Data.Highlight = Properties.ParentHighlight["ESP_Highlight"];
 				Data.Highlight.Enabled = Properties.Enabled;
 			elseif(Properties.Parent and Properties.Parent:FindFirstChild("ESP_Highlight")) then
-				Data.Highlight = Properties.Parent:FindFirstChild("ESP_Highlight");
+				for _, instance in pairs(Properties.Parent:GetChildren()) do if instance.ClassName == "Highlight" then instance.Enabled = false; end end
+				Data.Highlight = Properties.Parent["ESP_Highlight"];
 				Data.Highlight.Enabled = Properties.Enabled;
 			else
+				if Properties.ParentHighlight then for _, instance in pairs(Properties.ParentHighlight:GetChildren()) do if instance.ClassName == "Highlight" then instance.Enabled = false; end end
+				else for _, instance in pairs(Properties.Parent:GetChildren()) do if instance.ClassName == "Highlight" then instance.Enabled = false; end end end
 				Data.Highlight = Utility:Instance("Highlight", {
 					Name = "ESP_Highlight";
 					Parent = Properties.ParentHighlight or Properties.Parent;
@@ -270,11 +274,11 @@ local Success, Result = pcall(function()
 				});
 			end
 			if (Properties.ParentUI and Properties.ParentUI:FindFirstChild("ESP")) then
-				Data.UI = Properties.ParentUI:FindFirstChild("ESP");
+				Data.UI = Properties.ParentUI["ESP"];
 				Data.UI.Enabled = Properties.Enabled;
 				Data.Distance = Data.UI["Distance"];
 			elseif (Properties.Parent and Properties.Parent:FindFirstChild("ESP")) then
-				Data.UI = Properties.Parent:FindFirstChild("ESP");
+				Data.UI = Properties.Parent["ESP"];
 				Data.UI.Enabled = Properties.Enabled;
 				Data.Distance = Data.UI["Distance"];
 			else
@@ -426,6 +430,9 @@ local Success, Result = pcall(function()
 			if GhostESP then GhostESP:Disable(); end
 		end;
 	});
+	if game.Workspace:FindFirstChild("Ghost") then
+		GhostESP = CreateESP("[Ghost]", { ParentUI = game.Workspace["Ghost"]:WaitForChild("Head"); ParentHighlight = game.Workspace["Ghost"]; Color = Color3.fromRGB(255, 0, 0); Enabled = ESP.Enabled; });
+	end
 	game.Workspace.ChildAdded:Connect(function(instance)
 		if instance.Name ~= "Ghost" then return; end
 		GhostESP = CreateESP("[Ghost]", { ParentUI = instance:WaitForChild("Head"); ParentHighlight = instance; Color = Color3.fromRGB(255, 0, 0); Enabled = ESP.Enabled; });
