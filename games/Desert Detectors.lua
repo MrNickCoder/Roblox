@@ -393,8 +393,8 @@ local Success, Result = pcall(function()
     local timeBetween = 0;
 	local heldDown = false;
     local LootThread = Utility:Thread("Loot", function()
-        while task.wait() do
-            for _, Loot in pairs(game.Workspace["Loot"]:GetChildren()) do UpdateESP(Loot); end
+        while task.wait(.1) do
+            pcall(function() for _, Loot in pairs(game.Workspace["Loot"]:GetChildren()) do UpdateESP(Loot); end end)
         end
     end):Start();
 
