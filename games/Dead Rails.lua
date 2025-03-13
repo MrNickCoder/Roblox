@@ -733,7 +733,7 @@ local Success, Result = pcall(function()
 	local timeBetween = 0;
 	local heldDown = false;
 	local UpdaterThread = Utility:Thread("Updater", function()
-		while task.wait() do
+		while task.wait(.1) do
 			pcall(function()
 				Time.Label.Text = RStorage:FindFirstChild("TimeHour").Value
 				Gas.Label.Text = tostring(game.Workspace:FindFirstChild("Train"):FindFirstChild("Fuel").Value);
@@ -748,7 +748,7 @@ local Success, Result = pcall(function()
 	end):Start();
 
 	local GenerationThread = Utility:Thread("Generation", function()
-		while task.wait() do
+		while task.wait(.1) do
 			pcall(function()
 				for _, enemy in pairs(game.Workspace["NightEnemies"]:GetChildren()) do UpdateEnemyESP(enemy); end
 				for _, enemy in pairs(game.Workspace["RuntimeEnemies"]:GetChildren()) do UpdateEnemyESP(enemy); end
@@ -790,7 +790,9 @@ local Success, Result = pcall(function()
 	end):Start();
 
 	local ItemsThread = Utility:Thread("Items", function()
-		for _, item in pairs(game.Workspace["RuntimeItems"]:GetChildren()) do UpdateItemsESP(item); end
+		while task.wait(.1) do
+			for _, item in pairs(game.Workspace["RuntimeItems"]:GetChildren()) do UpdateItemsESP(item); end
+		end
 	end):Start();
 	
 	UserIS:GetPropertyChangedSignal("MouseBehavior"):Connect(function()
