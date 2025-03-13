@@ -498,7 +498,7 @@ local Success, Result = pcall(function()
 					if salt.Name == "SaltStepped" then RoomSalt.Visible = true; end
 				end
 			end
-			if not RoomCrying.Visible and CryingCount > 0 then RoomCrying.Visible = true; end
+			if CryingCount > 0 then RoomCrying.Visible = true; RoomCrying.Text = "Ghost Crying: "..tostring(CryingCount); end
 		end
 	end):Start()
 
