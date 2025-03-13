@@ -353,6 +353,7 @@ local Success, Result = pcall(function()
 	for _, value in pairs({"Ambient", "OutdoorAmbient", "Brightness"}) do SavedLighting[value] = Lighting[value]; end
 	local AtmosphereDensity = Lighting["Atmosphere"].Density
 	local LowestTemp = nil;
+	local CryingCount = 0;
 
 	--------------------------
 	-- [[ USER INTERFACE ]] --
@@ -470,6 +471,7 @@ local Success, Result = pcall(function()
 	local RoomTemp = Room.AddInfo("Room Temp");
 	local RoomWater = Room.AddInfo("Water Running");
 	local RoomSalt = Room.AddInfo("Salt Stepped"); RoomSalt.Visible = false;
+	local RoomCrying = Room.AddInfo("Ghost Crying"); RoomCrying.Visible = false;
 	local RoomThread = Utility:Thread("Room", function()
 		while task.wait() do
 			local LowestTempRoom = nil;
@@ -496,8 +498,14 @@ local Success, Result = pcall(function()
 					if salt.Name == "SaltStepped" then RoomSalt.Visible = true; end
 				end
 			end
+			if not RoomCrying.Visible and CryingCount > 0 then RoomCrying.Visible = true; end
 		end
 	end):Start()
+
+	game.Workspace["Map"].DescendantAdded:Connect(function(instance)
+		if instance.ClassName ~= "Sound" then return; end
+		if instance.Name == "GhostCrying" then CryingCount = CryingCount + 1; end
+	end)
 
 	-------------------
 	-- [[[ GHOST ]]] --
@@ -544,6 +552,7 @@ local Success, Result = pcall(function()
 			end
 		end
 	end):Start()
+
 	local blinkConnection;
 	game.Workspace.ChildAdded:Connect(function(instance)
 		if instance.Name ~= "Ghost" then return; end
@@ -637,7 +646,7 @@ local Success, Result = pcall(function()
 			if PlayerGui:FindFirstChild("Statusifier") then PlayerGui["Statusifier"]["Container"]["UIScale"].Scale = tonumber(SideStatusScale.Text) or 1; end
 		end
 	end):Start()
-	
+
 	UserIS.InputBegan:Connect(function(input, gameProcessed)
 		if gameProcessed then return end
 		if input.KeyCode == Enum.KeyCode.LeftShift then Sprinting = true; end
