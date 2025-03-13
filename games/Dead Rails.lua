@@ -651,6 +651,8 @@ local Success, Result = pcall(function()
 		if Item:FindFirstChild("ESP_Text") then ESP = Item:FindFirstChild("ESP_Text");
 		else ESP = Interface:CreateESP("Text", { Parent = Item; Text = Item["ObjectInfo"]:FindFirstChild("Title").Text; }); end
 
+		if table.find({"Sheet Metal","Newspaper","Wanted Poster"}, Item["ObjectInfo"]["Title"].Text) then UpdateCollision(Item, not Config["NoClip"]); end
+		
 		if not Config["ESPItems"] then ESP.Enabled = false; return; end
 		if table.find(Config["ESPItemsList"], Item["ObjectInfo"]["Title"].Text) then ESP.Enabled = true; return; end
 		for _, label in pairs(Item["ObjectInfo"]:GetChildren()) do
