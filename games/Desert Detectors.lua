@@ -405,6 +405,7 @@ local Success, Result = pcall(function()
 	]]
 	game.Workspace["Loot"].ChildAdded:Connect(UpdateESP);
 	game.Workspace["Loot"].ChildRemoved:Connect(UpdateESP);
+	UpdateESP();
 
     UserIS.InputBegan:Connect(function(input, gameProcessed)
         if gameProcessed then return; end
