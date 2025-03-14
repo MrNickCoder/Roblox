@@ -373,8 +373,8 @@ local Success, Result = pcall(function()
 			if Loot:FindFirstChild("ESP") then ESP = Loot["ESP"]
 			else ESP = Interface:CreateESP({ Parent = Loot; FillColor = Color3.fromRGB(0, 220, 0); }); end
 
-			if not Config["ESP"] then ESP.Enabled = false; return; end
-			if table.find(Config["ESPList"], Loot.Name) then ESP.Enabled = true; return; end
+			if not Config["ESP"] then ESP.Enabled = false; continue; end
+			if table.find(Config["ESPList"], Loot.Name) then ESP.Enabled = true; continue; end
 			ESP.Enabled = false;
 		end
     end
