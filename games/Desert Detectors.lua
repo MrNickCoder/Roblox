@@ -364,8 +364,8 @@ local Success, Result = pcall(function()
     ----------------------
 	-- [[ INITIALIZE ]] --
 	----------------------
-    local Items = {};
-    for _, item in pairs(RStorage["Objects"]:GetChildren()) do table.insert(Items, item.Name); end
+    local ItemList = {};
+    for _, item in pairs(RStorage["Objects"]:GetChildren()) do table.insert(ItemList, item.Name); end
 
     local UpdateESP = function()
 		for _, Loot in pairs(game.Workspace["Loot"]:GetChildren()) do 
@@ -374,8 +374,8 @@ local Success, Result = pcall(function()
 			else ESP = Interface:CreateESP({ Parent = Loot; FillColor = Color3.fromRGB(0, 220, 0); }); end
 
 			if not Config["ESP"] then ESP.Enabled = false; continue; end
-			if table.find(Config["ESPList"], Loot.Name) then ESP.Enabled = true; continue; end
-			ESP.Enabled = false;
+			if not table.find(Config["ESPList"], Loot.Name) then ESP.Enabled = false; continue; end
+			ESP.Enabled = true;
 		end
     end
 
@@ -386,7 +386,7 @@ local Success, Result = pcall(function()
     local ESPList = Interface:CreateDropdown("ESP List", {
 		Config = "ESPList";
 		Default = {};
-		Items = Items;
+		Items = ItemList;
 	}, UpdateESP);
 
     ------------------
@@ -394,8 +394,13 @@ local Success, Result = pcall(function()
 	------------------
     local timeBetween = 0;
 	local heldDown = false;
-    game.Workspace["Loot"].ChildAdded:Connect(UpdateESP);
-	game.Workspace["Loot"].ChildRemoved:Connect(UpdateESP);
+    game.Workspace["Loot"].ChildAdded:Connect(function(Loot)
+		local ESP = Interface:CreateESP({ Parent = Loot; FillColor = Color3.fromRGB(0, 220, 0); });
+
+		if not Config["ESP"] then ESP.Enabled = false; return; end
+		if not table.find(Config["ESPList"], Loot.Name) then ESP.Enabled = false; return; end
+		ESP.Enabled = true;
+	end)
 
     UserIS.InputBegan:Connect(function(input, gameProcessed)
         if gameProcessed then return; end
