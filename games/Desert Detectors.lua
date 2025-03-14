@@ -394,6 +394,7 @@ local Success, Result = pcall(function()
 	------------------
     local timeBetween = 0;
 	local heldDown = false;
+	--[[
     game.Workspace["Loot"].ChildAdded:Connect(function(Loot)
 		local ESP = Interface:CreateESP({ Parent = Loot; FillColor = Color3.fromRGB(0, 220, 0); });
 
@@ -401,6 +402,9 @@ local Success, Result = pcall(function()
 		if not table.find(Config["ESPList"], Loot.Name) then ESP.Enabled = false; return; end
 		ESP.Enabled = true;
 	end)
+	]]
+	game.Workspace["Loot"].ChildAdded:Connect(UpdateESP);
+	game.Workspace["Loot"].ChildRemoved:Connect(UpdateESP);
 
     UserIS.InputBegan:Connect(function(input, gameProcessed)
         if gameProcessed then return; end
