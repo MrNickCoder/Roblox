@@ -367,36 +367,35 @@ local Success, Result = pcall(function()
     local Items = {};
     for _, item in pairs(RStorage["Objects"]:GetChildren()) do table.insert(Items, item.Name); end
 
-    function UpdateESP(Loot)
-        local ESP;
-        if Loot:FindFirstChild("ESP") then ESP = Loot["ESP"]
-        else ESP = Interface:CreateESP({ Parent = Loot; FillColor = Color3.fromRGB(0, 220, 0); }); end
+    local UpdateESP = function()
+		for _, Loot in pairs(game.Workspace["Loot"]:GetChildren()) do 
+			local ESP;
+			if Loot:FindFirstChild("ESP") then ESP = Loot["ESP"]
+			else ESP = Interface:CreateESP({ Parent = Loot; FillColor = Color3.fromRGB(0, 220, 0); }); end
 
-        if not Config["ESP"] then ESP.Enabled = false; return; end
-        if table.find(Config["ESPList"], Loot.Name) then ESP.Enabled = true; return; end
-        ESP.Enabled = false;
+			if not Config["ESP"] then ESP.Enabled = false; return; end
+			if table.find(Config["ESPList"], Loot.Name) then ESP.Enabled = true; return; end
+			ESP.Enabled = false;
+		end
     end
 
     --------------------------
 	-- [[ USER INTERFACE ]] --
 	--------------------------
-    local ESP = Interface:CreateToggle("ESP", { Config = "ESP"; });
+    local ESP = Interface:CreateToggle("ESP", { Config = "ESP"; }, { On = UpdateESP; Off = UpdateESP; });
     local ESPList = Interface:CreateDropdown("ESP List", {
 		Config = "ESPList";
 		Default = {};
 		Items = Items;
-	});
+	}, UpdateESP);
 
     ------------------
 	-- [[ EVENTS ]] --
 	------------------
     local timeBetween = 0;
 	local heldDown = false;
-    local LootThread = Utility:Thread("Loot", function()
-        while task.wait(.1) do
-            pcall(function() for _, Loot in pairs(game.Workspace["Loot"]:GetChildren()) do UpdateESP(Loot); end end)
-        end
-    end):Start();
+    game.Workspace["Loot"].ChildAdded:Connect(UpdateESP);
+	game.Workspace["Loot"].ChildRemoved:Connect(UpdateESP);
 
     UserIS.InputBegan:Connect(function(input, gameProcessed)
         if gameProcessed then return; end
