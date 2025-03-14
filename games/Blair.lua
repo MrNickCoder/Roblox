@@ -358,6 +358,7 @@ local Success, Result = pcall(function()
 	local AtmosphereDensity = Lighting["Atmosphere"].Density
 	local LowestTemp = nil;
 	local CryingCount = 0;
+	local blinkConnection;
 
 	--------------------------
 	-- [[ USER INTERFACE ]] --
@@ -561,8 +562,15 @@ local Success, Result = pcall(function()
 			end
 		end
 	end):Start()
-
-	local blinkConnection;
+	if game.Workspace:FindFirstChild("Ghost") then
+		local saveStamp = tick();
+		pcall(function()
+			blinkConnection = game.Workspace["Ghost"]:WaitForChild("Head"):GetPropertyChangedSignal("Transparency"):Connect(function()
+				GhostBlink.Text = "Blink: ".. (math.floor((tick() - saveStamp) * 1000) / 1000) .."s"
+				saveStamp = tick();
+			end);
+		end);
+	end
 	game.Workspace.ChildAdded:Connect(function(instance)
 		if instance.Name ~= "Ghost" then return; end
 		local saveStamp = tick();
