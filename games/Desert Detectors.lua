@@ -161,20 +161,24 @@ local Success, Result = pcall(function()
 				Data.Enabled = Value;
 				local Info = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut);
 				if Data.Enabled then
-					pcall(function()
-						On();
-						TweenService:Create(Data.UI["Input"]["Button"], Info, {
-							Position = UDim2.new(0.5, 2, 0, 2);
-							BackgroundColor3 = Color3.fromRGB(0, 255, 0);
-						}):Play();
+					task.spawn(function()
+						pcall(function()
+							On();
+							TweenService:Create(Data.UI["Input"]["Button"], Info, {
+								Position = UDim2.new(0.5, 2, 0, 2);
+								BackgroundColor3 = Color3.fromRGB(0, 255, 0);
+							}):Play();
+						end)
 					end)
 				else
-					pcall(function()
-						Off();
-						TweenService:Create(Data.UI["Input"]["Button"], Info, {
-							Position = UDim2.new(0, 2, 0, 2);
-							BackgroundColor3 = Color3.fromRGB(255, 0, 0);
-						}):Play();
+					task.spawn(function()
+						pcall(function()
+							Off();
+							TweenService:Create(Data.UI["Input"]["Button"], Info, {
+								Position = UDim2.new(0, 2, 0, 2);
+								BackgroundColor3 = Color3.fromRGB(255, 0, 0);
+							}):Play();
+						end)
 					end)
 				end
 				if Options.Config then
@@ -386,7 +390,7 @@ local Success, Result = pcall(function()
     local ESPList = Interface:CreateDropdown("ESP List", {
 		Config = "ESPList";
 		Default = {};
-		Items = ItemList;
+		Items = Items;
 	}, UpdateESP);
 
     ------------------
@@ -394,7 +398,6 @@ local Success, Result = pcall(function()
 	------------------
     local timeBetween = 0;
 	local heldDown = false;
-	--[[
     game.Workspace["Loot"].ChildAdded:Connect(function(Loot)
 		local ESP = Interface:CreateESP({ Parent = Loot; FillColor = Color3.fromRGB(0, 220, 0); });
 
@@ -402,9 +405,6 @@ local Success, Result = pcall(function()
 		if not table.find(Config["ESPList"], Loot.Name) then ESP.Enabled = false; return; end
 		ESP.Enabled = true;
 	end)
-	]]
-	game.Workspace["Loot"].ChildAdded:Connect(UpdateESP);
-	game.Workspace["Loot"].ChildRemoved:Connect(UpdateESP);
 	UpdateESP();
 
     UserIS.InputBegan:Connect(function(input, gameProcessed)

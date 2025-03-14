@@ -209,20 +209,24 @@ local Success, Result = pcall(function()
 				Data.Enabled = Value;
 				local Info = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut);
 				if Data.Enabled then
-					pcall(function()
-						On();
-						TweenService:Create(Data.UI["Input"]["Button"], Info, {
-							Position = UDim2.new(0.5, 2, 0, 2);
-							BackgroundColor3 = Color3.fromRGB(0, 255, 0);
-						}):Play();
+					task.spawn(function()
+						pcall(function()
+							On();
+							TweenService:Create(Data.UI["Input"]["Button"], Info, {
+								Position = UDim2.new(0.5, 2, 0, 2);
+								BackgroundColor3 = Color3.fromRGB(0, 255, 0);
+							}):Play();
+						end)
 					end)
 				else
-					pcall(function()
-						Off();
-						TweenService:Create(Data.UI["Input"]["Button"], Info, {
-							Position = UDim2.new(0, 2, 0, 2);
-							BackgroundColor3 = Color3.fromRGB(255, 0, 0);
-						}):Play();
+					task.spawn(function()
+						pcall(function()
+							Off();
+							TweenService:Create(Data.UI["Input"]["Button"], Info, {
+								Position = UDim2.new(0, 2, 0, 2);
+								BackgroundColor3 = Color3.fromRGB(255, 0, 0);
+							}):Play();
+						end)
 					end)
 				end
 				if Options.Config then
