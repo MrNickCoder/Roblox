@@ -182,14 +182,14 @@ local Success, Result = pcall(function()
 
 			Data:Set(Data.Enabled);
 			Data.Button.MouseButton1Down:Connect(function() Data:Set(not Data.Enabled); end)
-			if Keybind ~= nil then
-				if UserIS.KeyboardEnabled and UserIS.MouseEnabled and not UserIS.TouchEnabled then
+			if UserIS.KeyboardEnabled and UserIS.MouseEnabled and not UserIS.TouchEnabled then
+				if Keybind ~= nil then
 					Data.Button["TextLabel"].Text = Name .." [".. Keybind.Name .."]";
+					UserIS.InputBegan:Connect(function(input, gameProcessed)
+						if gameProcessed then return; end
+						if input.KeyCode == Keybind then Data:Set(not Data.Enabled); end
+					end)
 				end
-				UserIS.InputBegan:Connect(function(input, gameProcessed)
-					if gameProcessed then return; end
-					if input.KeyCode == Keybind then Data:Set(not Data.Enabled);end
-				end)
 			end
 
 			return Data;
