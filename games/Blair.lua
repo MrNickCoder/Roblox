@@ -179,8 +179,8 @@ local Success, Result = pcall(function()
 				if Data.Enabled then pcall(function() On(); Data.Toggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0); end)
 				else pcall(function() Off(); Data.Toggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0); end) end
 			end
-
 			Data:Set(Data.Enabled);
+			
 			Data.Button.MouseButton1Down:Connect(function() Data:Set(not Data.Enabled); end)
 			if UserIS.KeyboardEnabled and UserIS.MouseEnabled and not UserIS.TouchEnabled then
 				if Keybind ~= nil then
