@@ -207,6 +207,10 @@ local Success, Result = pcall(function()
 			
 			function Data:Set(Value)
 				Data.Enabled = Value;
+				if Options.Config then
+					Config[Options.Config] = Data.Enabled;
+					Utility:SaveConfig(Config, Directory, File_Name);
+				end
 				local Info = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut);
 				if Data.Enabled then
 					task.spawn(function()
@@ -228,10 +232,6 @@ local Success, Result = pcall(function()
 							}):Play();
 						end)
 					end)
-				end
-				if Options.Config then
-					Config[Options.Config] = Data.Enabled;
-					Utility:SaveConfig(Config, Directory, File_Name);
 				end
 			end
 			
@@ -294,12 +294,12 @@ local Success, Result = pcall(function()
 			
 			function Data:Set(Value)
 				Data.Value = Value;
-				Data.UI["Input"]["Box"].Text = Value
-				Callback();
+				Data.UI["Input"]["Box"].Text = Value;
 				if Options.Config then
 					Config[Options.Config] = Data.Value;
 					Utility:SaveConfig(Config, Directory, File_Name);
 				end
+				Callback();
 			end
 			
 			Data.UI["Input"]["Box"].FocusLost:Connect(function() Data:Set(Data.UI["Input"]["Box"].Text); end)
@@ -380,11 +380,11 @@ local Success, Result = pcall(function()
 			function Data:Set(Value)
 				Data.Value = Value;
 				Data.UI["TextBox"]["Input"]["Box"].Text = tostring(Value);
-				Callback(Value);
 				if Options.Config then
 					Config[Options.Config] = Data.Value;
 					Utility:SaveConfig(Config, Directory, File_Name);
 				end
+				Callback(Value);
 			end
 			
 			local held = false;
@@ -519,11 +519,11 @@ local Success, Result = pcall(function()
 							table.insert(Data.Value, Item);
 							TweenService:Create(Button, Info, { BackgroundColor3 = Color3.fromRGB(0, 255, 0); }):Play();
 						end
-						Callback(Data.Value);
 						if Options.Config then
 							Config[Options.Config] = Data.Value;
 							Utility:SaveConfig(Config, Directory, File_Name);
 						end
+						Callback(Data.Value);
 					end)
 				end
 			end
@@ -648,37 +648,29 @@ local Success, Result = pcall(function()
 		else Interface:CreateESP("Highlight", { Parent = Enemy; Enabled = Config["ESPEnemies"]; FillColor = Color3.fromRGB(255, 0, 0); }); end
 	end
 
-	function UpdateItemsESP(Item)
-		if Item:FindFirstChild("ESP_Highlight") then Item["ESP_Highlight"]:Destroy(); end
-		if not Item:FindFirstChild("ObjectInfo") then return; end
+	function UpdateItemsESP(Item, Enabled)
+		if Item:WaitForChild("ESP_Highlight", 1) then Item["ESP_Highlight"]:Destroy(); end
+		if not Item:WaitForChild("ObjectInfo", 1) then return; end
 		local ESP;
-		if Item:FindFirstChild("ESP_Text") then ESP = Item:FindFirstChild("ESP_Text");
-		else ESP = Interface:CreateESP("Text", { Parent = Item; Text = Item["ObjectInfo"]:FindFirstChild("Title").Text; }); end
-
-		if table.find({"Sheet Metal","Newspaper","Wanted Poster"}, Item["ObjectInfo"]["Title"].Text) then UpdateCollision(Item, not Config["NoClip"]); end
+		if Item:WaitForChild("ESP_Text", 1) then ESP = Item["ESP_Text"];
+		else ESP = Interface:CreateESP("Text", { Parent = Item; Text = Item["ObjectInfo"]:WaitForChild("Title", 1).Text; }); end
 		
-		if not Config["ESPItems"] then ESP.Enabled = false; return; end
-		if table.find(Config["ESPItemsList"], Item["ObjectInfo"]["Title"].Text) then ESP.Enabled = true; return; end
-		for _, label in pairs(Item["ObjectInfo"]:GetChildren()) do
-			if not label.ClassName == "TextLabel" then continue; end
-			if table.find(Config["ESPItemsList"], label.Text) then ESP.Enabled = true; return; end
+		if Enabled or Config["ESPItems"] then
+			if table.find(Config["ESPItemsList"], Item["ObjectInfo"]["Title"].Text) then ESP.Enabled = true; return; end
+			for _, label in pairs(Item["ObjectInfo"]:GetChildren()) do
+				if not label.ClassName == "TextLabel" then continue; end
+				if table.find(Config["ESPItemsList"], label.Text) then ESP.Enabled = true; return; end
+			end
 		end
 		ESP.Enabled = false;
 	end
 	
-	function UpdateCollision(Child, Clip)
-		if not string.find(Child.Name, "ZombiePart") then
-			if not table.find({"Ceiling","Floor","PorchFloor","Roof","RoofSlant","FireRoof"}, Child.Name) then
-				if table.find({"Part","MeshPart","UnionOperation"}, Child.ClassName) then Child.CanCollide = Clip;; end
-			end
-		end
-		for _, object in pairs(Child:GetChildren()) do
-			if string.find(object.Name, "ZombiePart") then continue; end
-			if #object:GetChildren() > 0 then UpdateCollision(object, Clip); end
-			if table.find({"Ceiling","Floor","PorchFloor","Roof","RoofSlant","FireRoof"}, object.Name) then continue; end
-			if not table.find({"Part","MeshPart","UnionOperation"}, object.ClassName) then continue; end
-			object.CanCollide = Clip;
-		end
+	function UpdateCollision(Instance, Clip)
+		if not string.find(Child.Name, "ZombiePart") then return; end
+		if #Instance:GetChildren() > 0 then for _, Child in pairs(Instance:GetChildren()) do UpdateCollision(Child, Clip); end end
+		if table.find({"Ceiling","Floor","PorchFloor","Roof","RoofSlant","FireRoof"}, Instance.Name) then return; end
+		if not table.find({"Part","MeshPart","UnionOperation"}, Instance.ClassName) then return; end
+		Instance.CanCollide = Clip;
 	end
 	
 	--------------------------
@@ -689,7 +681,10 @@ local Success, Result = pcall(function()
 	
 	local NoClip = Interface:CreateToggle("No Clip", { Config = "NoClip"; Keybind = Enum.KeyCode.X; });
 	
-	local ESPItems = Interface:CreateToggle("ESP Items", { Config = "ESPItems"; });
+	local ESPItems = Interface:CreateToggle("ESP Items", { Config = "ESPItems"; }, {
+		On = function() for _, Item in pairs(game.Workspace["RuntimeItems"]:GetChildren()) do UpdateItemsESP(Item, true); end end;
+		Off = function() for _, Item in pairs(game.Workspace["RuntimeItems"]:GetChildren()) do UpdateItemsESP(Item, false); end end;
+	});
 	local ESPItemsList = Interface:CreateDropdown("ESP Items List", {
 		Config = "ESPItemsList";
 		Default = {};
@@ -709,7 +704,7 @@ local Success, Result = pcall(function()
 			-- [ AMMUNITION ] --
 			"Shotgun Shells","Rifle Ammo","Revolver Ammo","Turret Ammo",
 			-- [ VALUABLES ] --
-			"Bond","Money Bag",
+			"Treasure Bonds","Money Bag",
 			"Banjo","Camera",
 			"Coal","Sheet Metal","Barbed Wire","Lantern","Saddle",
 			"Stone Statue","Wooden Painting",
@@ -724,7 +719,7 @@ local Success, Result = pcall(function()
 			-- [ TAGS ] --
 			"Gun","Ammo","Weapon","Corpse","Fuel","Valuable","Junk"
 		};
-	});
+	}, function() for _, Item in pairs(game.Workspace["RuntimeItems"]:GetChildren()) do UpdateItemsESP(Item, ESPItems.Enabled); end end);
 	local ESPEnemies = Interface:CreateToggle("ESP Enemies", { Config = "ESPEnemies"; });
 	
 	local Status = Interface:CreateToggle("Status", { Config = "Status"; }, {
@@ -761,6 +756,9 @@ local Success, Result = pcall(function()
 	local GenerationThread = Utility:Thread("Generation", function()
 		while task.wait(.1) do
 			pcall(function()
+				for _, item in pairs(game.Workspace["RuntimeItems"]:GetChildren()) do
+					if table.find({"Sheet Metal","Newspaper","Wanted Poster"}, item["ObjectInfo"]["Title"].Text) then UpdateCollision(item, not Config["NoClip"]); end
+				end
 				for _, enemy in pairs(game.Workspace["NightEnemies"]:GetChildren()) do UpdateEnemyESP(enemy); end
 				for _, enemy in pairs(game.Workspace["RuntimeEnemies"]:GetChildren()) do UpdateEnemyESP(enemy); end
 				for _, building in pairs(game.Workspace["RandomBuildings"]:GetChildren()) do
@@ -800,12 +798,15 @@ local Success, Result = pcall(function()
 		end
 	end):Start();
 
+	--[[
 	local ItemsThread = Utility:Thread("Items", function()
 		while task.wait(.1) do
 			for _, item in pairs(game.Workspace["RuntimeItems"]:GetChildren()) do UpdateItemsESP(item); end
 		end
 	end):Start();
-	
+	--]]
+	game.Workspace["RuntimeItems"].ChildAdded:Connect(function(Item) UpdateItemsESP(Item, ESPItems.Enabled); end)
+
 	UserIS:GetPropertyChangedSignal("MouseBehavior"):Connect(function()
 		if UserIS.MouseBehavior == Enum.MouseBehavior.Default then UserInterface.Enabled = true; else UserInterface.Enabled = false; end
 	end);
