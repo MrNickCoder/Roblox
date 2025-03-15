@@ -610,7 +610,9 @@ local Success, Result = pcall(function()
 			local EvidenceThread = Utility:Thread("Evidence", function()
 				while task.wait() do
 					if not Evidences["EMF Level 5"].Visible then
-						
+						if not game.Workspace:FindFirstChild("Ghost") then
+							
+						end
 					end
 					if not Evidences["Ultraviolet"].Visible and #game.Workspace["Map"]["Prints"]:GetChildren() > 0 then Evidences["Ultraviolet"].Visible = true; end
 					if not Evidences["Freezing Temp."].Visible then
@@ -628,6 +630,11 @@ local Success, Result = pcall(function()
 							if Player.Character then FindSpiritBox(Player.Character); end
 						end
 						FindSpiritBox(game.Workspace["Map"]["Items"]);
+					end
+					if not Evidences["SLS Camera"].Visible then
+						if not game.Workspace:FindFirstChild("Ghost") then
+							
+						end
 					end
 				end
 			end):Start()
