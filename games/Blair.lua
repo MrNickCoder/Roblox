@@ -170,23 +170,25 @@ local Success, Result = pcall(function()
 				return Control
 			end;
 			
-			Data.Set = function(Value)
+			function Data:Set(Value)
 				Data.Enabled = Value;
-				if Data.Enabled then pcall(function() On(); Data.Toggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0); end)
-				else pcall(function() Off(); Data.Toggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0); end) end
 				if Options.Config then
 					Config[Options.Config] = Data.Enabled;
 					Utility:SaveConfig(Config, Directory, File_Name);
 				end
+				if Data.Enabled then pcall(function() On(); Data.Toggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0); end)
+				else pcall(function() Off(); Data.Toggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0); end) end
 			end
 
-			Data.Set(Data.Enabled);
-			Data.Button.MouseButton1Down:Connect(function() Data.Set(not Data.Enabled); end)
+			Data:Set(Data.Enabled);
+			Data.Button.MouseButton1Down:Connect(function() Data:Set(not Data.Enabled); end)
 			if Keybind ~= nil then
-				Data.Button["TextLabel"].Text = Name .." [".. Keybind.Name .."]";
+				if UserIS.KeyboardEnabled and UserIS.MouseEnabled and not UserIS.TouchEnabled then
+					Data.Button["TextLabel"].Text = Name .." [".. Keybind.Name .."]";
+				end
 				UserIS.InputBegan:Connect(function(input, gameProcessed)
 					if gameProcessed then return; end
-					if input.KeyCode == Keybind then Data.Set(not Data.Enabled);end
+					if input.KeyCode == Keybind then Data:Set(not Data.Enabled);end
 				end)
 			end
 
