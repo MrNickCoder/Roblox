@@ -667,7 +667,11 @@ local Success, Result = pcall(function()
 	end
 	
 	function UpdateCollision(Child, Clip)
-		if table.find({"Part","MeshPart","UnionOperation"}, Child.ClassName) then Child.CanCollid = Clip; end
+		if not string.find(Child.Name, "ZombiePart") then
+			if not table.find({"Ceiling","Floor","PorchFloor","Roof","RoofSlant","FireRoof"}, Child.Name) then
+				if table.find({"Part","MeshPart","UnionOperation"}, Child.ClassName) then Child.CanCollide = Clip;; end
+			end
+		end
 		for _, object in pairs(Child:GetChildren()) do
 			if string.find(object.Name, "ZombiePart") then continue; end
 			if #object:GetChildren() > 0 then UpdateCollision(object, Clip); end
