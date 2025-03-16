@@ -454,14 +454,14 @@ local Success, Result = pcall(function()
 	local Objects = CreateInfo("Cursed Object");
 	task.spawn(function()
 		pcall(function()
-			if game.Workspace:WaitForChild("SummoningCircle", 5) then Objects.AddInfo("Summoning Circle"); end
-			if game.Workspace:WaitForChild("Spirit Board", 5) then Objects.AddInfo("Spirit Board"); end
-			if game.Workspace["Map"]["Items"]:WaitForChild("Tarot Cards", 5) then Objects.AddInfo("Tarot Cards"); end
+			if game.Workspace:WaitForChild("SummoningCircle", 2) then Objects.AddInfo("Summoning Circle"); end
+			if game.Workspace:WaitForChild("Spirit Board", 2) then Objects.AddInfo("Spirit Board"); end
+			if game.Workspace["Map"]["Items"]:WaitForChild("Tarot Cards", 2) then Objects.AddInfo("Tarot Cards"); end
 			for _, Player in pairs(Players:GetChildren()) do
 				if Player.Backpack:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); break; end
 				if Player.Character and Player.Character:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); break; end
 			end
-			if game.Workspace["Map"]["Items"]:WaitForChild("Music Box", 5) then Objects.AddInfo("Music Box"); end
+			if game.Workspace["Map"]["Items"]:WaitForChild("Music Box", 2) then Objects.AddInfo("Music Box"); end
 			for _, Player in pairs(Players:GetChildren()) do
 				if Player.Backpack:FindFirstChild("Music Box") then Objects.AddInfo("Music Box"); break; end
 				if Player.Character and Player.Character:FindFirstChild("Music Box") then Objects.AddInfo("Music Box"); break; end
