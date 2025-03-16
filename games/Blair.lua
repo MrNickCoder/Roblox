@@ -258,16 +258,33 @@ local Success, Result = pcall(function()
 		function CreateESP(Text, Properties)
 			local Data = {}
 			if (Properties.ParentHighlight and Properties.ParentHighlight:FindFirstChild("ESP_Highlight")) then
-				for _, instance in pairs(Properties.ParentHighlight:GetChildren()) do if instance.ClassName == "Highlight" then instance.Enabled = false; end end
+				for _, instance in pairs(Properties.ParentHighlight:GetChildren()) do
+					if instance.ClassName ~= "Highlight" then continue; end
+					if instance.Name == "ESP_Highlight" then continue; end
+					instance:Destroy();
+				end
 				Data.Highlight = Properties.ParentHighlight["ESP_Highlight"];
 				Data.Highlight.Enabled = Properties.Enabled;
 			elseif(Properties.Parent and Properties.Parent:FindFirstChild("ESP_Highlight")) then
-				for _, instance in pairs(Properties.Parent:GetChildren()) do if instance.ClassName == "Highlight" then instance.Enabled = false; end end
+				for _, instance in pairs(Properties.Parent:GetChildren()) do
+					if instance.ClassName ~= "Highlight" then continue; end
+					if instance.Name == "ESP_Highlight" then continue; end
+					instance:Destroy();
+				end
 				Data.Highlight = Properties.Parent["ESP_Highlight"];
 				Data.Highlight.Enabled = Properties.Enabled;
 			else
-				if Properties.ParentHighlight then for _, instance in pairs(Properties.ParentHighlight:GetChildren()) do if instance.ClassName == "Highlight" then instance.Enabled = false; end end
-				else for _, instance in pairs(Properties.Parent:GetChildren()) do if instance.ClassName == "Highlight" then instance.Enabled = false; end end end
+				if Properties.ParentHighlight then
+					for _, instance in pairs(Properties.ParentHighlight:GetChildren()) do
+						if instance.ClassName ~= "Highlight" then continue; end
+						instance:Destroy();
+					end
+				else
+					for _, instance in pairs(Properties.Parent:GetChildren()) do
+						if instance.ClassName ~= "Highlight" then continue; end
+						instance:Destroy();
+					end
+				end
 				Data.Highlight = Utility:Instance("Highlight", {
 					Name = "ESP_Highlight";
 					Parent = Properties.ParentHighlight or Properties.Parent;
@@ -361,6 +378,7 @@ local Success, Result = pcall(function()
 	local AtmosphereDensity = Lighting["Atmosphere"].Density
 	local LowestTemp = nil;
 	local CryingCount = 0;
+	local DoorCount = 0;
 	local blinkConnection;
 
 	--------------------------
@@ -419,7 +437,7 @@ local Success, Result = pcall(function()
 	local GeneratorESP = CreateESP("[Generator]", { Parent = game.Workspace["Map"]["Generators"]:GetChildren()[1]; Color = Color3.fromRGB(255, 16, 240); });
 	local GhostESP = nil;
 	if game.Workspace:FindFirstChild("Ghost") then
-		if game.Workspace["Ghost"]:FindFirstChild("Highlight") then game.Workspace["Ghost"]["Highlight"]:Destroy(); end
+		if game.Workspace["Ghost"]:WaitForChild("Highlight", 1) then game.Workspace["Ghost"]["Highlight"]:Destroy(); end
 		GhostESP = CreateESP("[Ghost]", { ParentUI = game.Workspace["Ghost"]:WaitForChild("Head"); ParentHighlight = game.Workspace["Ghost"]; Color = Color3.fromRGB(255, 0, 0); });
 	end
 	
@@ -435,11 +453,6 @@ local Success, Result = pcall(function()
 			if GhostESP then GhostESP:Disable(); end
 		end;
 	});
-	game.Workspace.ChildAdded:Connect(function(instance)
-		if instance.Name ~= "Ghost" then return; end
-		if game.Workspace["Ghost"]:FindFirstChild("Highlight") then game.Workspace["Ghost"]["Highlight"]:Destroy(); end
-		GhostESP = CreateESP("[Ghost]", { ParentUI = instance:WaitForChild("Head"); ParentHighlight = instance; Color = Color3.fromRGB(255, 0, 0); Enabled = ESP.Enabled; });
-	end)
 	
 	local Freecam = CreateSettings("Freecam", { Config = "Freecam"; });
 
@@ -507,12 +520,14 @@ local Success, Result = pcall(function()
 				end
 			end
 			if CryingCount > 0 then RoomCrying.Visible = true; RoomCrying.Text = "Ghost Crying: "..tostring(CryingCount); end
+			if DoorCount > 0 then RoomDoor.Visible = true; RoomDoor.Text = "Door Interact: "..tostring(DoorCount); end
 		end
 	end):Start()
 
 	game.Workspace["Map"].DescendantAdded:Connect(function(instance)
 		if instance.ClassName ~= "Sound" then return; end
 		if instance.Name == "GhostCrying" then CryingCount = CryingCount + 1; end
+		if string.find(instance.Name, "DoorCreak") then DoorCount = DoorCount + 1; end
 	end)
 
 	-------------------
@@ -543,7 +558,6 @@ local Success, Result = pcall(function()
 			if RStorage["Disruption"].Value then GhostDisruption.Visible = true; else GhostDisruption.Visible = false; end
 			if game.Workspace:FindFirstChild("Ghost") then
 				for _, v in pairs({GhostLocation, GhostSpeed, GhostDuration, GhostBlink}) do v.Visible = true; end
-
 				pcall(function()
 					if game.Workspace:WaitForChild("Ghost") then
 						GhostLocation.Text = game.Workspace:WaitForChild("Ghost", 5):WaitForChild("Zone", 5).Value.Name or "";
@@ -573,9 +587,11 @@ local Success, Result = pcall(function()
 	end
 	game.Workspace.ChildAdded:Connect(function(instance)
 		if instance.Name ~= "Ghost" then return; end
+		if game.Workspace["Ghost"]:WaitForChild("Highlight", 1) then game.Workspace["Ghost"]["Highlight"]:Destroy(); end
+		GhostESP = CreateESP("[Ghost]", { ParentUI = instance:WaitForChild("Head", 1); ParentHighlight = instance; Color = Color3.fromRGB(255, 0, 0); Enabled = ESP.Enabled; });
 		local saveStamp = tick();
 		pcall(function()
-			blinkConnection = instance:WaitForChild("Head"):GetPropertyChangedSignal("Transparency"):Connect(function()
+			blinkConnection = instance:WaitForChild("Head", 1):GetPropertyChangedSignal("Transparency"):Connect(function()
 				GhostBlink.Text = "Blink: ".. (math.floor((tick() - saveStamp) * 1000) / 1000) .."s"
 				saveStamp = tick();
 			end);
