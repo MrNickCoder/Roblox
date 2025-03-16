@@ -557,7 +557,10 @@ local Success, Result = pcall(function()
 			GhostActivity.Text = "Activity: ".. RStorage["Activity"].Value;
 			if RStorage["Disruption"].Value then GhostDisruption.Visible = true; else GhostDisruption.Visible = false; end
 			if game.Workspace:FindFirstChild("Ghost") then
-				for _, v in pairs({GhostLocation, GhostSpeed, GhostDuration, GhostBlink}) do v.Visible = true; end
+				if game.Workspace["Ghost"]:FindFirstChild("Hunting") then
+					if game.Workspace["Ghost"]["Hunting"].Value then for _, v in pairs({GhostLocation, GhostSpeed, GhostBlink, GhostDuration}) do v.Visible = true; end
+					else for _, v in pairs({GhostLocation}) do v.Visible = true; end end
+				end
 				pcall(function()
 					if game.Workspace:WaitForChild("Ghost") then
 						GhostLocation.Text = game.Workspace:WaitForChild("Ghost", 5):WaitForChild("Zone", 5).Value.Name or "";
@@ -565,9 +568,7 @@ local Success, Result = pcall(function()
 						GhostDuration.Text = "Duration: ".. RStorage["HuntDuration"].Value;
 					end
 				end)
-			else
-				for _, v in pairs({GhostLocation, GhostSpeed, GhostDuration, GhostBlink}) do v.Visible = false; end
-			end
+			else for _, v in pairs({GhostLocation, GhostSpeed, GhostBlink, GhostDuration}) do v.Visible = false; end end
 			if not GhostBanshee.Visible or not GhostFaejkur.Visible then
 				for _, Player in pairs(Players:GetChildren()) do
 					if Player.Character then FindParabolic(Player.Character); end
@@ -649,7 +650,14 @@ local Success, Result = pcall(function()
 					end
 					if not Evidences["SLS Camera"].Visible then
 						if not game.Workspace:FindFirstChild("Ghost") then
-							
+							--[[
+							for _, instance in pairs(game.Workspace:GetChildren()) do
+								if instance.ClassName ~= "Model" then continue; end
+								if Players:FindFirstChild(instance.Name) then continue; end
+								if instance.Name == "Ghost" then continue; end
+								if string.find(instance.Name, "SLS_") then Evidences["SLS Camera"].Visible = true; break; end
+							end
+							--]]
 						end
 					end
 				end
