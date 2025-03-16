@@ -440,10 +440,7 @@ local Success, Result = pcall(function()
 		GhostESP = CreateESP("[Ghost]", { ParentUI = instance:WaitForChild("Head"); ParentHighlight = instance; Color = Color3.fromRGB(255, 0, 0); Enabled = ESP.Enabled; });
 	end)
 	
-	local Freecam = CreateSettings("Freecam", { Config = "Freecam"; }, {
-		On = function() end;
-		Off = function() end;
-	});
+	local Freecam = CreateSettings("Freecam", { Config = "Freecam"; });
 
 	local SideStatus = CreateSettings("Side Status", { Config = "SideStatus"; }, {
 		On = function() PlayerGui["Statusifier"].Enabled = true; end;
