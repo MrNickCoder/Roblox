@@ -418,7 +418,8 @@ local Success, Result = pcall(function()
 	local GeneratorESP = CreateESP("[Generator]", { Parent = game.Workspace["Map"]["Generators"]:GetChildren()[1]; Color = Color3.fromRGB(255, 16, 240); });
 	local GhostESP = nil;
 	if game.Workspace:FindFirstChild("Ghost") then
-		pcall(function() GhostESP = CreateESP("[Ghost]", { ParentUI = instance:FindFirstChild("Head"); ParentHighlight = instance; Color = Color3.fromRGB(255, 0, 0); }); end)
+		if game.Workspace["Ghost"]:FindFirstChild("Highlight") then game.Workspace["Ghost"]["Highlight"]:Destroy(); end
+		GhostESP = CreateESP("[Ghost]", { ParentUI = game.Workspace["Ghost"]:WaitForChild("Head"); ParentHighlight = game.Workspace["Ghost"]; Color = Color3.fromRGB(255, 0, 0); });
 	end
 	
 	local ESP = CreateSettings("ESP", { Config = "ESP"; }, {
@@ -433,11 +434,9 @@ local Success, Result = pcall(function()
 			if GhostESP then GhostESP:Disable(); end
 		end;
 	});
-	if game.Workspace:FindFirstChild("Ghost") then
-		GhostESP = CreateESP("[Ghost]", { ParentUI = game.Workspace["Ghost"]:WaitForChild("Head"); ParentHighlight = game.Workspace["Ghost"]; Color = Color3.fromRGB(255, 0, 0); Enabled = ESP.Enabled; });
-	end
 	game.Workspace.ChildAdded:Connect(function(instance)
 		if instance.Name ~= "Ghost" then return; end
+		if game.Workspace["Ghost"]:FindFirstChild("Highlight") then game.Workspace["Ghost"]["Highlight"]:Destroy(); end
 		GhostESP = CreateESP("[Ghost]", { ParentUI = instance:WaitForChild("Head"); ParentHighlight = instance; Color = Color3.fromRGB(255, 0, 0); Enabled = ESP.Enabled; });
 	end)
 	
