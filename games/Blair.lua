@@ -23,11 +23,12 @@ StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Loading B
 local Success, Result = pcall(function()
 	print("Loading Blair Script!");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild(LocalPlayer.Name);
-	repeat task.wait(.1) until game.Workspace:FindFirstChild(LocalPlayer.Name):FindFirstChild("HumanoidRootPart");
+	repeat task.wait(.1) until game.Workspace[LocalPlayer.Name]:FindFirstChild("HumanoidRootPart");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map");
-	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map"):FindFirstChild("Van");
-	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map"):FindFirstChild("Doors");
-	repeat task.wait(.1) until game.Workspace:FindFirstChild("Map"):FindFirstChild("Items");
+	repeat task.wait(.1) until game.Workspace["Map"]:FindFirstChild("Van");
+	repeat task.wait(.1) until game.Workspace["Map"]:FindFirstChild("Doors");
+	repeat task.wait(.1) until game.Workspace["Map"]:FindFirstChild("Items");
+	repeat task.wait(.1) until game.Workspace["Map"]:FindFirstChild("Zones");
 	repeat task.wait(.1) until PlayerGui:FindFirstChild("Journal");
 	repeat task.wait(.1) until RStorage:FindFirstChild("ActiveChallenges");
 	task.wait(5);
@@ -478,6 +479,7 @@ local Success, Result = pcall(function()
 	local RoomWater = Room.AddInfo("Water Running");
 	local RoomSalt = Room.AddInfo("Salt Stepped"); RoomSalt.Visible = false;
 	local RoomCrying = Room.AddInfo("Ghost Crying"); RoomCrying.Visible = false;
+	local RoomDoor = Room.AddInfo("Door Interact"); RoomDoor.Visible = false;
 	local RoomThread = Utility:Thread("Room", function()
 		while task.wait() do
 			local LowestTempRoom = nil;
