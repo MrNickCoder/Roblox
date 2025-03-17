@@ -171,6 +171,10 @@ local Success, Result = pcall(function()
 				
 				return Control
 			end;
+
+			function Data:AddDropdrown(Properties, Options)
+				local List = Options and Options.List or {}
+			end
 			
 			function Data:Set(Value)
 				Data.Enabled = Value;
@@ -256,92 +260,93 @@ local Success, Result = pcall(function()
 
 			return Data;
 		end
-		function CreateESP(Text, Properties)
+		function CreateESP(Type, Properties)
+			local Type = Type or "Text";
 			local Data = {}
-			if (Properties.ParentHighlight and Properties.ParentHighlight:FindFirstChild("ESP_Highlight")) then
-				for _, instance in pairs(Properties.ParentHighlight:GetChildren()) do
-					if instance.ClassName ~= "Highlight" then continue; end
-					if instance.Name == "ESP_Highlight" then continue; end
-					instance:Destroy();
+			if Type == "Text" then
+				if Properties.Parent:FindFirstChild("ESP_Text") then
+					Data.ESP = Properties.Parent["ESP_Text"];
+					Data.ESP["Title"].Text = Properties.Text;
+					Data.ESP["Title"].TextColor3 = Properties.Color or Color3.fromRGB(255, 255, 255);
+					Data.ESP.Enabled = Properties.Enabled;
+					if Properties.Distance and Data.ESP:FindFirstChild("Distance") then
+						Data.Distance = Data.ESP["Distance"];
+						Data.Distance.TextColor3 = Properties.Color or Color3.fromRGB(255, 255, 255);
+					end
+				else
+					Data.ESP = Utility:Instance("BillboardGui", {
+						Name = "ESP_Text";
+						Parent = Properties.ParentUI or Properties.Parent;
+						AlwaysOnTop = true;
+						Enabled = Properties.Enabled;
+						Size = UDim2.new(5, 0, 2, 0);
+						StudsOffset = Vector3.new(0, 2, 0);
+						Utility:Instance("TextLabel", {
+							Name = "Title";
+							BackgroundTransparency = 1;
+							Size = UDim2.new(1, 0, 0.5, 0);
+							Font = Enum.Font.FredokaOne;
+							Text = Properties.Text;
+							TextColor3 = Properties.Color or Color3.fromRGB(255, 255, 255);
+							TextScaled = true;
+						});
+					});
+					if Properties.Distance then
+						Data.Distance = Utility:Instance("TextLabel", {
+							Name = "Distance";
+							Parent = Data.ESP;
+							BackgroundTransparency = 1;
+							Position = UDim2.new(0, 0, 0.5, 0);
+							Size = UDim2.new(1, 0, 0.5, 0);
+							Font = Enum.Font.FredokaOne;
+							Text = "0m";
+							TextColor3 = Properties.Color or Color3.fromRGB(255, 255, 255);
+							TextScaled = true;
+						});
+					end
 				end
-				Data.Highlight = Properties.ParentHighlight["ESP_Highlight"];
-				Data.Highlight.Enabled = Properties.Enabled;
-			elseif(Properties.Parent and Properties.Parent:FindFirstChild("ESP_Highlight")) then
-				for _, instance in pairs(Properties.Parent:GetChildren()) do
-					if instance.ClassName ~= "Highlight" then continue; end
-					if instance.Name == "ESP_Highlight" then continue; end
-					instance:Destroy();
+				if Properties.Distance then
+					task.spawn(function()
+						while task.wait() do
+							if not Data.ESP.Parent then break; end
+							pcall(function() Data.Distance.Text = (math.floor((Data.ESP.Parent.Position - LocalPlayer.Character.PrimaryPart.Position).Magnitude * 100) / 100) .."m"; end)
+						end
+					end)
 				end
-				Data.Highlight = Properties.Parent["ESP_Highlight"];
-				Data.Highlight.Enabled = Properties.Enabled;
-			else
-				if Properties.ParentHighlight then
-					for _, instance in pairs(Properties.ParentHighlight:GetChildren()) do
+				function Data:Enable() pcall(function() Data.ESP.Enabled = true; end); end
+				function Data:Disable() pcall(function() Data.ESP.Enabled = false; end); end
+			elseif Type == "Highlight" then
+				if Properties.Parent:FindFirstChild("ESP_Highlight") then
+					for _, instance in pairs(Properties.Parent:GetChildren()) do
 						if instance.ClassName ~= "Highlight" then continue; end
+						if instance.Name == "ESP_Highlight" then continue; end
 						instance:Destroy();
 					end
+					Data.ESP = Properties.Parent["ESP_Highlight"];
+					Data.ESP.Enabled = Properties.Enabled;
 				else
 					for _, instance in pairs(Properties.Parent:GetChildren()) do
 						if instance.ClassName ~= "Highlight" then continue; end
 						instance:Destroy();
 					end
-				end
-				Data.Highlight = Utility:Instance("Highlight", {
-					Name = "ESP_Highlight";
-					Parent = Properties.ParentHighlight or Properties.Parent;
-					Enabled = Properties.Enabled;
-					FillColor = Properties.Color or Color3.fromRGB(255, 255, 255);
-					FillTransparency = 0.75;
-				});
-			end
-			if (Properties.ParentUI and Properties.ParentUI:FindFirstChild("ESP")) then
-				Data.UI = Properties.ParentUI["ESP"];
-				Data.UI.Enabled = Properties.Enabled;
-				Data.Distance = Data.UI["Distance"];
-			elseif (Properties.Parent and Properties.Parent:FindFirstChild("ESP")) then
-				Data.UI = Properties.Parent["ESP"];
-				Data.UI.Enabled = Properties.Enabled;
-				Data.Distance = Data.UI["Distance"];
-			else
-				Data.UI = Utility:Instance("BillboardGui", {
-					Name = "ESP";
-					Parent = Properties.ParentUI or Properties.Parent;
-					AlwaysOnTop = true;
-					Enabled = Properties.Enabled;
-					Size = UDim2.new(5, 0, 2, 0);
-					StudsOffset = Vector3.new(0, 2, 0);
-					Utility:Instance("TextLabel", {
-						BackgroundTransparency = 1;
-						Size = UDim2.new(1, 0, 0.5, 0);
-						Font = Enum.Font.FredokaOne;
-						Text = Text;
-						TextColor3 = Properties.Color or Color3.fromRGB(255, 255, 255);
-						TextScaled = true;
+					Data.ESP = Utility:Instance("Highlight", {
+						Name = "ESP_Highlight";
+						Parent = Properties.Parent;
+						Enabled = Properties.Enabled;
+						FillColor = Properties.Color or Color3.fromRGB(255, 255, 255);
+						FillTransparency = 0.75;
 					});
-				});
-				Data.Distance = Utility:Instance("TextLabel", {
-					Name = "Distance";
-					Parent = Data.UI;
-					BackgroundTransparency = 1;
-					Position = UDim2.new(0, 0, 0.5, 0);
-					Size = UDim2.new(1, 0, 0.5, 0);
-					Font = Enum.Font.FredokaOne;
-					Text = "0m";
-					TextColor3 = Properties.Color or Color3.fromRGB(255, 255, 255);
-					TextScaled = true;
-				});
-			end
-			
-			task.spawn(function()
-				while task.wait() do
-					if not Data.UI.Parent then break; end
-					pcall(function() Data.Distance.Text = (math.floor((Data.UI.Parent.Position - LocalPlayer.Character.PrimaryPart.Position).Magnitude * 100) / 100) .."m"; end)
 				end
-			end)
-			
-			function Data:Enable() pcall(function() Data.Highlight.Enabled = true; Data.UI.Enabled = true; end); end
-			function Data:Disable() pcall(function() Data.Highlight.Enabled = false; Data.UI.Enabled = false; end); end
-
+				function Data:Enable() pcall(function() Data.ESP.Enabled = true; end); end
+				function Data:Disable() pcall(function() Data.ESP.Enabled = false; end); end
+			elseif Type == "Both" then
+				local TextProperties = Properties; TextProperties.Parent = Properties.ParentText or Properties.Parent;
+				Data.TextESP = CreateESP("Text", TextProperties);
+				local HighlightProperties = Properties; HighlightProperties.Parent = Properties.ParentHighlight or Properties.Parent;
+				Data.HighlightESP = CreateESP("Highlight", HighlightProperties);
+				function Data:Enable() pcall(function() Data.TextESP:Enable(); Data.HighlightESP:Enable(); end); end
+				function Data:Disable() pcall(function() Data.TextESP:Disable(); Data.HighlightESP:Disable(); end); end
+			end
 			return Data
 		end
 	end
@@ -438,16 +443,16 @@ local Success, Result = pcall(function()
 	local GhostESP = nil;
 	task.spawn(function()
 		repeat task.wait() until game.Workspace:FindFirstChild("BooBooDoll")
-		BooBooESP = CreateESP("[BooBoo]", { Parent = game.Workspace:WaitForChild("BooBooDoll"); Color = Color3.fromRGB(0, 255, 0); });
+		BooBooESP = CreateESP("Both", { Text = "[BooBoo]"; Distance = true; Parent = game.Workspace:WaitForChild("BooBooDoll"); Color = Color3.fromRGB(0, 255, 0); });
 	end)
 	task.spawn(function()
 		repeat task.wait() until #game.Workspace["Map"]["Generators"]:GetChildren() > 0
-		GeneratorESP = CreateESP("[Generator]", { Parent = game.Workspace["Map"]["Generators"]:GetChildren()[1]; Color = Color3.fromRGB(255, 16, 240); });
+		GeneratorESP = CreateESP("Both", { Text = "[Generator]"; Distance = true; Parent = game.Workspace["Map"]["Generators"]:GetChildren()[1]; Color = Color3.fromRGB(255, 16, 240); });
 	end)
 	task.spawn(function()
 		if game.Workspace:FindFirstChild("Ghost") then
 			if game.Workspace["Ghost"]:WaitForChild("Highlight", 1) then game.Workspace["Ghost"]["Highlight"]:Destroy(); end
-			GhostESP = CreateESP("[Ghost]", { ParentUI = game.Workspace["Ghost"]:WaitForChild("Head"); ParentHighlight = game.Workspace["Ghost"]; Color = Color3.fromRGB(255, 0, 0); });
+			GhostESP = CreateESP("Both", { Text = "[Ghost]"; Distance = true; ParentText = game.Workspace["Ghost"]:WaitForChild("Head"); ParentHighlight = game.Workspace["Ghost"]; Color = Color3.fromRGB(255, 0, 0); });
 		end
 	end)
 	
@@ -600,7 +605,7 @@ local Success, Result = pcall(function()
 	game.Workspace.ChildAdded:Connect(function(instance)
 		if instance.Name ~= "Ghost" then return; end
 		if game.Workspace["Ghost"]:WaitForChild("Highlight", 1) then game.Workspace["Ghost"]["Highlight"]:Destroy(); end
-		GhostESP = CreateESP("[Ghost]", { ParentUI = instance:WaitForChild("Head", 1); ParentHighlight = instance; Color = Color3.fromRGB(255, 0, 0); Enabled = ESP.Enabled; });
+		GhostESP = CreateESP("Both", { Text = "[Ghost]"; Distance = true; ParentText = instance:WaitForChild("Head", 1); ParentHighlight = instance; Color = Color3.fromRGB(255, 0, 0); Enabled = ESP.Enabled; });
 		local saveStamp = tick();
 		pcall(function()
 			blinkConnection = instance:WaitForChild("Head", 1):GetPropertyChangedSignal("Transparency"):Connect(function()
