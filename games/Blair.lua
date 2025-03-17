@@ -433,13 +433,22 @@ local Success, Result = pcall(function()
 	});
 
 	local BooBooESP = nil;
-	if game.Workspace:FindFirstChild("BooBooDoll") then BooBooESP = CreateESP("[BooBoo]", { Parent = game.Workspace:WaitForChild("BooBooDoll"); Color = Color3.fromRGB(0, 255, 0); }); end
-	local GeneratorESP = CreateESP("[Generator]", { Parent = game.Workspace["Map"]["Generators"]:GetChildren()[1]; Color = Color3.fromRGB(255, 16, 240); });
+	local GeneratorESP = nil;
 	local GhostESP = nil;
-	if game.Workspace:FindFirstChild("Ghost") then
-		if game.Workspace["Ghost"]:WaitForChild("Highlight", 1) then game.Workspace["Ghost"]["Highlight"]:Destroy(); end
-		GhostESP = CreateESP("[Ghost]", { ParentUI = game.Workspace["Ghost"]:WaitForChild("Head"); ParentHighlight = game.Workspace["Ghost"]; Color = Color3.fromRGB(255, 0, 0); });
-	end
+	task.spawn(function()
+		repeat task.wait() until game.Workspace:FindFirstChild("BooBooDoll")
+		BooBooESP = CreateESP("[BooBoo]", { Parent = game.Workspace:WaitForChild("BooBooDoll"); Color = Color3.fromRGB(0, 255, 0); });
+	end)
+	task.spawn(function()
+		repeat task.wait() until #game.Workspace["Map"]["Generators"]:GetChildren() > 0
+		GeneratorESP = CreateESP("[Generator]", { Parent = game.Workspace["Map"]["Generators"]:GetChildren()[1]; Color = Color3.fromRGB(255, 16, 240); });
+	end)
+	task.spawn(function()
+		if game.Workspace:FindFirstChild("Ghost") then
+			if game.Workspace["Ghost"]:WaitForChild("Highlight", 1) then game.Workspace["Ghost"]["Highlight"]:Destroy(); end
+			GhostESP = CreateESP("[Ghost]", { ParentUI = game.Workspace["Ghost"]:WaitForChild("Head"); ParentHighlight = game.Workspace["Ghost"]; Color = Color3.fromRGB(255, 0, 0); });
+		end
+	end)
 	
 	local ESP = CreateSettings("ESP", { Config = "ESP"; }, {
 		On = function()
