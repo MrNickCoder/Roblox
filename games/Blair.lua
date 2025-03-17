@@ -630,8 +630,18 @@ local Success, Result = pcall(function()
 				for _, sb in pairs(Object:GetChildren()) do
 					if sb.Name ~= "Spirit Box" then continue; end
 					for _, talk in pairs(sb:FindFirstChild("GhostTalk"):GetChildren()) do
-						if talk.Playing then Evidences["Spirit Box"].Visible = true; end
+						if not talk.Playing then continue; end
+						if talk.Name == "GhostTalk5" then GhostYama.Visible = true; end
+						Evidences["Spirit Box"].Visible = true;
 					end
+				end
+			end
+			function FindEMF(Object)
+				for _, emf in pairs(Object:GetChildren()) do
+					if emf.Name ~= "EMF Reader" then continue; end
+					if not emf:FindFirstChild("5") then continue; end
+					if emf["5"].Material ~= Enum.Material.Neon then continue; end
+					Evidences["EMF Level 5"].Visible = true;
 				end
 			end
 			if RStorage["Remotes"]:FindFirstChild("TextChatServicer") then
@@ -642,7 +652,10 @@ local Success, Result = pcall(function()
 				while task.wait() do
 					if not Evidences["EMF Level 5"].Visible then
 						if not game.Workspace:FindFirstChild("Ghost") then
-							
+							for _, Player in pairs(Players:GetChildren()) do
+								if Player.Character then FindEMF(Player.Character); end
+							end
+							FindEMF(game.Workspace["Map"]["Items"]);
 						end
 					end
 					if not Evidences["Ultraviolet"].Visible and #game.Workspace["Map"]["Prints"]:GetChildren() > 0 then Evidences["Ultraviolet"].Visible = true; end
