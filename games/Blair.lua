@@ -668,7 +668,8 @@ local Success, Result = pcall(function()
 								if instance.ClassName ~= "Model" then continue; end
 								if Players:FindFirstChild(instance.Name) then continue; end
 								if instance.Name == "Ghost" then continue; end
-								if string.find(instance.Name, "SLS_") then Evidences["SLS Camera"].Visible = true; break; end
+								if not string.find(instance.Name, "SLS_") then continue; end
+								Evidences["SLS Anomaly"].Visible = true;
 							end
 						end
 					end
