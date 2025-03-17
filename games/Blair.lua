@@ -636,7 +636,7 @@ local Success, Result = pcall(function()
 					end
 				end
 			end
-			function FindEMF(Object)
+			function FindEMFReader(Object)
 				for _, emf in pairs(Object:GetChildren()) do
 					if emf.Name ~= "EMF Reader" then continue; end
 					if not emf:FindFirstChild("5") then continue; end
@@ -653,9 +653,9 @@ local Success, Result = pcall(function()
 					if not Evidences["EMF Level 5"].Visible then
 						if not game.Workspace:FindFirstChild("Ghost") then
 							for _, Player in pairs(Players:GetChildren()) do
-								if Player.Character then FindEMF(Player.Character); end
+								if Player.Character then FindEMFReader(Player.Character); end
 							end
-							FindEMF(game.Workspace["Map"]["Items"]);
+							FindEMFReader(game.Workspace["Map"]["Items"]);
 						end
 					end
 					if not Evidences["Ultraviolet"].Visible and #game.Workspace["Map"]["Prints"]:GetChildren() > 0 then Evidences["Ultraviolet"].Visible = true; end
