@@ -650,12 +650,14 @@ local Success, Result = pcall(function()
 					end
 					if not Evidences["SLS Anomaly"].Visible then
 						if not game.Workspace:FindFirstChild("Ghost") then
+							--[[
 							for _, instance in pairs(game.Workspace:GetChildren()) do
 								if instance.ClassName ~= "Model" then continue; end
 								if Players:FindFirstChild(instance.Name) then continue; end
 								if instance.Name == "Ghost" then continue; end
 								if string.find(instance.Name, "SLS_") then Evidences["SLS Camera"].Visible = true; break; end
 							end
+							--]]
 						end
 					end
 				end
