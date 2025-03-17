@@ -31,6 +31,7 @@ local Success, Result = pcall(function()
 	repeat task.wait(.1) until game.Workspace["Map"]:FindFirstChild("Zones");
 	repeat task.wait(.1) until PlayerGui:FindFirstChild("Journal");
 	repeat task.wait(.1) until RStorage:FindFirstChild("ActiveChallenges");
+	repeat task.wait(.1) until RStorage:FindFirstChild("Remotes");
 	task.wait(5);
 
 	local Utility = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/UtilityModule.lua"))()
@@ -632,6 +633,9 @@ local Success, Result = pcall(function()
 						if talk.Playing then Evidences["Spirit Box"].Visible = true; end
 					end
 				end
+			end
+			if RStorage["Remotes"]:FindFirstChild("TextChatServicer") then
+				RStorage["Remotes"]["TextChatServicer"].OnClientEvent:Connect(function() Evidences["Spirit Box"].Visible = true; end)
 			end
 			
 			local EvidenceThread = Utility:Thread("Evidence", function()
