@@ -610,7 +610,7 @@ local Success, Result = pcall(function()
 		if not (RStorage["ActiveChallenges"]:FindFirstChild("evidencelessOne") and RStorage["ActiveChallenges"]:FindFirstChild("evidencelessTwo")) then
 			local Evidence = CreateInfo("Evidences");
 			local Evidences = {}
-			for _, evi in pairs({"EMF Level 5","Ultraviolet","Freezing Temp.","Ghost Orbs","Ghost Writing","Spirit Box","SLS Camera"}) do
+			for _, evi in pairs({"EMF Level 5","Ultraviolet","Freezing Temp.","Ghost Orbs","Ghost Writing","Spirit Box","SLS Anomaly"}) do
 				Evidences[evi] = Evidence.AddInfo(evi);
 				Evidences[evi].Visible = false;
 			end
@@ -648,16 +648,14 @@ local Success, Result = pcall(function()
 						end
 						FindSpiritBox(game.Workspace["Map"]["Items"]);
 					end
-					if not Evidences["SLS Camera"].Visible then
+					if not Evidences["SLS Anomaly"].Visible then
 						if not game.Workspace:FindFirstChild("Ghost") then
-							--[[
 							for _, instance in pairs(game.Workspace:GetChildren()) do
 								if instance.ClassName ~= "Model" then continue; end
 								if Players:FindFirstChild(instance.Name) then continue; end
 								if instance.Name == "Ghost" then continue; end
 								if string.find(instance.Name, "SLS_") then Evidences["SLS Camera"].Visible = true; break; end
 							end
-							--]]
 						end
 					end
 				end
