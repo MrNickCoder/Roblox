@@ -510,13 +510,9 @@ local Success, Result = pcall(function()
 				if v:FindFirstChild("Exclude") then continue; end
 				if not v:FindFirstChild("_____Temperature") then continue; end
 				if not v["_____Temperature"]:FindFirstChild("_____LocalBaseTemp") then continue; end
-				if LowestTempRoom == nil then
-					LowestTempRoom = v;
-					continue;
-				else
-					if v["_____Temperature"]["_____LocalBaseTemp"].Value > LowestTempRoom["_____Temperature"]["_____LocalBaseTemp"].Value then continue; end
-					LowestTempRoom = v;
-				end
+				if LowestTempRoom == nil then LowestTempRoom = v; continue; end
+				if v["_____Temperature"]["_____LocalBaseTemp"].Value > LowestTempRoom["_____Temperature"]["_____LocalBaseTemp"].Value then continue; end
+				LowestTempRoom = v;
 			end
 			if LowestTempRoom and LowestTempRoom["_____Temperature"] then
 				RoomName.Text = LowestTempRoom.Name;
