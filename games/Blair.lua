@@ -462,8 +462,50 @@ local Success, Result = pcall(function()
 					Destroy = function() pcall(function() Data.TextESP:Destroy(); Data.HighlightESP:Destroy(); end); end;
 				}, {});
 			elseif Type == "Backpack" then
+				if Properties.Parent and Properties.Parent:FindFirstChild("ESP_Backpack") then
+					Data.ESP = Properties.Parent["ESP_Backpack"];
+					Data.ESP.MaxDistance = Properties.MaxDistance or 15;
+					Data.ESP.Size = Properties.Size or UDim2.new(2, 0, 2, 0);
+					Data.ESP.StudsOffset = Properties.StudsOffset or Vector3.new(2, 1, 1);
+					Data.ESP.Enabled = Properties.Enabled or false;
+				else
+					Data.ESP = Utility:Instance("BillboardGui", {
+						Name = "ESP_Backpack";
+						Parent = Properties.Parent;
+						MaxDistance = Properties.MaxDistance or 15;
+						Size = Properties.Size or UDim2.new(2, 0, 2, 0);
+						StudsOffset = Properties.StudsOffset or Vector3.new(2, 1, 1);
+						Enabled = Properties.Enabled or false;
+						Utility:Instance("Frame", {
+							BackgroundTransparency = 1;
+							Size = UDim2.new(1, 0, 1, 0);
+							Utility:Instance("UIListLayout", { HorizontalAlignment = Enum.HorizontalAlignment.Center; });
+						});
+					});
+				end
+				Data.Slots = {};
+				for Slot = 1, 5 do
+					if Data.ESP["Frame"]:FindFirstChild("Slot_"..tostring(Slot)) then
+						Data.Slots[Slot] = Data.ESP["Frame"]:FindFirstChild("Slot_"..tostring(Slot));
+					else
+						Data.Slots[Slot] = Utility:Instance("TextLabel", {
+							Name = "Slot_"..tostring(Slot);
+							Parent = Data.ESP["Frame"];
+							BackgroundTransparency = 1;
+							Size = UDim2.new(1, 0, 0.2, 0);
+							Font = Enum.Font.SourceSansBold;
+							Text = "";
+							TextColor3 = Color3.fromRGB(255, 255, 255);
+							TextScaled = true;
+						});
+					end
+				end
 				return setmetatable({
-
+					ESP = Data.ESP;
+					Slots = Data.Slots;
+					Enable = function() pcall(function() Data.ESP.Enabled = true; end); end;
+					Disable = function() pcall(function() Data.ESP.Enabled = false; end); end;
+					Destroy = function() pcall(function() Data.Destroyed = true; Data.ESP:Destroy(); end); end;
 				}, {});
 			end
 		end
@@ -537,7 +579,10 @@ local Success, Result = pcall(function()
 	for _, player in pairs(Players:GetChildren()) do
 		if player == LocalPlayer then continue; end
 		repeat task.wait() until player.Character
-		PlayerESP[player.Name] = CreateESP("Text & Highlight", { Text = player.DisplayName; Parent = player.Character; Color = Color3.fromRGB(255, 255, 255); FillTransparency = 1; });
+		PlayerESP[player.Name] = {};
+		PlayerESP[player.Name]["Player"] = player;
+		PlayerESP[player.Name]["ESP"] = CreateESP("Text & Highlight", { Text = player.DisplayName; Parent = player.Character; Color = Color3.fromRGB(255, 255, 255); FillTransparency = 1; });
+		PlayerESP[player.Name]["Backpack"] = CreateESP("Backpack", { Parent = player.Character; });
 	end
 	function ValidateItemESP(item)
 		if item.Name == "Tarot Cards" then return false; end
@@ -620,7 +665,7 @@ local Success, Result = pcall(function()
 	local ESPList = ESP:AddDropdrown({}, {
 		Config = "ESPList";
 		List = {
-			"Ghost","BooBoo Doll","Generator","Players","Cursed Object",
+			"Ghost","BooBoo Doll","Generator","Players","Cursed Object","Backpack",
 			"Incense Burner","Lighter","Crucifix",
 			"Flashlight","Strong Flashlight","UV Light","GlowStick",
 			"Photo Camera","Video Camera","Trail Camera","SLS Camera",
@@ -920,7 +965,17 @@ local Success, Result = pcall(function()
 				if GhostESP["Highlight"] then GhostESP["Highlight"]:Disable(); end
 			end
 			if CursedObjectESP then if Config["ESP"] and table.find(Config["ESPList"], "Cursed Object") then CursedObjectESP:Enable(); else CursedObjectESP:Disable(); end end
-			for _, pESP in pairs(PlayerESP) do if Config["ESP"] and table.find(Config["ESPList"], "Players") then pESP:Enable(); else pESP:Disable(); end end
+			for _, pESP in pairs(PlayerESP) do
+				if Config["ESP"] and table.find(Config["ESPList"], "Players") then pESP["ESP"]:Enable(); else pESP["ESP"]:Disable(); end
+				if Config["ESP"] and table.find(Config["ESPList"], "Backpack") then
+					pESP["Backpack"]:Enable();
+					for Slot = 1, 5 do
+						if not pESP["Player"]:FindFirstChild("Slot"..tostring(Slot)) then pESP["Backpack"]["Slots"][Slot].Text = ""; continue; end
+						if pESP["Player"]["Slot"..tostring(Slot)].Value == nil then pESP["Backpack"]["Slots"][Slot].Text = ""; continue; end
+						pESP["Backpack"]["Slots"][Slot].Text = (pESP["Player"]["Slot"..tostring(Slot)].Value).Name;
+					end
+				else pESP["Backpack"]:Disable(); end
+			end
 			for _, iESP in pairs(ItemsESP) do
 				if iESP["Item"].Parent ~= game.Workspace["Map"]["Items"] then iESP["ESP"]:Disable(); continue; end
 				if not Config["ESP"] then iESP["ESP"]:Disable(); continue; end
@@ -955,8 +1010,10 @@ local Success, Result = pcall(function()
 	Players.ChildAdded:Connect(function(player)
 		if PlayerESP[player.Name] then return; end
 		repeat task.wait() until player.Character;
-		PlayerESP[player.Name] = CreateESP("Text & Highlight", { Text = player.DisplayName; Parent = player.Character; Color = Color3.fromRGB(255, 255, 255); FillTransparency = 1; });
-		if table.find(Config["ESPList"], "Players") then PlayerESP[player.Name]:Enable(); else PlayerESP[player.Name]:Disable(); end
+		PlayerESP[player.Name] = {};
+		PlayerESP[player.Name]["Player"] = player;
+		PlayerESP[player.Name]["ESP"] = CreateESP("Text & Highlight", { Text = player.DisplayName; Parent = player.Character; Color = Color3.fromRGB(255, 255, 255); FillTransparency = 1; });
+		PlayerESP[player.Name]["Backpack"] = CreateESP("Backpack", { Parent = player.Character; });
 	end)
 
 	UserIS.InputBegan:Connect(function(input, gameProcessed)
