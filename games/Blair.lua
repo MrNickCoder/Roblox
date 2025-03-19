@@ -32,6 +32,10 @@ local Success, Result = pcall(function()
 	repeat task.wait(.1) until PlayerGui:FindFirstChild("Journal");
 	repeat task.wait(.1) until RStorage:FindFirstChild("ActiveChallenges");
 	repeat task.wait(.1) until RStorage:FindFirstChild("Remotes");
+	repeat task.wait(.1) until RStorage:FindFirstChild("EnvironmentLoaded");
+	repeat task.wait(.1) until RStorage["EnvironmentLoaded"].Value;
+	repeat task.wait(.1) until RStorage:FindFirstChild("LoadingFinished");
+	repeat task.wait(.1) until RStorage["LoadingFinished"].Value;
 	task.wait(5);
 
 	local Utility = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/UtilityModule.lua"))()
@@ -53,6 +57,7 @@ local Success, Result = pcall(function()
 		["NoClipDoor"] = false;
 		
 		["ESP"] = false;
+		["ESPList"] = {};
 		
 		["Freecam"] = false;
 		
@@ -102,6 +107,7 @@ local Success, Result = pcall(function()
 				Parent = Settings;
 				BackgroundColor3 = Color3.fromRGB(0,0);
 				BackgroundTransparency = 0.25;
+				BorderSizePixel = 0;
 				Size = UDim2.new(0.10, 0, 1, 0);
 				Text = "";
 				Utility:Instance("TextLabel", {
@@ -116,6 +122,7 @@ local Success, Result = pcall(function()
 				});
 				Utility:Instance("Frame", {
 					BackgroundColor3 = Data.Enabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0);
+					BorderSizePixel = 0;
 					Position = UDim2.new(0, 0, 1, 0);
 					Size = UDim2.new(1, 0, 0, 2);
 				});
@@ -132,6 +139,7 @@ local Success, Result = pcall(function()
 					AnchorPoint = Vector2.new(0.5, 1);
 					BackgroundColor3 = Color3.fromRGB(0, 0, 0);
 					BackgroundTransparency = 0.25;
+					BorderSizePixel = 0;
 					Position = UDim2.new(0.5, 0, 0, -2);
 					Size = UDim2.new(0.8, 0, 0.8, 0);
 					Font = Enum.Font.SourceSansBold;
@@ -169,11 +177,104 @@ local Success, Result = pcall(function()
 					end
 				end)
 				
-				return Control
+				return Control;
 			end;
 
 			function Data:AddDropdrown(Properties, Options)
-				local List = Options and Options.List or {}
+				local Selected = Options and Config[Options.Config] or {};
+				local List = Options and Options.List or {};
+				local Control = { Selected = Selected; };
+				Control.Button = Utility:Instance("TextButton", {
+					Parent = Data.Button;
+					AnchorPoint = Vector2.new(0.5, 1);
+					BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+					BackgroundTransparency = 0.25;
+					BorderSizePixel = 0;
+					Position = UDim2.new(0.5, 0, 0, -2);
+					Size = UDim2.new(0.8, 0, 0.8, 0);
+					Font = Enum.Font.SourceSansBold;
+					Text = "Open List";
+					TextColor3 = Color3.fromRGB(255, 255, 255);
+					TextScaled = true;
+					Utility:Instance("UICorner", { CornerRadius = UDim.new(0, 5); });
+				});
+				for Index, Value in pairs(Properties or {}) do
+					if Control.Button[Index] then Control.Button[Index] = Value; end
+				end;
+				Control.Scroll = Utility:Instance("Frame", {
+					Parent = Data.Button;
+					AnchorPoint = Vector2.new(0.5, 0);
+					BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+					BackgroundTransparency = 0.25;
+					BorderSizePixel = 0;
+					Position = UDim2.new(0.5, 0, 0, 0);
+					Size = UDim2.new(1.1, 0, 10, 0);
+					Visible = false;
+					ZIndex = 2;
+					ClipsDescendants = true;
+					Utility:Instance("UICorner", { CornerRadius = UDim.new(0, 10); });
+					Utility:Instance("ScrollingFrame", {
+						AnchorPoint = Vector2.new(0.5, 0.5);
+						BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+						BackgroundTransparency = 1;
+						Position = UDim2.new(0.5, 0, 0.5, 0);
+						Size = UDim2.new(1, 0, 0.96, 0);
+						ZIndex = 2;
+						AutomaticCanvasSize = Enum.AutomaticSize.Y;
+						CanvasSize = UDim2.new(0, 0, 0, 0);
+						ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255);
+						ScrollBarThickness = 5;
+						Utility:Instance("UIListLayout", { Padding = UDim.new(0, 3); HorizontalAlignment = Enum.HorizontalAlignment.Center; });
+						Utility:Instance("UIPadding", { PaddingLeft = UDim.new(0.06, 0); PaddingRight = UDim.new(0.06, 0); });
+					})
+				});
+				for _, Item in pairs(List) do
+					local Button = Utility:Instance("TextButton", {
+						Name = Item;
+						Parent = Control.Scroll["ScrollingFrame"];
+						BackgroundColor3 = Color3.fromRGB(40, 40, 40);
+						Size = UDim2.new(1, 0, 0.1, 0);
+						Text = "";
+						ZIndex = 2;
+						Utility:Instance("UICorner", { CornerRadius = UDim.new(1, 0); });
+						Utility:Instance("TextLabel", {
+							AnchorPoint = Vector2.new(0.5, 0.5);
+							BackgroundTransparency = 1;
+							Position = UDim2.new(0.5, 0, 0.5, 0);
+							Size = UDim2.new(0.9, 0, 0.9, 0);
+							ZIndex = 2;
+							Font = Enum.Font.SourceSansBold;
+							Text = Item;
+							TextColor3 = Color3.fromRGB(255, 255, 255);
+							TextScaled = true;
+						});
+					});
+					if table.find(Control.Selected, Item) then Button.BackgroundColor3 = Color3.fromRGB(0, 211, 0);
+					else Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40); end
+
+					Button.MouseButton1Down:Connect(function()
+						if table.find(Control.Selected, Item) then
+							table.remove(Control.Selected, table.find(Control.Selected, Item));
+							Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40);
+						else
+							table.insert(Control.Selected, Item);
+							Button.BackgroundColor3 = Color3.fromRGB(0, 211, 0);
+						end
+						if Options.Config then
+							Config[Options.Config] = Control.Selected;
+							Utility:SaveConfig(Config, Directory, File_Name);
+						end
+						if Options.Callback then Options.Callback(Control.Selected); end
+					end)
+				end
+
+				Control.Button.MouseButton1Down:Connect(function()
+					Control.Scroll.Visible = not Control.Scroll.Visible
+					if Control.Scroll.Visible then Control.Button.Text = "Close List";
+					else Control.Button.Text = "Open List"; end
+				end)
+
+				return Control;
 			end
 			
 			function Data:Set(Value)
@@ -262,13 +363,26 @@ local Success, Result = pcall(function()
 		end
 		function CreateESP(Type, Properties)
 			local Type = Type or "Text";
-			local Data = {}
+			local Data = {};
 			if Type == "Text" then
-				if Properties.Parent:FindFirstChild("ESP_Text") then
-					Data.ESP = Properties.Parent["ESP_Text"];
+				if Properties.ParentText and Properties.ParentText:FindFirstChild("ESP_Text") then
+					Data.ESP = Properties.ParentText["ESP_Text"];
+					Data.ESP.Size = Properties.Size or UDim2.new(5, 0, 2, 0);
+					Data.ESP.StudsOffset = Properties.StudsOffset or Vector3.new(0, 2, 0);
+					Data.ESP.Enabled = Properties.Enabled or false;
 					Data.ESP["Title"].Text = Properties.Text;
 					Data.ESP["Title"].TextColor3 = Properties.Color or Color3.fromRGB(255, 255, 255);
-					Data.ESP.Enabled = Properties.Enabled;
+					if Properties.Distance and Data.ESP:FindFirstChild("Distance") then
+						Data.Distance = Data.ESP["Distance"];
+						Data.Distance.TextColor3 = Properties.Color or Color3.fromRGB(255, 255, 255);
+					end
+				elseif Properties.Parent and Properties.Parent:FindFirstChild("ESP_Text") then
+					Data.ESP = Properties.Parent["ESP_Text"];
+					Data.ESP.Size = Properties.Size or UDim2.new(5, 0, 2, 0);
+					Data.ESP.StudsOffset = Properties.StudsOffset or Vector3.new(0, 2, 0);
+					Data.ESP.Enabled = Properties.Enabled or false;
+					Data.ESP["Title"].Text = Properties.Text;
+					Data.ESP["Title"].TextColor3 = Properties.Color or Color3.fromRGB(255, 255, 255);
 					if Properties.Distance and Data.ESP:FindFirstChild("Distance") then
 						Data.Distance = Data.ESP["Distance"];
 						Data.Distance.TextColor3 = Properties.Color or Color3.fromRGB(255, 255, 255);
@@ -276,11 +390,11 @@ local Success, Result = pcall(function()
 				else
 					Data.ESP = Utility:Instance("BillboardGui", {
 						Name = "ESP_Text";
-						Parent = Properties.ParentUI or Properties.Parent;
+						Parent = Properties.ParentText or Properties.Parent;
 						AlwaysOnTop = true;
-						Enabled = Properties.Enabled;
-						Size = UDim2.new(5, 0, 2, 0);
-						StudsOffset = Vector3.new(0, 2, 0);
+						Enabled = Properties.Enabled or false;
+						Size = Properties.Size or UDim2.new(5, 0, 2, 0);
+						StudsOffset = Properties.StudsOffset or Vector3.new(0, 2, 0);
 						Utility:Instance("TextLabel", {
 							Name = "Title";
 							BackgroundTransparency = 1;
@@ -308,46 +422,50 @@ local Success, Result = pcall(function()
 				if Properties.Distance then
 					task.spawn(function()
 						while task.wait() do
-							if not Data.ESP.Parent then break; end
-							pcall(function() Data.Distance.Text = (math.floor((Data.ESP.Parent.Position - LocalPlayer.Character.PrimaryPart.Position).Magnitude * 100) / 100) .."m"; end)
+							if Data.Destroyed then break; end
+							if not Properties.Distance then break; end
+							pcall(function() Data.Distance.Text = (math.floor((Properties.Distance.Position - LocalPlayer.Character.PrimaryPart.Position).Magnitude * 100) / 100) .."m"; end)
 						end
 					end)
 				end
-				function Data:Enable() pcall(function() Data.ESP.Enabled = true; end); end
-				function Data:Disable() pcall(function() Data.ESP.Enabled = false; end); end
+				return setmetatable({
+					ESP = Data.ESP;
+					Distance = Data.Distance;
+					Enable = function() pcall(function() Data.ESP.Enabled = true; end); end;
+					Disable = function() pcall(function() Data.ESP.Enabled = false; end); end;
+					Destroy = function() pcall(function() Data.Destroyed = true; Data.ESP:Destroy(); end); end;
+				}, {});
 			elseif Type == "Highlight" then
-				if Properties.Parent:FindFirstChild("ESP_Highlight") then
-					for _, instance in pairs(Properties.Parent:GetChildren()) do
-						if instance.ClassName ~= "Highlight" then continue; end
-						if instance.Name == "ESP_Highlight" then continue; end
-						instance:Destroy();
-					end
-					Data.ESP = Properties.Parent["ESP_Highlight"];
-					Data.ESP.Enabled = Properties.Enabled;
-				else
-					for _, instance in pairs(Properties.Parent:GetChildren()) do
-						if instance.ClassName ~= "Highlight" then continue; end
-						instance:Destroy();
-					end
-					Data.ESP = Utility:Instance("Highlight", {
-						Name = "ESP_Highlight";
-						Parent = Properties.Parent;
-						Enabled = Properties.Enabled;
-						FillColor = Properties.Color or Color3.fromRGB(255, 255, 255);
-						FillTransparency = 0.75;
-					});
-				end
-				function Data:Enable() pcall(function() Data.ESP.Enabled = true; end); end
-				function Data:Disable() pcall(function() Data.ESP.Enabled = false; end); end
-			elseif Type == "Both" then
-				local TextProperties = Properties; TextProperties.Parent = Properties.ParentText or Properties.Parent;
-				Data.TextESP = CreateESP("Text", TextProperties);
-				local HighlightProperties = Properties; HighlightProperties.Parent = Properties.ParentHighlight or Properties.Parent;
-				Data.HighlightESP = CreateESP("Highlight", HighlightProperties);
-				function Data:Enable() pcall(function() Data.TextESP:Enable(); Data.HighlightESP:Enable(); end); end
-				function Data:Disable() pcall(function() Data.TextESP:Disable(); Data.HighlightESP:Disable(); end); end
+				if Properties.ParentHighlight and Properties.ParentHighlight:FindFirstChild("ESP_Highlight") then Properties.ParentHighlight["ESP_Highlight"]:Destroy(); end
+				if Properties.Parent and Properties.Parent:FindFirstChild("ESP_Highlight") then Properties.Parent["ESP_Highlight"]:Destroy(); end
+				Data.ESP = Utility:Instance("Highlight", {
+					Name = "ESP_Highlight";
+					Parent = Properties.ParentHighlight or Properties.Parent;
+					Enabled = Properties.Enabled or false;
+					FillColor = Properties.Color or Color3.fromRGB(255, 255, 255);
+					FillTransparency = Properties.FillTransparency or 0.75;
+				});
+				return setmetatable({
+					ESP = Data.ESP;
+					Enable = function() pcall(function() Data.ESP.Enabled = true; end); end;
+					Disable = function() pcall(function() Data.ESP.Enabled = false; end); end;
+					Destroy = function() pcall(function() Data.ESP:Destroy(); end); end;
+				}, {});
+			elseif Type == "Text & Highlight" then
+				Data.TextESP = CreateESP("Text", Properties);
+				Data.HighlightESP = CreateESP("Highlight", Properties);
+				return setmetatable({
+					TextESP = Data.TextESP;
+					HighlightESP = Data.HighlightESP;
+					Enable = function() pcall(function() Data.TextESP:Enable(); Data.HighlightESP:Enable(); end); end;
+					Disable = function() pcall(function() Data.TextESP:Disable(); Data.HighlightESP:Disable(); end); end;
+					Destroy = function() pcall(function() Data.TextESP:Destroy(); Data.HighlightESP:Destroy(); end); end;
+				}, {});
+			elseif Type == "Backpack" then
+				return setmetatable({
+
+				}, {});
 			end
-			return Data
 		end
 	end
 
@@ -356,6 +474,7 @@ local Success, Result = pcall(function()
 	----------------------
 	local FreecamModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/FreecamModule.lua"))()
 	FreecamModule.IgnoreGUI = {"Radio", "Journal", "MobileUI", "Statusifier"}
+
 	local Light;
 	if LocalPlayer.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild("SpotLight") then
 		Light = LocalPlayer.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild("SpotLight")
@@ -369,9 +488,11 @@ local Success, Result = pcall(function()
 			Shadows = false;
 		});
 	end
+
 	local Sprinting = false
+
 	local Doors = {}
-	function PopulateDoors(Model)
+	local function PopulateDoors(Model)
 		for _, v in pairs(Model:GetChildren()) do
 			if not table.find({"Part", "MeshPart", "Model"}, v.ClassName) then continue; end
 			if #v:GetChildren() > 0 then PopulateDoors(v); end
@@ -379,13 +500,70 @@ local Success, Result = pcall(function()
 		end
 	end
 	PopulateDoors(game.Workspace["Map"]["Doors"]);
+
 	local SavedLighting = {}
 	for _, value in pairs({"Ambient", "OutdoorAmbient", "Brightness"}) do SavedLighting[value] = Lighting[value]; end
 	local AtmosphereDensity = Lighting["Atmosphere"].Density
+
 	local LowestTemp = nil;
 	local CryingCount = 0;
 	local DoorCount = 0;
 	local blinkConnection;
+
+	local BooBooESP = {};
+	local GeneratorESP = {};
+	local GhostESP = {};
+	local PlayerESP = {};
+	local CursedObjectESP = nil;
+	local ItemsESP = {};
+
+	task.spawn(function()
+		repeat task.wait() until game.Workspace:FindFirstChild("BooBooDoll")
+		BooBooESP["Text"] = CreateESP("Text", { Text = "[BooBoo]"; Distance = game.Workspace["BooBooDoll"]; Parent = game.Workspace["BooBooDoll"]; Color = Color3.fromRGB(0, 255, 255); });
+		BooBooESP["Highlight"] = CreateESP("Highlight", { Parent = game.Workspace["BooBooDoll"]; Color = Color3.fromRGB(0, 255, 255); });
+
+		repeat task.wait() until #game.Workspace["Map"]["Generators"]:GetChildren() > 0
+		if (game.Workspace["Map"]["Generators"]:GetChildren()[1]):WaitForChild("Highlight", 1) then (game.Workspace["Map"]["Generators"]:GetChildren()[1])["Highlight"]:Destroy(); end
+		local Generator = game.Workspace["Map"]["Generators"]:GetChildren()[1];
+		GeneratorESP["Text"] = CreateESP("Text", { Text = "[Generator]"; Distance = Generator; Parent = Generator; Color = Color3.fromRGB(255, 16, 240); });
+		GeneratorESP["Highlight"] = CreateESP("Highlight", { Parent = Generator; Color = Color3.fromRGB(255, 16, 240); });
+	end)
+	if game.Workspace:FindFirstChild("Ghost") then
+		if game.Workspace["Ghost"]:WaitForChild("Highlight", 1) then game.Workspace["Ghost"]["Highlight"]:Destroy(); end
+		local Ghost = game.Workspace["Ghost"];
+		GhostESP["Text"] = CreateESP("Text", { Text = "[Ghost]"; Distance = Ghost.PrimaryPart; ParentText = Ghost:WaitForChild("Head"); Color = Color3.fromRGB(255, 0, 0); });
+		GhostESP["Text"] = CreateESP("Highlight", { Parent = Ghost; Color = Color3.fromRGB(255, 0, 0); });
+	end
+	for _, player in pairs(Players:GetChildren()) do
+		if player == LocalPlayer then continue; end
+		repeat task.wait() until player.Character
+		PlayerESP[player.Name] = CreateESP("Text & Highlight", { Text = player.DisplayName; Parent = player.Character; Color = Color3.fromRGB(255, 255, 255); FillTransparency = 1; });
+	end
+	function ValidateItemESP(item)
+		if item.Name == "Tarot Cards" then return false; end
+		if item.Name == "Music Box" then return false; end
+		if not table.find({
+			"Incense Burner","Lighter","Crucifix",
+			"Flashlight","Strong Flashlight","UV Light","GlowStick",
+			"Photo Camera","Video Camera","Trail Camera","SLS Camera",
+			"EMF Reader","Thermometer","Spirit Box","Ghost Writing Book",
+			"Parabolic Microphone","Salt",
+			"Sanity Soda"
+		}, item.Name) then return false; end
+		if item.Name == "Incense Burner" and item:WaitForChild("Used").Value then return false; end
+		if item.Name == "Photo Camera" and item:WaitForChild("PhotoCameraMemory"):WaitForChild("Memory").Value == 100 then return false; end
+		return true;
+	end
+	task.spawn(function()
+		task.wait(5);
+		for _, item in pairs(game.Workspace["Map"]["Items"]:GetChildren()) do
+			if not ValidateItemESP(item) then continue; end
+			if not table.find(Config["ESPList"], item.Name) then continue; end
+			local Item = { ["Item"] = item; };
+			Item["ESP"] = CreateESP("Highlight", { Parent = item; Color = Color3.fromRGB(0, 255, 0); });
+			table.insert(ItemsESP, Item)
+		end
+	end)
 
 	--------------------------
 	-- [[ USER INTERFACE ]] --
@@ -437,35 +615,28 @@ local Success, Result = pcall(function()
 			game.Workspace["Map"]["Van"]["Van"]["Door"]["Main"].CanCollide = true;
 		end;
 	});
-
-	local BooBooESP = nil;
-	local GeneratorESP = nil;
-	local GhostESP = nil;
-	task.spawn(function()
-		repeat task.wait() until game.Workspace:FindFirstChild("BooBooDoll")
-		BooBooESP = CreateESP("Both", { Text = "[BooBoo]"; Distance = true; Parent = game.Workspace:WaitForChild("BooBooDoll"); Color = Color3.fromRGB(0, 255, 0); });
-	end)
-	task.spawn(function()
-		repeat task.wait() until #game.Workspace["Map"]["Generators"]:GetChildren() > 0
-		GeneratorESP = CreateESP("Both", { Text = "[Generator]"; Distance = true; Parent = game.Workspace["Map"]["Generators"]:GetChildren()[1]; Color = Color3.fromRGB(255, 16, 240); });
-	end)
-	task.spawn(function()
-		if game.Workspace:FindFirstChild("Ghost") then
-			if game.Workspace["Ghost"]:WaitForChild("Highlight", 1) then game.Workspace["Ghost"]["Highlight"]:Destroy(); end
-			GhostESP = CreateESP("Both", { Text = "[Ghost]"; Distance = true; ParentText = game.Workspace["Ghost"]:WaitForChild("Head"); ParentHighlight = game.Workspace["Ghost"]; Color = Color3.fromRGB(255, 0, 0); });
-		end
-	end)
 	
-	local ESP = CreateSettings("ESP", { Config = "ESP"; }, {
-		On = function()
-			if BooBooESP then BooBooESP:Enable(); end
-			if GeneratorESP then GeneratorESP:Enable(); end
-			if GhostESP then GhostESP:Enable(); end
-		end;
-		Off = function()
-			if BooBooESP then BooBooESP:Disable(); end
-			if GeneratorESP then GeneratorESP:Disable(); end
-			if GhostESP then GhostESP:Disable(); end
+	local ESP = CreateSettings("ESP", { Config = "ESP"; });
+	local ESPList = ESP:AddDropdrown({}, {
+		Config = "ESPList";
+		List = {
+			"Ghost","BooBoo Doll","Generator","Players","Cursed Object",
+			"Incense Burner","Lighter","Crucifix",
+			"Flashlight","Strong Flashlight","UV Light","GlowStick",
+			"Photo Camera","Video Camera","Trail Camera","SLS Camera",
+			"EMF Reader","Thermometer","Spirit Box","Ghost Writing Book",
+			"Parabolic Microphone","Salt",
+			"Sanity Soda"
+		};
+		Callback = function()
+			for _, iESP in pairs(ItemsESP) do iESP["ESP"]:Destroy(); end ItemsESP = {};
+			for _, item in pairs(game.Workspace["Map"]["Items"]:GetChildren()) do
+				if not ValidateItemESP(item) then continue; end
+				if not table.find(Config["ESPList"], item.Name) then continue; end
+				local Item = { ["Item"] = item; };
+				Item["ESP"] = CreateESP("Highlight", { Parent = item; Color = Color3.fromRGB(0, 255, 0); });
+				table.insert(ItemsESP, Item)
+			end
 		end;
 	});
 	
@@ -483,17 +654,21 @@ local Success, Result = pcall(function()
 	local Objects = CreateInfo("Cursed Object");
 	task.spawn(function()
 		pcall(function()
-			if game.Workspace:WaitForChild("SummoningCircle", 2) then Objects.AddInfo("Summoning Circle"); end
-			if game.Workspace:WaitForChild("Spirit Board", 2) then Objects.AddInfo("Spirit Board"); end
-			if game.Workspace["Map"]["Items"]:WaitForChild("Tarot Cards", 2) then Objects.AddInfo("Tarot Cards"); end
-			for _, Player in pairs(Players:GetChildren()) do
-				if Player.Backpack:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); break; end
-				if Player.Character and Player.Character:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); break; end
+			local function AddCursedESP(Display, Parent)
+				CursedObjectESP = CreateESP("Text", { Text = Display; Parent = Parent; Color = Color3.fromRGB(215, 252, 0); });
+				if Config["ESP"] and table.find(Config["ESPList"], "Cursed Object") then CursedObjectESP:Enable(); else CursedObjectESP:Disable(); end
 			end
-			if game.Workspace["Map"]["Items"]:WaitForChild("Music Box", 2) then Objects.AddInfo("Music Box"); end
+			if game.Workspace:WaitForChild("SummoningCircle", 2) then Objects.AddInfo("Summoning Circle"); AddCursedESP("[Summoning Circle]", game.Workspace["SummoningCircle"]); end
+			if game.Workspace:WaitForChild("Spirit Board", 2) then Objects.AddInfo("Spirit Board"); AddCursedESP("[Spirit Board]", game.Workspace["Spirit Board"]); end
+			if game.Workspace["Map"]["Items"]:WaitForChild("Tarot Cards", 2) then Objects.AddInfo("Tarot Cards"); AddCursedESP("[Tarot Cards]", game.Workspace["Map"]["Items"]["Tarot Cards"]); end
 			for _, Player in pairs(Players:GetChildren()) do
-				if Player.Backpack:FindFirstChild("Music Box") then Objects.AddInfo("Music Box"); break; end
-				if Player.Character and Player.Character:FindFirstChild("Music Box") then Objects.AddInfo("Music Box"); break; end
+				if Player.Backpack:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); AddCursedESP("[Tarot Cards]", Player.Backpack["Tarot Cards"]); break; end
+				if Player.Character and Player.Character:FindFirstChild("Tarot Cards") then Objects.AddInfo("Tarot Cards"); AddCursedESP("[Tarot Cards]", Player.Character["Tarot Cards"]); break; end
+			end
+			if game.Workspace["Map"]["Items"]:WaitForChild("Music Box", 2) then Objects.AddInfo("Music Box"); AddCursedESP("[Music Box]", game.Workspace["Map"]["Items"]["Music Box"]); end
+			for _, Player in pairs(Players:GetChildren()) do
+				if Player.Backpack:FindFirstChild("Music Box") then Objects.AddInfo("Music Box"); AddCursedESP("[Music Box]", Player.Backpack["Music Box"]); break; end
+				if Player.Character and Player.Character:FindFirstChild("Music Box") then Objects.AddInfo("Music Box"); AddCursedESP("[Music Box]", Player.Character["Music Box"]); break; end
 			end
 		end)
 	end)
@@ -539,12 +714,6 @@ local Success, Result = pcall(function()
 			if DoorCount > 0 then RoomDoor.Visible = true; RoomDoor.Text = "Door Interact: "..tostring(DoorCount); end
 		end
 	end):Start()
-
-	game.Workspace["Map"].DescendantAdded:Connect(function(instance)
-		if instance.ClassName ~= "Sound" then return; end
-		if instance.Name == "GhostCrying" then CryingCount = CryingCount + 1; end
-		if string.find(instance.Name, "DoorCreak") then DoorCount = DoorCount + 1; end
-	end)
 
 	-------------------
 	-- [[[ GHOST ]]] --
@@ -605,7 +774,8 @@ local Success, Result = pcall(function()
 	game.Workspace.ChildAdded:Connect(function(instance)
 		if instance.Name ~= "Ghost" then return; end
 		if game.Workspace["Ghost"]:WaitForChild("Highlight", 1) then game.Workspace["Ghost"]["Highlight"]:Destroy(); end
-		GhostESP = CreateESP("Both", { Text = "[Ghost]"; Distance = true; ParentText = instance:WaitForChild("Head", 1); ParentHighlight = instance; Color = Color3.fromRGB(255, 0, 0); Enabled = ESP.Enabled; });
+		GhostESP["Text"] = CreateESP("Text", { Text = "[Ghost]"; Distance = instance.PrimaryPart; Parent = instance:WaitForChild("Head", 1); Color = Color3.fromRGB(255, 0, 0); });
+		GhostESP["Highlight"] = CreateESP("Highlight", { Parent = instance; Color = Color3.fromRGB(255, 0, 0); });
 		local saveStamp = tick();
 		pcall(function()
 			blinkConnection = instance:WaitForChild("Head", 1):GetPropertyChangedSignal("Transparency"):Connect(function()
@@ -631,7 +801,7 @@ local Success, Result = pcall(function()
 				Evidences[evi].Visible = false;
 			end
 			
-			function FindSpiritBox(Object)
+			local function FindSpiritBox(Object)
 				for _, sb in pairs(Object:GetChildren()) do
 					if sb.Name ~= "Spirit Box" then continue; end
 					for _, talk in pairs(sb:FindFirstChild("GhostTalk"):GetChildren()) do
@@ -641,7 +811,7 @@ local Success, Result = pcall(function()
 					end
 				end
 			end
-			function FindEMFReader(Object)
+			local function FindEMFReader(Object)
 				for _, emf in pairs(Object:GetChildren()) do
 					if emf.Name ~= "EMF Reader" then continue; end
 					if not emf:FindFirstChild("5") then continue; end
@@ -725,6 +895,69 @@ local Success, Result = pcall(function()
 			if PlayerGui:FindFirstChild("Statusifier") then PlayerGui["Statusifier"]["Container"]["UIScale"].Scale = tonumber(SideStatusScale.Text) or 1; end
 		end
 	end):Start()
+
+	local ESPThread = Utility:Thread("ESP", function()
+		while task.wait() do
+			if Config["ESP"] and table.find(Config["ESPList"], "BooBoo Doll") then
+				if BooBooESP["Text"] then BooBooESP["Text"]:Enable(); end
+				if BooBooESP["Highlight"] then BooBooESP["Highlight"]:Enable(); end
+			else
+				if BooBooESP["Text"] then BooBooESP["Text"]:Disable(); end
+				if BooBooESP["Highlight"] then BooBooESP["Highlight"]:Disable(); end
+			end
+			if Config["ESP"] and table.find(Config["ESPList"], "Generator") then
+				if GeneratorESP["Text"] then GeneratorESP["Text"]:Enable(); end
+				if GeneratorESP["Highlight"] then GeneratorESP["Highlight"]:Enable(); end
+			else
+				if GeneratorESP["Text"] then GeneratorESP["Text"]:Disable(); end
+				if GeneratorESP["Highlight"] then GeneratorESP["Highlight"]:Disable(); end
+			end
+			if Config["ESP"] and table.find(Config["ESPList"], "Ghost") then
+				if GhostESP["Text"] then GhostESP["Text"]:Enable(); end
+				if GhostESP["Highlight"] then GhostESP["Highlight"]:Enable(); end
+			else
+				if GhostESP["Text"] then GhostESP["Text"]:Disable(); end
+				if GhostESP["Highlight"] then GhostESP["Highlight"]:Disable(); end
+			end
+			if CursedObjectESP then if Config["ESP"] and table.find(Config["ESPList"], "Cursed Object") then CursedObjectESP:Enable(); else CursedObjectESP:Disable(); end end
+			for _, pESP in pairs(PlayerESP) do if Config["ESP"] and table.find(Config["ESPList"], "Players") then pESP:Enable(); else pESP:Disable(); end end
+			for _, iESP in pairs(ItemsESP) do
+				if iESP["Item"].Parent ~= game.Workspace["Map"]["Items"] then iESP["ESP"]:Disable(); continue; end
+				if not Config["ESP"] then iESP["ESP"]:Disable(); continue; end
+				iESP["ESP"]:Enable();
+			end
+		end
+	end):Start()
+
+	game.Workspace["Map"].DescendantAdded:Connect(function(instance)
+		if instance.ClassName ~= "Sound" then return; end
+		if instance.Name == "GhostCrying" then CryingCount = CryingCount + 1; end
+		if string.find(instance.Name, "DoorCreak") then DoorCount = DoorCount + 1; end
+	end)
+
+	game.Workspace["Map"]["Items"].ChildAdded:Connect(function(item)
+		if not ValidateItemESP(item) then return; end
+		if not table.find(Config["ESPList"], item.Name) then return; end
+		for _, items in pairs(ItemsESP) do
+			if items["Item"] and items["Item"] == item then
+				if not ValidateItemESP(items["Item"]) then
+					items["ESP"]:Disable();
+					table.remove(ItemsESP, table.find(items));
+				end
+				return;
+			end
+		end
+		local Item = { ["Item"] = item; };
+		Item["ESP"] = CreateESP("Highlight", { Parent = item; Color = Color3.fromRGB(0, 255, 0); });
+		table.insert(ItemsESP, Item)
+	end)
+
+	Players.ChildAdded:Connect(function(player)
+		if PlayerESP[player.Name] then return; end
+		repeat task.wait() until player.Character;
+		PlayerESP[player.Name] = CreateESP("Text & Highlight", { Text = player.DisplayName; Parent = player.Character; Color = Color3.fromRGB(255, 255, 255); FillTransparency = 1; });
+		if table.find(Config["ESPList"], "Players") then PlayerESP[player.Name]:Enable(); else PlayerESP[player.Name]:Disable(); end
+	end)
 
 	UserIS.InputBegan:Connect(function(input, gameProcessed)
 		if gameProcessed then return end
