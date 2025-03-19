@@ -497,6 +497,7 @@ local Success, Result = pcall(function()
 							Text = "";
 							TextColor3 = Color3.fromRGB(255, 255, 255);
 							TextScaled = true;
+							TextStrokeTransparency = 0;
 						});
 					end
 				end
