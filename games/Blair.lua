@@ -967,6 +967,7 @@ local Success, Result = pcall(function()
 			end
 			if CursedObjectESP then if Config["ESP"] and table.find(Config["ESPList"], "Cursed Object") then CursedObjectESP:Enable(); else CursedObjectESP:Disable(); end end
 			for _, pESP in pairs(PlayerESP) do
+				if pESP["Player"] == nil then continue; end
 				if Config["ESP"] and table.find(Config["ESPList"], "Players") then pESP["ESP"]:Enable(); else pESP["ESP"]:Disable(); end
 				if Config["ESP"] and table.find(Config["ESPList"], "Backpack") then
 					pESP["Backpack"]:Enable();
