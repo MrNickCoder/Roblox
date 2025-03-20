@@ -584,7 +584,7 @@ local Success, Result = pcall(function()
 		repeat task.wait() until player.Character;
 		PlayerESP[player.Name] = {};
 		PlayerESP[player.Name]["Player"] = player;
-		PlayerESP[player.Name]["ESP"] = CreateESP("Text & Highlight", { Text = player.DisplayName; Parent = player.Character; Color = Color3.fromRGB(255, 255, 255); FillTransparency = 1; });
+		PlayerESP[player.Name]["ESP"] = CreateESP("Text & Highlight", { Text = player.DisplayName; ParentText = player.Character:FindFirstChild("Head"); ParentHighlight = player.Character; Color = Color3.fromRGB(255, 255, 255); FillTransparency = 1; });
 		PlayerESP[player.Name]["Backpack"] = CreateESP("Backpack", { Parent = player.Character; });
 	end
 	function ValidateItemESP(item)
@@ -1016,7 +1016,7 @@ local Success, Result = pcall(function()
 		repeat task.wait() until player.Character;
 		PlayerESP[player.Name] = {};
 		PlayerESP[player.Name]["Player"] = player;
-		PlayerESP[player.Name]["ESP"] = CreateESP("Text & Highlight", { Text = player.DisplayName; Parent = player.Character; Color = Color3.fromRGB(255, 255, 255); FillTransparency = 1; });
+		PlayerESP[player.Name]["ESP"] = CreateESP("Text & Highlight", { Text = player.DisplayName; ParentText = player.Character:FindFirstChild("Head"); ParentHighlight = player.Character; Color = Color3.fromRGB(255, 255, 255); FillTransparency = 1; });
 		PlayerESP[player.Name]["Backpack"] = CreateESP("Backpack", { Parent = player.Character; });
 	end)
 
