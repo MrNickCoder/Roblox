@@ -391,6 +391,7 @@ local Success, Result = pcall(function()
 					Data.ESP = Utility:Instance("BillboardGui", {
 						Name = "ESP_Text";
 						Parent = Properties.ParentText or Properties.Parent;
+						ResetOnSpawn = false;
 						AlwaysOnTop = true;
 						Enabled = Properties.Enabled or false;
 						Size = Properties.Size or UDim2.new(5, 0, 2, 0);
@@ -472,6 +473,7 @@ local Success, Result = pcall(function()
 					Data.ESP = Utility:Instance("BillboardGui", {
 						Name = "ESP_Backpack";
 						Parent = Properties.Parent;
+						ResetOnSpawn = false;
 						MaxDistance = Properties.MaxDistance or 15;
 						Size = Properties.Size or UDim2.new(2, 0, 2, 0);
 						StudsOffset = Properties.StudsOffset or Vector3.new(2, 1, 1);
@@ -579,7 +581,7 @@ local Success, Result = pcall(function()
 	end
 	for _, player in pairs(Players:GetChildren()) do
 		if player == LocalPlayer then continue; end
-		repeat task.wait() until player.Character
+		repeat task.wait() until player.Character;
 		PlayerESP[player.Name] = {};
 		PlayerESP[player.Name]["Player"] = player;
 		PlayerESP[player.Name]["ESP"] = CreateESP("Text & Highlight", { Text = player.DisplayName; Parent = player.Character; Color = Color3.fromRGB(255, 255, 255); FillTransparency = 1; });
