@@ -554,6 +554,7 @@ local Success, Result = pcall(function()
 	local LowestTemp = nil;
 	local CryingCount = 0;
 	local DoorCount = 0;
+	local ManifestCount = 0;
 	local blinkConnection;
 
 	local BooBooESP = {};
@@ -740,6 +741,7 @@ local Success, Result = pcall(function()
 	local RoomSalt = Room.AddInfo("Salt Stepped"); RoomSalt.Visible = false;
 	local RoomCrying = Room.AddInfo("Ghost Crying"); RoomCrying.Visible = false;
 	local RoomDoor = Room.AddInfo("Door Interact"); RoomDoor.Visible = false;
+	local RoomManifest = Room.AddInfo("Manifest"); RoomManifest.Visible = false;
 	local RoomThread = Utility:Thread("Room", function()
 		while task.wait() do
 			local LowestTempRoom = nil;
@@ -769,6 +771,7 @@ local Success, Result = pcall(function()
 			end
 			if CryingCount > 0 then RoomCrying.Visible = true; RoomCrying.Text = "Ghost Crying: "..tostring(CryingCount); end
 			if DoorCount > 0 then RoomDoor.Visible = true; RoomDoor.Text = "Door Interact: "..tostring(DoorCount); end
+			if ManifestCount > 0 then RoomManifest.Visible = true; RoomManifest.Text = "Manifest: "..tostring(ManifestCount); end
 		end
 	end):Start()
 
@@ -840,6 +843,9 @@ local Success, Result = pcall(function()
 				saveStamp = tick();
 			end);
 		end);
+		if game.Workspace["Ghost"]:WaitForChild("Hunting") then
+			if not game.Workspace["Ghost"]["Hunting"].Value then ManifestCount = ManifestCount + 1; end
+		end
 	end);
 	game.Workspace.ChildRemoved:Connect(function(instance)
 		if instance.Name ~= "Ghost" then return; end
