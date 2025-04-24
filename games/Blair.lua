@@ -616,7 +616,7 @@ local Success, Result = pcall(function()
 		for _, egg in pairs(game.Workspace:GetChildren()) do -- EASTER HUNT
 			if egg.Name ~= "Egg" then continue; end
 			local Egg = { ["Egg"] = egg; };
-			Egg["ESP"]  = CreateESP("Highlight", { Parent = egg; Color = Color3.fromRGB(184, 140, 234); });
+			Egg["ESP"]  = CreateESP("Text", { Text = "▼"; StudsOffset = Vector3.new(0, 1, 0); Parent = egg; Color = Color3.fromRGB(184, 140, 234); });
 			table.insert(EggsESP, Egg)
 		end
 	end)
