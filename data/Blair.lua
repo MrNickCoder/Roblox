@@ -55,4 +55,25 @@ return {
     ["Map"] = {
 
     };
+    ["Items"] = {
+        ["Incense Burner"] = {Parent = game.Workspace["Map"]["Items"]};
+        ["Lighter"] = {Parent = game.Workspace["Map"]["Items"]};
+        ["Crucifix"] = {Parent = game.Workspace["Map"]["Items"]};
+		["Flashlight"] = {Parent = game.Workspace["Map"]["Items"]};
+        ["Strong Flashlight"] = {Parent = game.Workspace["Map"]["Items"]};
+        ["UV Light"] = {Parent = game.Workspace["Map"]["Items"]};
+        ["GlowStick"] = {Parent = game.Workspace["Map"]["Items"]};
+		["Photo Camera"] = {Parent = game.Workspace["Map"]["Items"]};
+        ["Video Camera"] = {Parent = game.Workspace["Map"]["Items"]};
+        ["Trail Camera"] = {Parent = game.Workspace["Map"]["Items"]};
+        ["SLS Camera"] = {Parent = game.Workspace["Map"]["Items"]};
+		["EMF Reader"] = {Parent = game.Workspace["Map"]["Items"]};
+        ["Thermometer"] = {Parent = game.Workspace["Map"]["Items"]};
+        ["Spirit Box"] = {Parent = game.Workspace["Map"]["Items"]};
+        ["Ghost Writing Book"] = {Parent = game.Workspace["Map"]["Items"]};
+		["Parabolic Microphone"] = {Parent = game.Workspace["Map"]["Items"]};
+        ["Salt"] = {Parent = game.Workspace["Map"]["Items"]};
+		["Sanity Soda"] = {Parent = game.Workspace["Map"]["Items"]};
+        ["Easter Egg"] = {Parent = game.Workspace};
+    };
 }
