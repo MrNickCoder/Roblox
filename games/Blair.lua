@@ -391,7 +391,7 @@ local Success, Result = pcall(function()
 					Data.ESP = Utility:Instance("BillboardGui", {
 						Name = "ESP_Text";
 						Parent = Properties.ParentText or Properties.Parent;
-						ResetOnSpawn = false;
+						ResetOnSpawn = Properties.ResetOnSpawn or false;
 						AlwaysOnTop = true;
 						Enabled = Properties.Enabled or false;
 						Size = Properties.Size or UDim2.new(5, 0, 2, 0);
@@ -473,7 +473,8 @@ local Success, Result = pcall(function()
 					Data.ESP = Utility:Instance("BillboardGui", {
 						Name = "ESP_Backpack";
 						Parent = Properties.Parent;
-						ResetOnSpawn = false;
+						ResetOnSpawn = Properties.ResetOnSpawn or false;
+						AlwaysOnTop = true;
 						MaxDistance = Properties.MaxDistance or 15;
 						Size = Properties.Size or UDim2.new(2, 0, 2, 0);
 						StudsOffset = Properties.StudsOffset or Vector3.new(2, 1, 1);
@@ -561,6 +562,7 @@ local Success, Result = pcall(function()
 	local PlayerESP = {};
 	local CursedObjectESP = nil;
 	local ItemsESP = {};
+	local EggsESP = {}; -- EASTER HUNT
 
 	task.spawn(function()
 		repeat task.wait() until game.Workspace:FindFirstChild("BooBooDoll")
@@ -610,6 +612,12 @@ local Success, Result = pcall(function()
 			local Item = { ["Item"] = item; };
 			Item["ESP"] = CreateESP("Highlight", { Parent = item; Color = Color3.fromRGB(0, 255, 0); });
 			table.insert(ItemsESP, Item)
+		end
+		for _, egg in pairs(game.Workspace:GetChildren()) do -- EASTER HUNT
+			if egg.Name ~= "Egg" then continue; end
+			local Egg = { ["Egg"] = egg; };
+			Egg["ESP"]  = CreateESP("Highlight", { Parent = egg; Color = Color3.fromRGB(184, 140, 234); });
+			table.insert(EggsESP, Egg)
 		end
 	end)
 
@@ -674,7 +682,8 @@ local Success, Result = pcall(function()
 			"Photo Camera","Video Camera","Trail Camera","SLS Camera",
 			"EMF Reader","Thermometer","Spirit Box","Ghost Writing Book",
 			"Parabolic Microphone","Salt",
-			"Sanity Soda"
+			"Sanity Soda",
+			"Eggs" -- EASTER HUNT
 		};
 		Callback = function()
 			for _, iESP in pairs(ItemsESP) do iESP["ESP"]:Destroy(); end ItemsESP = {};
@@ -981,9 +990,15 @@ local Success, Result = pcall(function()
 				else pESP["Backpack"]:Disable(); end
 			end
 			for _, iESP in pairs(ItemsESP) do
-				if iESP["Item"].Parent ~= game.Workspace["Map"]["Items"] then iESP["ESP"]:Disable(); continue; end
 				if not Config["ESP"] then iESP["ESP"]:Disable(); continue; end
+				if iESP["Item"].Parent ~= game.Workspace["Map"]["Items"] then iESP["ESP"]:Disable(); continue; end
 				iESP["ESP"]:Enable();
+			end
+			for _, eggESP in pairs(EggsESP) do -- EASTER HUNT
+				if not Config["ESP"] then eggESP["ESP"]:Disable(); continue; end
+				if not table.find(Config["ESPList"], "Eggs") then eggESP["ESP"]:Disable(); continue; end
+				if eggESP["Egg"].Parent ~= game.Workspace then eggESP["ESP"]:Disable(); continue; end
+				eggESP["ESP"]:Enable();
 			end
 		end
 	end):Start()
@@ -997,11 +1012,11 @@ local Success, Result = pcall(function()
 	game.Workspace["Map"]["Items"].ChildAdded:Connect(function(item)
 		if not ValidateItemESP(item) then return; end
 		if not table.find(Config["ESPList"], item.Name) then return; end
-		for _, items in pairs(ItemsESP) do
-			if items["Item"] and items["Item"] == item then
-				if not ValidateItemESP(items["Item"]) then
-					items["ESP"]:Disable();
-					table.remove(ItemsESP, table.find(items));
+		for _, iESP in pairs(ItemsESP) do
+			if iESP["Item"] and iESP["Item"] == item then
+				if not ValidateItemESP(iESP["Item"]) then
+					iESP["ESP"]:Disable();
+					table.remove(ItemsESP, table.find(iESP));
 				end
 				return;
 			end
@@ -1011,13 +1026,16 @@ local Success, Result = pcall(function()
 		table.insert(ItemsESP, Item)
 	end)
 
-	Players.ChildAdded:Connect(function(player)
+	Players.PlayerAdded:Connect(function(player)
 		if PlayerESP[player.Name] then return; end
 		repeat task.wait() until player.Character;
 		PlayerESP[player.Name] = {};
 		PlayerESP[player.Name]["Player"] = player;
 		PlayerESP[player.Name]["ESP"] = CreateESP("Text & Highlight", { Text = player.DisplayName; ParentText = player.Character:FindFirstChild("Head"); ParentHighlight = player.Character; Color = Color3.fromRGB(255, 255, 255); FillTransparency = 1; });
 		PlayerESP[player.Name]["Backpack"] = CreateESP("Backpack", { Parent = player.Character; });
+	end)
+	Players.PlayerRemoving:Connect(function(player)
+		PlayerESP[player.Name] = nil;
 	end)
 
 	UserIS.InputBegan:Connect(function(input, gameProcessed)
