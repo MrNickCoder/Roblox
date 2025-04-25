@@ -601,8 +601,16 @@ local Success, Result = pcall(function()
 			"Parabolic Microphone","Salt",
 			"Sanity Soda"
 		}, item.Name) then return false; end
-		if item.Name == "Incense Burner" and item:WaitForChild("Used").Value then return false; end
-		if item.Name == "Photo Camera" and item:WaitForChild("PhotoCameraMemory"):WaitForChild("Memory").Value == 100 then return false; end
+		if item.Name == "Incense Burner" then
+			if item:WaitForChild("Used").Value then return false; end
+			if item:WaitForChild("GhostIncensed").Value then return false; end
+		end
+		if item.Name == "Photo Camera" then
+			if item:WaitForChild("PhotoCameraMemory") then
+				if item["PhotoCameraMemory"]:WaitForChild("Memory").Value == 100 then return false; end
+				if item["PhotoCameraMemory"]:WaitForChild("MemoryCapacity").Text == "100/100 MB" then return false; end
+			end
+		end
 		return true;
 	end
 	task.spawn(function()
@@ -1029,7 +1037,7 @@ local Success, Result = pcall(function()
 		for _, iESP in pairs(ItemsESP) do
 			if iESP["Item"] and iESP["Item"] == item then
 				if not ValidateItemESP(iESP["Item"]) then
-					iESP["ESP"]:Disable();
+					iESP["ESP"]:Destroy();
 					table.remove(ItemsESP, table.find(iESP));
 				end
 				return;
