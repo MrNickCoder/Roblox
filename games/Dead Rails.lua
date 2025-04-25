@@ -248,7 +248,7 @@ local Success, Result = pcall(function()
 		end
 		function Interface:CreateTextBox(Name, Options, Callback)
 			local Value = Options and (Config[Options.Config] or Options.Default or "");
-			local Callback = Callback or function() end;
+			local Callback = Callback or function(Value) end;
 			
 			local Data = {Value = Value};
 			Data.UI = Utility:Instance("Frame", {
@@ -299,7 +299,7 @@ local Success, Result = pcall(function()
 					Config[Options.Config] = Data.Value;
 					Utility:SaveConfig(Config, Directory, File_Name);
 				end
-				Callback();
+				Callback(Value);
 			end
 			
 			Data.UI["Input"]["Box"].FocusLost:Connect(function() Data:Set(Data.UI["Input"]["Box"].Text); end)
