@@ -76,6 +76,6 @@ return {
 		["Sanity Soda"] = {Parent = game.Workspace["Map"]["Items"]};
     };
     ["Events"] = {
-        ["Easter"] = DateTime.fromLocalTime(2025, 5, 2, 12, 0, 0, 0);
+        ["Easter"] = DateTime.now().UnixTimestampMillis <= DateTime.fromLocalTime(2025, 5, 2, 12, 0, 0, 0).UnixTimestampMillis;
     }
 }
