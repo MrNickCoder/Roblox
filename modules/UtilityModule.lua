@@ -35,6 +35,12 @@ do
 		end
 		return newTable
 	end
+
+	function Utility:GetTableKeys(Table:{any})
+		local newTable = {}
+		for k, _ in pairs(Table) do table.insert(newTable, k) end
+		return newTable
+	end
 	
 	function Utility:Length(Table:{any})
 		local Counter = 0
