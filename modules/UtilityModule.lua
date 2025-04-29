@@ -16,7 +16,7 @@ do
 		return Object;
 	end
 	
-	function Utility:Comma_Value(Text:string)
+	function Utility:CommaValue(Text:string)
 		local Value = Text;
 		while true do
 			local Str, Num = string.gsub(Value, "^(-?%d+)(%d%d%d)", "%1,%2");
@@ -26,7 +26,7 @@ do
 		return Value
 	end
 
-	function Utility:Combine_Table(...:{any})
+	function Utility:CombineTable(...:{any})
 		local newTable = {}
 		for _, v in ipairs({...}) do
 			for i, x in ipairs(v) do

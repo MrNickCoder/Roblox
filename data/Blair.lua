@@ -74,7 +74,6 @@ return {
 		["Parabolic Microphone"] = {Parent = game.Workspace["Map"]["Items"]};
         ["Salt"] = {Parent = game.Workspace["Map"]["Items"]};
 		["Sanity Soda"] = {Parent = game.Workspace["Map"]["Items"]};
-        ["Easter Egg"] = {Parent = game.Workspace};
     };
     ["Events"] = {
         ["Easter"] = DateTime.fromLocalTime(2025, 5, 2, 12, 0, 0, 0);
