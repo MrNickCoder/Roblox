@@ -630,15 +630,6 @@ local Success, Result = pcall(function()
 		if item.Name == "Tarot Cards" then return false; end
 		if item.Name == "Music Box" then return false; end
 		if not table.find(Utility:GetTableKeys(BlairData["Items"]), item.Name) then return false; end
-		--[[
-		if not table.find({
-			"Incense Burner","Lighter","Crucifix",
-			"Flashlight","Strong Flashlight","UV Light","GlowStick",
-			"Photo Camera","Video Camera","Trail Camera","SLS Camera",
-			"EMF Reader","Thermometer","Spirit Box","Ghost Writing Book",
-			"Parabolic Microphone","Salt",
-			"Sanity Soda"
-		}, item.Name) then return false; end--]]
 		if item.Name == "Incense Burner" then
 			if item:WaitForChild("Used").Value then return false; end
 			if item:WaitForChild("GhostIncensed").Value then return false; end
@@ -744,17 +735,6 @@ local Success, Result = pcall(function()
 	local ESPList = ESP:AddDropdrown({}, {
 		Config = "ESPList";
 		List = List;
-		--[[
-		List = {
-			"Ghost","BooBoo Doll","Generator","Players","Cursed Object","Backpack",
-			"Incense Burner","Lighter","Crucifix",
-			"Flashlight","Strong Flashlight","UV Light","GlowStick",
-			"Photo Camera","Video Camera","Trail Camera","SLS Camera",
-			"EMF Reader","Thermometer","Spirit Box","Ghost Writing Book",
-			"Parabolic Microphone","Salt",
-			"Sanity Soda",
-			"Eggs" -- EASTER HUNT
-		};--]]
 		Callback = function()
 			for _, iESP in pairs(ItemsESP) do iESP["ESP"]:Destroy(); end ItemsESP = {};
 			for _, item in pairs(game.Workspace["Map"]["Items"]:GetChildren()) do
