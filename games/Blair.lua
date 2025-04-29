@@ -276,6 +276,41 @@ local Success, Result = pcall(function()
 
 				return Control;
 			end
+
+			function Data:AddButton(Properties, Options)
+				local Display = Options and Options.Display or "";
+				local Control = { Debounce = false; };
+				Control.Button = Utility:Instance("TextButton", {
+					Parent = Data.Button;
+					AnchorPoint = Vector2.new(0.5, 1);
+					BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+					BackgroundTransparency = 0.25;
+					BorderSizePixel = 0;
+					Position = UDim2.new(0.5, 0, 0, -2);
+					Size = UDim2.new(0.8, 0, 0.8, 0);
+					Font = Enum.Font.SourceSansBold;
+					Text = Display;
+					TextColor3 = Color3.fromRGB(255, 255, 255);
+					TextScaled = true;
+					Utility:Instance("UICorner", { CornerRadius = UDim.new(0, 5); });
+				});
+				for Index, Value in pairs(Properties or {}) do
+					if Control.Button[Index] then Control.Button[Index] = Value; end
+				end;
+
+				Control.Button.MouseButton1Down:Connect(function()
+					if Control.Debounce then return; end
+					if Options.Callback then Options.Callback(); end
+
+					Control.Debounce = true;
+					task.spawn(function()
+						task.wait(1);
+						Control.Debounce = false;
+					end)
+				end)
+
+				return Control;
+			end
 			
 			function Data:Set(Value)
 				Data.Enabled = Value;
@@ -683,6 +718,16 @@ local Success, Result = pcall(function()
 			game.Workspace["Map"]["Van"]["Van"]["Door"]["Main"].CanCollide = true;
 		end;
 	});
+	local CollectEgg = NoClipDoor:AddButton({}, { -- EASTER HUNT
+		Display = "Collect Egg";
+		Callback = function()
+			for _, egg in pairs(game.Workspace:GetChildren()) do
+				if egg.Name ~= "Egg" and egg.Name ~= "FabergeEgg" then continue; end
+				egg.CFrame = LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame;
+				task.wait(0.05)
+			end
+		end;
+	})
 	
 	local ESP = CreateSettings("ESP", { Config = "ESP"; });
 	local ESPList = ESP:AddDropdrown({}, {
