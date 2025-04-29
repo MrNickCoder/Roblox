@@ -623,9 +623,12 @@ local Success, Result = pcall(function()
 			table.insert(ItemsESP, Item)
 		end
 		for _, egg in pairs(game.Workspace:GetChildren()) do -- EASTER HUNT
-			if egg.Name ~= "Egg" then continue; end
+			if egg.Name ~= "Egg" and egg.Name ~= "FabergeEgg" then continue; end
+			
+			local EggColor = Color3.fromRGB(240, 56, 255);
+			if egg.Name == "FabergeEgg" then EggColor = Color3.fromRGB(239, 112, 157); end
 			local Egg = { ["Egg"] = egg; };
-			Egg["ESP"]  = CreateESP("Text", { Text = "▼"; StudsOffset = Vector3.new(0, 1, 0); Parent = egg; Color = Color3.fromRGB(240, 56, 255); });
+			Egg["ESP"]  = CreateESP("Text", { Text = "▼"; StudsOffset = Vector3.new(0, 1, 0); Parent = egg; Color = EggColor; });
 			table.insert(EggsESP, Egg)
 		end
 	end)
@@ -1018,6 +1021,9 @@ local Success, Result = pcall(function()
 	end):Start()
 
 	game.Workspace.ChildAdded:Connect(function(instance)
+		if Players:FindFirstChild(instance.Name) and PlayerESP[instance.Name] then
+			
+		end
 		if instance.Name == "FabergeEgg" then -- EASTER HUNT
 			local Egg = { ["Egg"] = instance; };
 			Egg["ESP"]  = CreateESP("Text", { Text = "▼"; StudsOffset = Vector3.new(0, 1, 0); Parent = instance; Color = Color3.fromRGB(239, 112, 157); });
