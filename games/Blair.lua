@@ -39,6 +39,7 @@ local Success, Result = pcall(function()
 	task.wait(5);
 
 	local Utility = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/UtilityModule.lua"))()
+	local BlairData = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/data/Blair.lua"))()
 	
 	------------------
 	-- [[ CONFIG ]] --
@@ -657,14 +658,16 @@ local Success, Result = pcall(function()
 			Item["ESP"] = CreateESP("Highlight", { Parent = item; Color = Color3.fromRGB(0, 255, 0); });
 			table.insert(ItemsESP, Item)
 		end
-		for _, egg in pairs(game.Workspace:GetChildren()) do -- EASTER HUNT
-			if egg.Name ~= "Egg" and egg.Name ~= "FabergeEgg" then continue; end
-			
-			local EggColor = Color3.fromRGB(240, 56, 255);
-			if egg.Name == "FabergeEgg" then EggColor = Color3.fromRGB(239, 112, 157); end
-			local Egg = { ["Egg"] = egg; };
-			Egg["ESP"]  = CreateESP("Text", { Text = "▼"; StudsOffset = Vector3.new(0, 1, 0); Parent = egg; Color = EggColor; });
-			table.insert(EggsESP, Egg)
+		if DateTime.now().UnixTimestampMillis <= BlairData["Events"]["Easter"].UnixTimestampMillis then -- EASTER HUNT
+			for _, egg in pairs(game.Workspace:GetChildren()) do
+				if egg.Name ~= "Egg" and egg.Name ~= "FabergeEgg" then continue; end
+				
+				local EggColor = Color3.fromRGB(240, 56, 255);
+				if egg.Name == "FabergeEgg" then EggColor = Color3.fromRGB(239, 112, 157); end
+				local Egg = { ["Egg"] = egg; };
+				Egg["ESP"]  = CreateESP("Text", { Text = "▼"; StudsOffset = Vector3.new(0, 1, 0); Parent = egg; Color = EggColor; });
+				table.insert(EggsESP, Egg)
+			end
 		end
 	end)
 
@@ -718,16 +721,18 @@ local Success, Result = pcall(function()
 			game.Workspace["Map"]["Van"]["Van"]["Door"]["Main"].CanCollide = true;
 		end;
 	});
-	local CollectEgg = NoClipDoor:AddButton({}, { -- EASTER HUNT
-		Display = "Collect Egg";
-		Callback = function()
-			for _, egg in pairs(game.Workspace:GetChildren()) do
-				if egg.Name ~= "Egg" and egg.Name ~= "FabergeEgg" then continue; end
-				egg.CFrame = LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame;
-				task.wait(0.05)
-			end
-		end;
-	})
+	if DateTime.now().UnixTimestampMillis <= BlairData["Events"]["Easter"].UnixTimestampMillis then -- EASTER HUNT
+		local CollectEgg = NoClipDoor:AddButton({}, {
+			Display = "Collect Egg";
+			Callback = function()
+				for _, egg in pairs(game.Workspace:GetChildren()) do
+					if egg.Name ~= "Egg" and egg.Name ~= "FabergeEgg" then continue; end
+					egg.CFrame = LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame;
+					task.wait(0.05)
+				end
+			end;
+		})
+	end
 	
 	local ESP = CreateSettings("ESP", { Config = "ESP"; });
 	local ESPList = ESP:AddDropdrown({}, {
@@ -1056,11 +1061,13 @@ local Success, Result = pcall(function()
 				if iESP["Item"].Parent ~= game.Workspace["Map"]["Items"] then iESP["ESP"]:Disable(); continue; end
 				iESP["ESP"]:Enable();
 			end
-			for _, eggESP in pairs(EggsESP) do -- EASTER HUNT
-				if not Config["ESP"] then eggESP["ESP"]:Disable(); continue; end
-				if not table.find(Config["ESPList"], "Eggs") then eggESP["ESP"]:Disable(); continue; end
-				if eggESP["Egg"].Parent ~= game.Workspace then eggESP["ESP"]:Disable(); continue; end
-				eggESP["ESP"]:Enable();
+			if DateTime.now().UnixTimestampMillis <= BlairData["Events"]["Easter"].UnixTimestampMillis then -- EASTER HUNT
+				for _, eggESP in pairs(EggsESP) do
+					if not Config["ESP"] then eggESP["ESP"]:Disable(); continue; end
+					if not table.find(Config["ESPList"], "Eggs") then eggESP["ESP"]:Disable(); continue; end
+					if eggESP["Egg"].Parent ~= game.Workspace then eggESP["ESP"]:Disable(); continue; end
+					eggESP["ESP"]:Enable();
+				end
 			end
 		end
 	end):Start()
@@ -1069,10 +1076,12 @@ local Success, Result = pcall(function()
 		if Players:FindFirstChild(instance.Name) and PlayerESP[instance.Name] then
 			
 		end
-		if instance.Name == "FabergeEgg" then -- EASTER HUNT
-			local Egg = { ["Egg"] = instance; };
-			Egg["ESP"]  = CreateESP("Text", { Text = "▼"; StudsOffset = Vector3.new(0, 1, 0); Parent = instance; Color = Color3.fromRGB(239, 112, 157); });
-			table.insert(EggsESP, Egg)
+		if DateTime.now().UnixTimestampMillis <= BlairData["Events"]["Easter"].UnixTimestampMillis then -- EASTER HUNT
+			if instance.Name == "FabergeEgg" then
+				local Egg = { ["Egg"] = instance; };
+				Egg["ESP"]  = CreateESP("Text", { Text = "▼"; StudsOffset = Vector3.new(0, 1, 0); Parent = instance; Color = Color3.fromRGB(239, 112, 157); });
+				table.insert(EggsESP, Egg)
+			end
 		end
 	end)
 
