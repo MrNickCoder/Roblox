@@ -412,7 +412,7 @@ local Success, Result = pcall(function()
         if input.KeyCode == Enum.KeyCode.J then UserInterface.Enabled = not UserInterface.Enabled; end
     end)
 
-    print("Desert Detectors Script!");
+    print("Loaded Desert Detectors Script!");
 end)
 
 local WebhookModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/WebhookModule.lua"))();

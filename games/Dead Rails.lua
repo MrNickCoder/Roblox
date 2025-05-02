@@ -821,7 +821,7 @@ local Success, Result = pcall(function()
 	end);
 	UIButton.MouseLeave:Connect(function() timeBetween = 0; heldDown = false; end);
 	
-	print("Dead Rails Script!");
+	print("Loaded Dead Rails Script!");
 end)
 
 local WebhookModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/WebhookModule.lua"))();

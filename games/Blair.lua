@@ -1117,7 +1117,7 @@ local Success, Result = pcall(function()
 		PlayerGui["MobileUI"].FlashlightButton.MouseLeave:Connect(function() timeBetween["Freecam"] = 0; heldDown["Freecam"] = false; end)
 	end
 
-	print("Blair Script!");
+	print("Loaded Blair Script!");
 end)
 
 local WebhookModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrNickCoder/Roblox/refs/heads/main/modules/WebhookModule.lua"))();

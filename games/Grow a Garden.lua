@@ -22,5 +22,5 @@ local Success, Result = pcall(function()
     repeat task.wait(.1) until game.Workspace:FindFirstChild(LocalPlayer.Name);
 	repeat task.wait(.1) until game.Workspace[LocalPlayer.Name]:FindFirstChild("HumanoidRootPart");
 
-    print("Grow a Garden Script!");
+    print("Loaded Grow a Garden Script!");
 end)
