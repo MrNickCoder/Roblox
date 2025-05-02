@@ -599,7 +599,6 @@ local Success, Result = pcall(function()
 	local PlayerESP = {};
 	local CursedObjectESP = nil;
 	local ItemsESP = {};
-	local EggsESP = {}; -- EASTER HUNT
 
 	task.spawn(function()
 		repeat task.wait() until game.Workspace:FindFirstChild("BooBooDoll")
@@ -650,17 +649,6 @@ local Success, Result = pcall(function()
 			local Item = { ["Item"] = item; };
 			Item["ESP"] = CreateESP("Highlight", { Parent = item; Color = Color3.fromRGB(0, 255, 0); });
 			table.insert(ItemsESP, Item)
-		end
-		if BlairData["Events"]["Easter"] then -- EASTER HUNT
-			for _, egg in pairs(game.Workspace:GetChildren()) do
-				if egg.Name ~= "Egg" and egg.Name ~= "FabergeEgg" then continue; end
-				
-				local EggColor = Color3.fromRGB(240, 56, 255);
-				if egg.Name == "FabergeEgg" then EggColor = Color3.fromRGB(239, 112, 157); end
-				local Egg = { ["Egg"] = egg; };
-				Egg["ESP"]  = CreateESP("Text", { Text = "▼"; StudsOffset = Vector3.new(0, 1, 0); Parent = egg; Color = EggColor; });
-				table.insert(EggsESP, Egg)
-			end
 		end
 	end)
 
@@ -714,21 +702,8 @@ local Success, Result = pcall(function()
 			game.Workspace["Map"]["Van"]["Van"]["Door"]["Main"].CanCollide = true;
 		end;
 	});
-	if BlairData["Events"]["Easter"] then -- EASTER HUNT
-		local CollectEgg = NoClipDoor:AddButton({}, {
-			Display = "Collect Egg";
-			Callback = function()
-				for _, egg in pairs(game.Workspace:GetChildren()) do
-					if egg.Name ~= "Egg" and egg.Name ~= "FabergeEgg" then continue; end
-					egg.CFrame = LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame;
-					task.wait(0.05)
-				end
-			end;
-		})
-	end
 	
 	local List =  Utility:CombineTable({"Ghost","BooBoo Doll","Generator","Players","Cursed Object","Backpack"}, Utility:GetTableKeys(BlairData["Items"]));
-	if BlairData["Events"]["Easter"] then table.insert(List, "Eggs"); end -- EASTER HUNT
 	local ESP = CreateSettings("ESP", { Config = "ESP"; });
 	local ESPList = ESP:AddDropdrown({}, {
 		Config = "ESPList";
@@ -945,7 +920,7 @@ local Success, Result = pcall(function()
 					end
 					if not Evidences["Ultraviolet"].Visible and #game.Workspace["Map"]["Prints"]:GetChildren() > 0 then Evidences["Ultraviolet"].Visible = true; end
 					if not Evidences["Freezing Temp."].Visible then
-						if LowestTemp["_____Temperature"].Value < 0.1 then Evidences["Freezing Temp."].Visible = true; end
+						if LowestTemp["_____Temperature"].Value < 0.1 and LowestTemp["_____Temperature"]["_____LocalBaseTemp"].Value <= 0 then Evidences["Freezing Temp."].Visible = true; end
 					end
 					if not Evidences["Ghost Orbs"].Visible and #game.Workspace["Map"]["Orbs"]:GetChildren() > 0 then Evidences["Ghost Orbs"].Visible = true; end
 					if not Evidences["Ghost Writing"].Visible then
@@ -1047,27 +1022,12 @@ local Success, Result = pcall(function()
 				if iESP["Item"].Parent ~= game.Workspace["Map"]["Items"] then iESP["ESP"]:Disable(); continue; end
 				iESP["ESP"]:Enable();
 			end
-			if BlairData["Events"]["Easter"] then -- EASTER HUNT
-				for _, eggESP in pairs(EggsESP) do
-					if not Config["ESP"] then eggESP["ESP"]:Disable(); continue; end
-					if not table.find(Config["ESPList"], "Eggs") then eggESP["ESP"]:Disable(); continue; end
-					if eggESP["Egg"].Parent ~= game.Workspace then eggESP["ESP"]:Disable(); continue; end
-					eggESP["ESP"]:Enable();
-				end
-			end
 		end
 	end):Start()
 
 	game.Workspace.ChildAdded:Connect(function(instance)
 		if Players:FindFirstChild(instance.Name) and PlayerESP[instance.Name] then
 			
-		end
-		if BlairData["Events"]["Easter"] then -- EASTER HUNT
-			if instance.Name == "FabergeEgg" then
-				local Egg = { ["Egg"] = instance; };
-				Egg["ESP"]  = CreateESP("Text", { Text = "▼"; StudsOffset = Vector3.new(0, 1, 0); Parent = instance; Color = Color3.fromRGB(239, 112, 157); });
-				table.insert(EggsESP, Egg)
-			end
 		end
 	end)
 

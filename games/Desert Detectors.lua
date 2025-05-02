@@ -21,7 +21,7 @@ StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Loading D
 local Success, Result = pcall(function()
     print("Loading Desert Detectors Script!");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild(LocalPlayer.Name);
-	repeat task.wait(.1) until game.Workspace:FindFirstChild(LocalPlayer.Name):FindFirstChild("HumanoidRootPart");
+	repeat task.wait(.1) until game.Workspace[LocalPlayer.Name]:FindFirstChild("HumanoidRootPart");
 	repeat task.wait(.1) until game.Workspace:FindFirstChild("Loot");
     repeat task.wait(.1) until PlayerGui:FindFirstChild("Menu_UI");
     repeat task.wait(.1) until PlayerGui["Menu_UI"]:FindFirstChild("Frame");
