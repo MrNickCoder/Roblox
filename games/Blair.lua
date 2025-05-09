@@ -918,11 +918,21 @@ local Success, Result = pcall(function()
 							FindEMFReader(game.Workspace["Map"]["Items"]);
 						end
 					end
-					if not Evidences["Ultraviolet"].Visible and #game.Workspace["Map"]["Prints"]:GetChildren() > 0 then Evidences["Ultraviolet"].Visible = true; end
+					if not Evidences["Ultraviolet"].Visible and #game.Workspace["Map"]["Prints"]:GetChildren() > 0 then
+						for _, prints in pairs(game.Workspace["Map"]["Prints"]:GetChildren()) do
+							if table.find({"Script, LocalScript"}, prints.ClassName) then continue; end
+							Evidences["Ultraviolet"].Visible = true;
+						end
+					end
 					if not Evidences["Freezing Temp."].Visible then
 						if LowestTemp["_____Temperature"].Value < 0.1 and LowestTemp["_____Temperature"]["_____LocalBaseTemp"].Value <= 0 then Evidences["Freezing Temp."].Visible = true; end
 					end
-					if not Evidences["Ghost Orbs"].Visible and #game.Workspace["Map"]["Orbs"]:GetChildren() > 0 then Evidences["Ghost Orbs"].Visible = true; end
+					if not Evidences["Ghost Orbs"].Visible and #game.Workspace["Map"]["Orbs"]:GetChildren() > 0 then
+						for _, orbs in pairs(game.Workspace["Map"]["Orbs"]:GetChildren()) do
+							if table.find({"Script, LocalScript"}, orbs.ClassName) then continue; end
+							Evidences["Ghost Orbs"].Visible = true;
+						end
+					end
 					if not Evidences["Ghost Writing"].Visible then
 						for _, item in pairs(game.Workspace["Map"]["Items"]:GetChildren()) do
 							if item.Name ~= "Ghost Writing Book" then continue; end
