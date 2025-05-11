@@ -40,23 +40,42 @@ local Success, Result = pcall(function()
     -------------------
     local Farm;
     while Farm == nil do
-        for _, v in pairs(game.Workspace["Farm"]:GetChildren()) do
-            if not v:FindFirstChild("Important") then continue; end
-            if not v["Important"]:FindFirstChild("Data") then continue; end
-            if not v["Important"]["Data"]:FindFirstChild("Owner") then continue; end
-            if not v["Important"]["Data"]["Owner"].Value == LocalPlayer.DisplayName then continue; end
-            Farm = v; break;
+        for _, farm in pairs(game.Workspace["Farm"]:GetChildren()) do
+            if not farm:FindFirstChild("Important") then continue; end
+            if not farm["Important"]:FindFirstChild("Data") then continue; end
+            if not farm["Important"]["Data"]:FindFirstChild("Owner") then continue; end
+            if not farm["Important"]["Data"]["Owner"].Value == LocalPlayer.DisplayName then continue; end
+            Farm = farm; break;
         end
         if Farm == nil then task.wait(.1); else break; end
-    end
-
-    for _, v in pairs(Farm["Important"]["Plants_Physical"]:GetChildren()) do
-        
     end
 
     -------------------
     -- [ FUNCTIONS ] --
     -------------------
+
+    ----------------
+    -- [ EVENTS ] --
+    ----------------
+    local Moonlit = 0;
+    local Frozen = 0;
+    local Shocked = 0;
+    for _, crop in pairs(Farm["Important"]["Plants_Physical"]:GetChildren()) do
+        if Data["Crops"][crop.Name]["Multi"] then
+            for _, fruit in pairs(crop["Fruits"]:GetChildren()) do
+                if fruit:GetAttribute("Moonlit") then Moonlit = Moonlit + 1; Utility:Instance("Highlight", { Parent = fruit; }) end
+                if fruit:GetAttribute("Frozen") then Frozen = Frozen + 1; end
+                if fruit:GetAttribute("Shocked") then Shocked = Shocked + 1; end
+            end
+        else
+            if crop:GetAttribute("Moonlit") then Moonlit = Moonlit + 1; Utility:Instance("Highlight", { Parent = fruit; }) end
+            if crop:GetAttribute("Frozen") then Frozen = Frozen + 1; end
+            if crop:GetAttribute("Shocked") then Shocked = Shocked + 1; end
+        end
+    end
+    --print("Moonlit: "..tostring(Moonlit))
+    --print("Frozen: "..tostring(Frozen))
+    --print("Shocked: "..tostring(Shocked))
 
     print("Loaded Grow a Garden Script!");
 end)
