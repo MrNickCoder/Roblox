@@ -1,4 +1,5 @@
 if not game:IsLoaded() then game.Loaded:Wait() end
+if game:GetService("HttpService"):JSONDecode(game:HttpGet("https://apis.roblox.com/universes/v1/places/".. game.PlaceId .."/universe")).universeId ~= 7436755782 then return; end
 
 --------------------
 -- [[ SERVICES ]] --
@@ -46,7 +47,11 @@ local Success, Result = pcall(function()
             if not v["Important"]["Data"]["Owner"].Value == LocalPlayer.DisplayName then continue; end
             Farm = v; break;
         end
-        if Farm == nil then task.wait(.1); end
+        if Farm == nil then task.wait(.1); else break; end
+    end
+
+    for _, v in pairs(Farm["Important"]["Plants_Physical"]:GetChildren()) do
+        
     end
 
     -------------------

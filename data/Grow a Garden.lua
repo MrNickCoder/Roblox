@@ -44,12 +44,12 @@ return {
         ["Venus flytrap"] = { ["Multi"] = true; };
         ["Lotus"] = { ["Multi"] = true; };
         -- Lunar Event
-        ["Glowshroom"] = { ["Multi"] = false; };
-        ["Mint"] = { ["Multi"] = false; };
-        ["Moonflower"] = { ["Multi"] = false; };
-        ["Starfruit"] = { ["Multi"] = false; };
-        ["Moonglow"] = { ["Multi"] = false; };
-        ["Moon Blossom"] = { ["Multi"] = false; };
+        ["Glowshroom"] = { ["Multi"] = true; };
+        ["Mint"] = { ["Multi"] = true; };
+        ["Moonflower"] = { ["Multi"] = true; };
+        ["Starfruit"] = { ["Multi"] = true; };
+        ["Moonglow"] = { ["Multi"] = true; };
+        ["Moon Blossom"] = { ["Multi"] = true; };
         -- Other Seeds
         ["Cherry Blossom"] = { ["Multi"] = true; };
     };
