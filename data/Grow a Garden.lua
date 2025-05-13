@@ -44,6 +44,7 @@ return {
         ["Venus flytrap"] = { ["Multi"] = true; };
         ["Lotus"] = { ["Multi"] = true; };
         -- Lunar Event
+        ["Nightshade"] = { ["Multi"] = false; };
         ["Glowshroom"] = { ["Multi"] = true; };
         ["Mint"] = { ["Multi"] = true; };
         ["Moonflower"] = { ["Multi"] = true; };

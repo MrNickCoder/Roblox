@@ -44,7 +44,7 @@ local Success, Result = pcall(function()
             if not farm:FindFirstChild("Important") then continue; end
             if not farm["Important"]:FindFirstChild("Data") then continue; end
             if not farm["Important"]["Data"]:FindFirstChild("Owner") then continue; end
-            if not farm["Important"]["Data"]["Owner"].Value == LocalPlayer.DisplayName then continue; end
+            if not farm["Important"]["Data"]["Owner"].Value == LocalPlayer.Name then continue; end
             Farm = farm; break;
         end
         if Farm == nil then task.wait(.1); else break; end
@@ -73,9 +73,6 @@ local Success, Result = pcall(function()
             if crop:GetAttribute("Shocked") then Shocked = Shocked + 1; end
         end
     end
-    --print("Moonlit: "..tostring(Moonlit))
-    --print("Frozen: "..tostring(Frozen))
-    --print("Shocked: "..tostring(Shocked))
 
     print("Loaded Grow a Garden Script!");
 end)
