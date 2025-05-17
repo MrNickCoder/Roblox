@@ -19,6 +19,7 @@ return {
         ["Mushroom"] = { ["Multi"] = false; };
         ["Pepper"] = { ["Multi"] = true; };
         ["Cacao"] = { ["Multi"] = true; };
+        ["Beanstalk"] = { ["Multi"] = true; };
         -- Seed Packs (Daily Quest)
         ["Lemon"] = { ["Multi"] = true; };
         ["Pineapple"] = { ["Multi"] = true; };
@@ -54,7 +55,6 @@ return {
         -- Bloodmoon & Meteor Shower
         ["Blood Banana"] = { ["Multi"] = true; };
         ["Moon Melon"] = { ["Multi"] = false; };
-        ["Beanstalk"] = { ["Multi"] = true; };
         -- Other Seeds
         ["Cherry Blossom"] = { ["Multi"] = true; };
     };
