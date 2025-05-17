@@ -51,6 +51,10 @@ return {
         ["Starfruit"] = { ["Multi"] = true; };
         ["Moonglow"] = { ["Multi"] = true; };
         ["Moon Blossom"] = { ["Multi"] = true; };
+        -- Bloodmoon & Meteor Shower
+        ["Blood Banana"] = { ["Multi"] = true; };
+        ["Moon Melon"] = { ["Multi"] = false; };
+        ["Beanstalk"] = { ["Multi"] = true; };
         -- Other Seeds
         ["Cherry Blossom"] = { ["Multi"] = true; };
     };
