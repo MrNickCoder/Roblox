@@ -1137,14 +1137,12 @@ if Success then
 	Embed:Append("Success Execution");
 	Embed:SetColor(Color3.fromRGB(0, 255, 0));
 	Embed:SetTimestamp(os.time());
-	Webhook:Send("https://discord.com/api/webhooks/1348458639886913676/4_VhSrcVKLiz2V3mkUgeoEPQV3AWiIOIrhhb4ZyN_YCxFgv6auOfA7SeXt5q6UjQIQyP?thread_id=1348457378907164722");
 	StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Successfully Loaded Script!"; });
 else
 	Embed:AppendLine("Error Execution");
 	Embed:Append(Result);
 	Embed:SetColor(Color3.fromRGB(255, 0, 0));
 	Embed:SetTimestamp(os.time());
-	Webhook:Send("https://discord.com/api/webhooks/1348458639886913676/4_VhSrcVKLiz2V3mkUgeoEPQV3AWiIOIrhhb4ZyN_YCxFgv6auOfA7SeXt5q6UjQIQyP?thread_id=1348457472645660703");
 	StarterGui:SetCore("SendNotification", { Title = "Paradoxium"; Text = "Error Loading Script!"; });
 	error(Result);
 end

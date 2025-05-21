@@ -69,8 +69,12 @@ do
 		return #self["embeds"]
 	end
 
-	function Webhook:Send(url)
+	function Webhook:Send(discord_id, webhook_key, thread_id)
 		local headers = { ["content-type"] = "application/json" }
+		local url = ""
+
+		local url = "https://discord.com/api/webhooks/"..discord_id.."/"..webhook_key
+		if thread_id and thread_id ~= "" then url = url.."?"..thread_id end
 
 		if typeof(url) == "string" then
 			local request = http_request or request or HttpPost or syn.request or http.request

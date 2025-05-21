@@ -21,7 +21,6 @@ return {
         ["Cacao"] = { ["Multi"] = true; };
         ["Beanstalk"] = { ["Multi"] = true; };
         -- Seed Packs (Daily Quest)
-        ["Lemon"] = { ["Multi"] = true; };
         ["Pineapple"] = { ["Multi"] = true; };
         ["Peach"] = { ["Multi"] = true; };
         ["Raspberry"] = { ["Multi"] = true; };
@@ -56,6 +55,7 @@ return {
         ["Blood Banana"] = { ["Multi"] = true; };
         ["Moon Melon"] = { ["Multi"] = false; };
         -- Other Seeds
+        ["Lemon"] = { ["Multi"] = true; };
         ["Cherry Blossom"] = { ["Multi"] = true; };
     };
     ["Gears"] = {
